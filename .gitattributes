@@ -1,2 +1,0 @@
-*.csv filter=lfs diff=lfs merge=lfs -text
-toy_data/* filter=lfs diff=lfs merge=lfs -text
