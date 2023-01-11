@@ -96,13 +96,17 @@ with tf.Session() as sess:
     print('Learning Finished!')
 
     print('###################################################################')
-    print(' Test Model and check accuracy ')
+    print(' Test Model and check accuracy 1')
     print('###################################################################')
 
     prediction = tf.argmax(logits, 1)
     is_correct = tf.equal(prediction, tf.argmax(Y, 1))
     accuracy = tf.reduce_mean(tf.cast(is_correct, tf.float32))
     Y_one_hot = np.eye(nb_classes)[test_labels]
+
+    print('###################################################################')
+    print(' Test Model and check accuracy 2')
+    print('###################################################################')
 
     now = datetime.datetime.now()
     nowDatetime = now.strftime('%Y-%m-%d %H:%M:%S')
