@@ -4,6 +4,7 @@ import pandas as pd
 tf.compat.v1.disable_eager_execution()
 import datetime
 
+
 # read_data_sets() 를 통해 데이터를 객체형태로 받아오고
 # 정답(label)은 한 자리 숫자로 저장되어 있기 때문에
 # one_hot 옵션을 통해 정답(label) 을 one-hot 인코딩된 10자리 형태로 받아옴
