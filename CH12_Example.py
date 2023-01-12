@@ -1,6 +1,8 @@
 import tensorflow.compat.v1 as tf
 import numpy as np
 tf.compat.v1.disable_eager_execution()
+import tensorflow_addons as tfa
+from tf_slim.layers import layers as _layers
 
 # 'gohome'  Data Creation
 idx2char = ['g', 'o', 'h', 'm', 'e']  # g = 0, o = 1, h = 2, m = 3, e = 4
@@ -23,7 +25,7 @@ sequence_length = 5  # 입력으로 들어가는 문장 길이 gohom == 5
 learning_rate = 0.1
 
 X = tf.placeholder(tf.float32, [None, sequence_length, input_dim])
-T = tf.placeholder(tf.int32, [None, sequence_length])
+Y = tf.placeholder(tf.int32, [None, sequence_length])
 
 cell = tf.contrib.rnn.BasicRNNCell(num_units=hidden_size)  # BasicRNNCell(rnn_size)
 
@@ -33,21 +35,21 @@ outputs, _states = tf.nn.dynamic_rnn(cell, X, initial_state=initial_state, dtype
 
 weights = tf.ones([batch_size, sequence_length])
 
-seq_loss = tf.contrib.seq2seq.sequence_loss(logits=outputs, targets=T, weights=weights)
+seq_loss = tf.contrib.seq2seq.sequence_loss(logits=outputs, targets=Y, weights=weights)
 
 loss = tf.reduce_mean(seq_loss)
 
 train = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(loss)
 
-y = prediction = tf.argmax(outputs, axis=2)
+Y = prediction = tf.argmax(outputs, axis=2)
 
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
 
     for step in range(2001):
 
-        loss_val, _ = sess.run([loss, train], feed_dict={X: x_one_hot, T: t_data})
-        result = sess.run(y, feed_dict={X: x_one_hot})
+        loss_val, _ = sess.run([loss, train], feed_dict={X: x_one_hot, Y: t_data})
+        result = sess.run(Y, feed_dict={X: x_one_hot})
 
         if step % 400 == 0:
             print("step = ", step, ", loss = ", loss_val, ", prediction = ", result, ", target = ", t_data)
