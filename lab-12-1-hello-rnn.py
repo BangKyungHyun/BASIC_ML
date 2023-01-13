@@ -145,8 +145,7 @@ print("weights = ", weights)
 sequence_loss = tfa.seq2seq.sequence_loss(logits=outputs3, targets=Y, weights=weights)
 loss = tf.reduce_mean(sequence_loss)
 train = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(loss)
-
-prediction = tf.argmax(outputs3, axis=2)
+prediction = tf.argmax(outputs, axis=2)
 
 '''
 with 구문 세션 생성
