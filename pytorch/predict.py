@@ -18,7 +18,6 @@ def load(fn, device):
     d = torch.load(fn, map_location=device)
 
     return d['model'], d['config']
-
 def plot(x, y_hat):
     for i in range(x.size(0)):
         img = (np.array(x[i].detach().cpu(), dtype='float')).reshape(28,28)
