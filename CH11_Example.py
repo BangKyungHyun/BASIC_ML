@@ -23,7 +23,7 @@ test_images = test_images  / 255.
 
 # 입력노드, 은닉노드, 출력노드, 학습율, 반복횟수, 배치 개수 등 설정
 learning_rate = 0.1  # 학습율
-num_epochs = 100# 반복횟수
+num_epochs = 10 # 반복횟수
 batch_size = 20      # 한번에 입력으로 주어지는 MNIST 개수
 
 input_nodes = 784     # 입력노드 개수
