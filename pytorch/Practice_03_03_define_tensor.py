@@ -1,38 +1,8 @@
 import torch
-
 # Tensor Allocation
 
-W = torch.FloatTensor([[1, 2],
-                       [3, 4],
-                       [5, 6]])
-b = torch.FloatTensor([2,2])
-
-def linear(x, W, b):
-    y = torch.matmul(x,W) + b
-
-    return y
-
-x = torch.FloatTensor(4,3)
-
-y = linear(x, W ,b)
-print("y = ",y)
-print("y.size() = ",y.size())
-
-import torch.nn as nn
-
-class Mylinaer(nn.Module):
-
-    def __init__(self, input_dim=3, output_dim=2):
-        self.input_dim = input_dim
-        self.output_dim = output_dim
-
-        super().__init__()
-
-        self.W = torch.FloatTensor(input_dim, output_dim)
-        self.b = torch.FloatTensor(output_dim)
-
-
-'''
+ft = torch.FloatTensor([[1, 2],
+                        [3, 4]])
 print(ft);
 
 lt = torch.LongTensor([[1, 2],
@@ -95,4 +65,3 @@ print(x.shape[1])
 
 print(x.size(-1))
 print(x.shape[-1])
-'''
