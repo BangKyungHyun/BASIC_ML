@@ -28,8 +28,8 @@ class Mylinear(nn.Module):
 
         super().__init__()
 
-        self.W = torch.FloatTensor(input_dim, output_dim)
-        self.b = torch.FloatTensor(output_dim)
+        self.W = nn.Parameter(torch.FloatTensor(input_dim, output_dim))
+        self.b = nn.Parameter(torch.FloatTensor(output_dim))
 
     def forward(self,x):
         # |x| = (batch_size, input_dim)

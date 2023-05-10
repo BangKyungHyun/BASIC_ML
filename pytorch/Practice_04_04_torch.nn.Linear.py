@@ -7,6 +7,8 @@ W = torch.FloatTensor([[1, 2],
                        [5, 6]])
 b = torch.FloatTensor([2,2])
 
+
+'''
 def linear(x, W, b):
     y = torch.matmul(x,W) + b
 
@@ -18,7 +20,11 @@ y = linear(x, W ,b)
 print("y = ",y)
 print("y.size() = ",y.size())
 
+'''
 import torch.nn as nn
+
+linear = nn.linear(3,2)
+
 
 class Mylinear(nn.Module):
 
@@ -28,12 +34,11 @@ class Mylinear(nn.Module):
 
         super().__init__()
 
-        self.W = torch.FloatTensor(input_dim, output_dim)
-        self.b = torch.FloatTensor(output_dim)
+        self.linear = nn.Linear(input_dim,out_dim)
 
     def forward(self,x):
         # |x| = (batch_size, input_dim)
-        y = torch.matmul(x, self.W) + self.b
+        y = torch.linear(x)
         # |y| = (batch_size, input_dim) * (input_dim, output_dim)
         #     = (batch_size, output_dim)
 
