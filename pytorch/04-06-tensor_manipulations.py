@@ -77,15 +77,31 @@ print(x.squeeze())
 print(x.squeeze().size())
 
 # Remove certain dimension, if it has only one element. If it is not, there would be no change.
-# 요소가 하나만 있는 경우 특정 차원을 제거합니다. 그렇지 않다면 변화가 없을 것입니다.
+# 요소가 하나만 있는 경우 특정 차원을 제거합니다. 그렇지 않다면 변화가 없을 것 입니다.
 print(x.squeeze(0).size())
 #torch.Size([2, 2])
 print(x.squeeze(1).size())
 #torch.Size([2, 2])
+
 # unsqueeze: Insert dimension at certain index.
 x = torch.FloatTensor([[1, 2],
                        [3, 4]])
 print(x.size())
+#torch.Size([2, 2])
 print(x.unsqueeze(2))
+#torch.Size([1, 2, 2])
 print(x.unsqueeze(-1))
+#torch.Size([2, 2])
 print(x.reshape(2, 2, -1))
+#tensor([[[1.],
+#         [2.]],
+#        [[3.],
+#         [4.]]])
+#tensor([[[1.],
+#         [2.]],
+#        [[3.],
+#         [4.]]])
+#tensor([[[1.],
+#         [2.]],
+#        [[3.],
+#         [4.]]])
