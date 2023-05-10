@@ -4,20 +4,28 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+# 실습에서 사용할 데이터셋을 불러옴
 from sklearn.datasets import load_boston
 boston = load_boston()
 
+# 보스턴 주택 가격 데이터셋을 대한 설명이 자세하게 출력됨
 print(boston.DESCR)
 
+# 데이터셋은 506개의 샘플을 가지고 있으며 13개의 속성들과 이에 타깃값(label)을 갖고 있음
+# 간단한 탐험적 데이터 분석을 위해 판다스 데이터 프레임으로 변환 후에 데이터 일부를 확인함
 df = pd.DataFrame(boston.data, columns=boston.feature_names)
 df["TARGET"] = boston.target
 df.tail()
+print("df.tail()\n", df.tail())
 
-
-
+# 각 속성의 분포와 속성 사이의 선형적 관계 유무를 파악하기 위해 페어플롯을 그림
 sns.pairplot(df)
 plt.show()
 
+# Target 속성에 대응하는 맨 마지막을 줄을 살펴보면 일부 속성들이 Target 속성과
+# 약간의 선형적 관계를 띄는 것을 볼 수 있음
+# 선형적 관계를 띄는 것으로 보이는 일부 속성을 추려 내여 다시 페어플롯을 그림
+# 그림의 맨 첫 줄이 target 속성과 대응하여 그린 것임
 cols = ["TARGET", "INDUS", "RM", "LSTAT", "NOX", "DIS"]
 
 df[cols].describe()
@@ -30,21 +38,24 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 
+# Numpy 데이터를 파이토치 실수형 텐서로 변환함
 data = torch.from_numpy(df[cols].values).float()
 
-data.shape
-# Split x and y.
+print("data.shape = ", data.shape)
+
+# 데이터를 입력 x와 출력 y로 나눔
 y = data[:, :1]
 x = data[:, 1:]
 
-print(x.shape, y.shape)
+print("x.shape = ", x.shape, "y.shape = ", y.shape)
 
-# Define configurations.
+# 학습에 필요한 설정값을 정함
 n_epochs = 2000
 learning_rate = 1e-3
 print_interval = 100
 
-# Define model.
+# 모델을 생성. 텐서x의 마지막 차원의 크기를 선형 계층의 입력 크기로 주고,
+# 텐서 y의 마지막 차원의 크기를 선형 계층의 출력 크기로 함
 model = nn.Linear(x.size(-1), y.size(-1))
 
 model
