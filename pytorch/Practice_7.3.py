@@ -4,6 +4,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+#실습에서 사용할 데이터셋을 불러옴
 from sklearn.datasets import load_boston
 boston = load_boston()
 
