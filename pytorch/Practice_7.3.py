@@ -63,10 +63,13 @@ model
 
 # Instead of implement gradient equation,
 # we can use <optim class> to update model parameters, automatically.
-# 옵티마이져 생서.
+# 옵티마이져 생성. 파이토치에서 제공하는 옵티마이저 클래스를 통해 최적화 작업을 수행
+# backward함수를 호출한 후 옵티마이저 객체에서 step 함수를 호출하면 경사하강을
+# 1회 수행한다.
 optimizer = optim.SGD(model.parameters(),
                       lr=learning_rate)
 
+# 정해진 에폭만큼 for 반복문을 통해 최적화를 수행
 for i in range(n_epochs):
     y_hat = model(x)
     loss = F.mse_loss(y_hat, y)
@@ -79,8 +82,13 @@ for i in range(n_epochs):
     if (i + 1) % print_interval == 0:
         print('Epoch %d: loss=%.4e' % (i + 1, loss))
 
+# 결과 확인
+# 모델을 통과한 y_hat를 가져와서 실제 y와 비교하기 위한 페어 플롯을 그림 
 df = pd.DataFrame(torch.cat([y, y_hat], dim=1).detach_().numpy(),
                   columns=["y", "y_hat"])
 
+# 왼쪽 위에 그려진 y의 분포와 오른쪽 아래에 그려진 y_hat의 분포가 약간은 다르게 나타난 것을
+# 볼수 있음. 하지만 오른쪽 위에 그려진 y와 왼쪽 아래의 y_hat과의 비교에서는 대부분의 점들이
+# 빨간색 점선 부근에 나타나 있는 것을 확인할 수 있음
 sns.pairplot(df, height=5)
 plt.show()
