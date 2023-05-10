@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="e04970a3-cbf9-43dc-b17b-3358e88cfc7c" name="Changes" comment="수정">
+    <list default="true" id="e04970a3-cbf9-43dc-b17b-3358e88cfc7c" name="Changes" comment="Merge remote-tracking branch 'origin/main'">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Practice_7.3.py" beforeDir="false" afterPath="$PROJECT_DIR$/Practice_7.3.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/04-02-hello_pytorch.py" beforeDir="false" afterPath="$PROJECT_DIR$/Practice_04_02-hello_pytorch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/04-04-tensor.py" beforeDir="false" afterPath="$PROJECT_DIR$/Practice_04_04.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/04-05-tensor_operations.py" beforeDir="false" afterPath="$PROJECT_DIR$/Practice_04_05-tensor_operations.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/04-06-tensor_manipulations.py" beforeDir="false" afterPath="$PROJECT_DIR$/Practice_04_06-tensor_manipulations.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Practice_7.3.2.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Practice_7.3.py" beforeDir="false" afterPath="$PROJECT_DIR$/Practice_07_03.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Practice_7.3_Figure_1.png" beforeDir="false" afterPath="$PROJECT_DIR$/Practice_07_03_Figure_1.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Practice_7.3_Figure_2.png" beforeDir="false" afterPath="$PROJECT_DIR$/Practice_07_03_Figure_2.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Practice_7.3_Figure_3.png" beforeDir="false" afterPath="$PROJECT_DIR$/Practice_07_03_Figure_3.png" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,14 +40,19 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/bangkh21/PycharmProjects/BASIC_ML/pytorch/Practice_7.3.py&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "last_opened_file_path": "C:/Users/bangkh21/PycharmProjects/BASIC_ML/pytorch"
   }
-}</component>
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\bangkh21\PycharmProjects\BASIC_ML\pytorch" />
+    </key>
+  </component>
   <component name="RunManager" selected="Python.Practice_7.3">
     <configuration name="Practice_7.3" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="pytorch" />
@@ -134,7 +147,14 @@
       <option name="project" value="LOCAL" />
       <updated>1683743778269</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Merge remote-tracking branch 'origin/main'">
+      <created>1683744441052</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1683744441052</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -149,8 +169,8 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Merge remote-tracking branch 'origin/main'" />
     <MESSAGE value="수정" />
-    <option name="LAST_COMMIT_MESSAGE" value="수정" />
+    <MESSAGE value="Merge remote-tracking branch 'origin/main'" />
+    <option name="LAST_COMMIT_MESSAGE" value="Merge remote-tracking branch 'origin/main'" />
   </component>
 </project>
