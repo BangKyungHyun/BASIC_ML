@@ -50,6 +50,7 @@ x = data[:, 1:]
 print("x.shape = ", x.shape, "y.shape = ", y.shape)
 
 # 학습에 필요한 설정값을 정함
+
 n_epochs = 2000
 learning_rate = 1e-3
 print_interval = 100
@@ -62,6 +63,7 @@ model
 
 # Instead of implement gradient equation,
 # we can use <optim class> to update model parameters, automatically.
+# 옵티마이져 생서.
 optimizer = optim.SGD(model.parameters(),
                       lr=learning_rate)
 
