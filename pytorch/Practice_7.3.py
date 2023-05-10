@@ -13,6 +13,8 @@ df = pd.DataFrame(boston.data, columns=boston.feature_names)
 df["TARGET"] = boston.target
 df.tail()
 
+
+
 sns.pairplot(df)
 plt.show()
 
