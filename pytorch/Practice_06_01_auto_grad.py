@@ -29,7 +29,7 @@ print("x = ",x)
 # x =  tensor([[1., 2.],
 #        [3., 4.]], requires_grad=True)
 
-print("x3.numpy() = ",x3.numpy())
+#print("x3.numpy() = ",x3.numpy())
 
 # Traceback (most recent call last):
 #  File "C:\Users\KBDS\PycharmProjects\BASIC_ML\pytorch\Practice_06_01_auto_grad.py", line 32, in <module>
