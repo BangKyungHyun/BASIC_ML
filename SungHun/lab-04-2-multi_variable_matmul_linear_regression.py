@@ -36,12 +36,15 @@ train = optimizer.minimize(cost)
 
 # Launch the graph in a session.
 sess = tf.Session()
+
 # Initializes global variables in the graph.
 sess.run(tf.global_variables_initializer())
 
 for step in range(2000000001):
+
     cost_val, w_val, b_val, hy_val, _ = sess.run(
         [cost, W, b, hypothesis, train], feed_dict={X: x_data, Y: y_data})
+
     if step % 100000 == 0:
 
         #print(step, "Cost: ", cost_val, "\nPrediction:\n", hy_val)
