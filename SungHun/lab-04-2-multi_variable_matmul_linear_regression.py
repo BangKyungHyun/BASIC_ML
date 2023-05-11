@@ -43,8 +43,10 @@ for step in range(2000000001):
     cost_val, w_val, b_val, hy_val, _ = sess.run(
         [cost, W, b, hypothesis, train], feed_dict={X: x_data, Y: y_data})
     if step % 100000 == 0:
+
         #print(step, "Cost: ", cost_val, "\nPrediction:\n", hy_val)
         now         = datetime.datetime.now()
         nowDatetime = now.strftime('%Y-%m-%d %H:%M:%S')
+
         print(nowDatetime,"\nStep:", format(step,',d'), "\nw=\n", w_val, "\nb=", b_val,
               "Cost:", cost_val,"\nPrediction:\n", hy_val)
