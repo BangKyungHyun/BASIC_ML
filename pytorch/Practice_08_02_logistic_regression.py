@@ -55,9 +55,9 @@ y = data[:, -1:]
 print('x.shape, y.shape =',x.shape, y.shape)
 # x.shape, y.shape = torch.Size([569, 10]) torch.Size([569, 1])
 
-n_epochs = 2000000
+n_epochs = 20000000
 learning_rate = 1e-2
-print_interval = 20000
+print_interval = 200000
 
 class MyModel(nn.Module):
 
