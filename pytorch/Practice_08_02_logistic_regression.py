@@ -55,9 +55,9 @@ y = data[:, -1:]
 print('x.shape, y.shape =',x.shape, y.shape)
 # x.shape, y.shape = torch.Size([569, 10]) torch.Size([569, 1])
 
-n_epochs = 200000
+n_epochs = 2000000
 learning_rate = 1e-2
-print_interval = 10000
+print_interval = 20000
 
 class MyModel(nn.Module):
 
@@ -125,7 +125,8 @@ total_cnt = float(y.size(0))
 print('Accuracy: %.4f' % (correct_cnt / total_cnt))
 # Accuracy: 0.9666
 
-df= pd.DataFrame(torch.cat([y,y_hat], dim=1).detach().numpy(),
-                 columns=["y","y_hat"])
+df = pd.DataFrame(torch.cat([y, y_hat], dim=1).detach().numpy(),
+                  columns=["y", "y_hat"])
+
 sns.histplot(df, x='y_hat', hue='y', bins=50, stat='probability')
 plt.show()
