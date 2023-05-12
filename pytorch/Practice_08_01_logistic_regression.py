@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 from matplotlib import pyplot as plt
 
+# Activation Functions
 x = torch.sort(torch.randn(100) * 10)[0]
 
 print('x =', x )
@@ -22,6 +23,8 @@ x = tensor([-34.0305, -28.1465, -24.9094, -24.8057, -20.1777, -19.5317, -18.8103
           9.9577,  10.2843,  11.0021,  11.2206,  11.7517,  11.7841,  13.5676,
          15.0509,  17.2372])
 '''
+
+# Sigmoid
 act = nn.Sigmoid()
 print('act(x) = ',act(x) )
 
@@ -71,6 +74,7 @@ torch.sigmoid(x) =  tensor([3.9047e-09, 3.9306e-09, 4.6676e-08, 5.2302e-08, 1.75
 plt.plot(x.numpy(), torch.sigmoid(x).numpy())
 plt.show()
 
+# Tanh
 act = nn.Tanh()
 print('act(x) = ',act(x) )
 '''
