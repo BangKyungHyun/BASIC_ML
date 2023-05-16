@@ -3,6 +3,7 @@ import torch.nn as nn
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import datetime
 
 # Load Dataset from sklearn
 # 위스콘신 유방암 데이터셋은 30개의 속성을 가지며 이를 통해 유방방 여부 예측
@@ -94,7 +95,9 @@ for i in range(n_epochs):
     optimizer.step()
 
     if (i + 1) % print_interval == 0:
-        print('Epoch %d: loss=%.4e' % (i + 1, loss))
+        now = datetime.datetime.now()
+        nowDatetime = now.strftime('%Y-%m-%d %H:%M:%S')
+        print(nowDatetime,'Epoch %d: loss=%.4e' % (i + 1, loss))
 
 '''
 Epoch 10000: loss=2.7718e-01

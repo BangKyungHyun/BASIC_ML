@@ -101,9 +101,9 @@ for i in range(n_epochs):
 
     if ( i + 1) % print_interval == 0:
 
-        now         = datetime.datetime.now()
+        now = datetime.datetime.now()
         nowDatetime = now.strftime('%Y-%m-%d %H:%M:%S')
-        print(format(step,',d'),'Epoch %d: loss=%.4e' % (i + 1, loss))
+        print(nowDatetime,'Epoch %d: loss=%.4e' % (i + 1, loss))
 
 # Let's see the result!
 
