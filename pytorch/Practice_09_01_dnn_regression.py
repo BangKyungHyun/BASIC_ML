@@ -4,6 +4,7 @@
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import datetime
 
 from sklearn.preprocessing import StandardScaler
 
@@ -99,7 +100,10 @@ for i in range(n_epochs):
     optimizer.step()
 
     if ( i + 1) % print_interval == 0:
-        print('Epoch %d: loss=%.4e' % (i + 1, loss))
+
+        now         = datetime.datetime.now()
+        nowDatetime = now.strftime('%Y-%m-%d %H:%M:%S')
+        print(format(step,',d'),'Epoch %d: loss=%.4e' % (i + 1, loss))
 
 # Let's see the result!
 
