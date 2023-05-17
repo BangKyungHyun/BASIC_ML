@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import datetime
 
 # Load Dataset from sklearn
-# 위스콘신 유방암 데이터셋은 30개의 속성을 가지며 이를 통해 유방방 여부 예측
+# 위스콘신 유방암 데이터셋은 30개의 속성을 가지며 이를 통해 유방암 여부 예측
 from sklearn.datasets import load_breast_cancer
 cancer = load_breast_cancer()
 
@@ -22,6 +22,10 @@ df['class'] = cancer.target
 #sns.pairplot(df[['class'] + list(df.columns[:10])])
 #plt.show()
 
+# 각 속성별 샘플의 점들이 0번 클래스에 해당하는 경우 아래쪽에 1번 클래스에
+# 해당하는 경우 위쪽으로 찍혀 있음
+# 만약 이 점들의 클래스별 그룹이 특정값을 기준으로 명확하게 나눠진다면 좋다는
+# 것을 확인
 # Pair plot with std features
 #sns.pairplot(df[['class'] + list(df.columns[10:20])])
 # plt.show()
@@ -35,6 +39,9 @@ cols = ["mean radius", "mean texture",
         "worst radius", "worst texture",
         "worst smoothness", "worst compactness", "worst concave points",
         "class"]
+
+# 0번 클래스는 파란색, 1번 클래스는 주황색으로 표시. 겹치는 영역이 적을수록 좋은
+# 속성임
 
 for c in cols[:-1]:
     sns.histplot(df, x=c, hue=cols[-1], bins=50, stat='probability')
@@ -51,6 +58,7 @@ data = torch.from_numpy(df[cols].values).float()
 print('data.shape = ', data.shape)
 # data.shape =  torch.Size([569, 11])
 
+# 선형회귀와 같이 텐서 x와 텐서 y을 가져옴 
 x = data[:, :-1]
 y = data[:, -1:]
 print('x.shape, y.shape =',x.shape, y.shape)
@@ -60,6 +68,10 @@ n_epochs = 20000000
 learning_rate = 1e-2
 print_interval = 200000
 
+# nn.Module을 상속받은 자식 클래스를 정의할 때에는 보통 두개의 함수(메서드)를
+# 오버라이드함. 또한 __init__ 함수를 통해 모델을 구성하는데 필요한 내부모듈
+# (선형계층)을 미리 선언함. forward함수는 미리 선언된 내부 모듈을 활용하여 
+# 계산을 수행함
 class MyModel(nn.Module):
 
     def __init__(self, input_dim, output_dim):

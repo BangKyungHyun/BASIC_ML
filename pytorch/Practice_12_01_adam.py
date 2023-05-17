@@ -30,7 +30,7 @@ x = data[:, :-1]
 y = data[:, -1:]
 print('x.shape, y.shape =',x.shape, y.shape)
 
-n_epochs = 4000
+n_epochs = 40
 batch_size = 256
 print_interval = 200
 
@@ -93,8 +93,6 @@ y = torch.cat(y_, dim=0)
 df = pd.DataFrame(torch.cat([y,y_hat], dim=1).detach().numpy(),columns=["y","y_hat"])
 sns.pairplot(df, height=5)
 plt.show()
-
-
 
 
 

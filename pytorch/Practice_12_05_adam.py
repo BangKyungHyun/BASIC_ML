@@ -1,7 +1,9 @@
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+%matplotlib inline
 import datetime
+
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.datasets import fetch_california_housing

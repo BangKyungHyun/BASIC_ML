@@ -3,9 +3,10 @@ import torch.nn as nn
 from matplotlib import pyplot as plt
 
 # Activation Functions
+# torch.sort()에 텐서를 입력하면, 정렬된 값과 인덱스를 반환한다.
 x = torch.sort(torch.randn(100) * 10)[0]
-
 print('x =', x )
+
 '''
 x = tensor([-34.0305, -28.1465, -24.9094, -24.8057, -20.1777, -19.5317, -18.8103,
         -18.5662, -17.9374, -17.5032, -16.6117, -16.0546, -15.6237, -15.1198,
@@ -26,7 +27,7 @@ x = tensor([-34.0305, -28.1465, -24.9094, -24.8057, -20.1777, -19.5317, -18.8103
 
 # Sigmoid
 act = nn.Sigmoid()
-print('act(x) = ',act(x) )
+print('act(x) = ',act(x))
 
 '''
 act(x) =  tensor([3.2884e-11, 2.6115e-10, 1.1214e-08, 1.9541e-08, 3.4166e-06, 5.9072e-06,
