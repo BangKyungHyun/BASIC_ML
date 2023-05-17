@@ -1,6 +1,7 @@
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import datetime
 
 from sklearn.preprocessing import  StandardScaler
 
@@ -26,7 +27,7 @@ plt.show()
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-imoprt torch.optim as optim
+import torch.optim as optim
 
 data = torch.from_numpy(df.values).float()
 print('data.shape = ',data.shape)
@@ -59,7 +60,7 @@ optimizer = optim.SGD(model.parameters(), lr = learning_rate)
 # |x| = = (total_size, input_dim)
 # |y| = = (total_size, output_dim)
 
-for i range(n_epochs):
+for i in range(n_epochs):
     #suffle thn index to feed-forward
     indices = torch.randperm(x.size(0))
     x_ = torch.index_select(x, dim=0, index=indices)
@@ -67,4 +68,36 @@ for i range(n_epochs):
 
     x_ = x_.split(batch_size, dim=0)
     y_ = y_.split(batch_size, dim=0)
+    # |x_[i]| = = (total_size, input_dim)
+    # |y_[i]| = = (total_size, output_dim)
+
+    y_hat = []
+    total_loss = 0
+
+    for x_i, y_i in zip(x_, y_):
+        # |x_i| = |x_[i]|
+        # |y_i| = |y_[i]|
+        y_hat_i = model(x_i)
+        loss = F.mse_loss(y_hat_i, y_i)
+
+        optimizer.zero_grad()
+        loss.backward()
+
+        optimizer.step()
+
+        total_loss += float(loss) # This is very important to prevent memory leak
+        y_hat += [y_hat_i]
+
+    total_loss = total_loss / len(x_)
+    if( i + 1 ) % print_interval == 0:
+        now = datetime.datetime.now()
+        nowDatetime = now.strftime('%Y-%m-%d %H:%M:%S')
+        print(nowDatetime, 'Epoch %d: loss=%.4e' % (i + 1, total_loss))
+
+y_hat = torch.cat(y_hat, dim=0)
+y = torch.cat(y_, dim=0)
+# |y_hat| = (total_size, output_dim)
+# |y| = (total_size, output_dim)
+
+
 
