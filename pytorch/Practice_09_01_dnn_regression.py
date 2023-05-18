@@ -12,21 +12,29 @@ from sklearn.datasets import load_boston
 boston = load_boston()
 
 df = pd.DataFrame(boston.data, columns=boston.feature_names)
+# 출력값은 TARGET속성으로 저장되도록 함
 df["TARGET"] = boston.target
-df.tail()
+print('df.tail() =\n',df.tail())
 
+# 보스톤 주택 가격 데이터넷은 13개의 속성을 가지며 506개의 샘플로 구성되어 있음.
+# 일부 속성만을 활용하여 선형 회귀를 학습했던 것과 달리 이번에는 전체 속성들을 활용하여 
+# 심층신경망 학습을 진행함
+# 조금 더 쉽고 수월한 최적화 및 성능향샹을 위해 표준 스케줄링을 통해 입력값을 정규화 함
+# 보스턴 주택 가격 데이터셋의 각 열이 정규분포를 따른다고 가정하고 표준 스케줄링을 적용함
+# 다음 테이블은 표준 스케일링을 적용한 결과를 보여 줌
 scalar = StandardScaler()
 scalar.fit(df.values[:, :-1])
 df.values[:, :-1] = scalar.transform(df.values[:, :-1]).round(4)
-df.tail()
+print('df.tail() =\n',df.tail())
 
 # Train Model with PyTorch
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 
+# 학습에 필요한 패키지를 불려오고 판다스에 저장된 넘파이 값을 파이토치 텐서로 변환하여
+# 입력 텐서 x와 출력 텐서 y를 만듬
 data = torch.from_numpy(df.values).float()
 print('data.shape = ',data.shape)
 # data.shape =  torch.Size([506, 14])
@@ -43,7 +51,7 @@ print_interval = 5000
 # Build Model using nn.Module
 
 relu = nn.ReLU()
-leaky_relu = nn.LeakyReLU(0.1)
+ leaky_relu = nn.LeakyReLU(0.1)
 
 class MyModel(nn.Module):
 
@@ -106,16 +114,3 @@ for i in range(n_epochs):
         print(nowDatetime,'Epoch %d: loss=%.4e' % (i + 1, loss))
 
 # Let's see the result!
-
-
-
-
-
-
-
-
-
-
-
-
-

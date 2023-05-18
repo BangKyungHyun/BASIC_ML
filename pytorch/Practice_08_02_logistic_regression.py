@@ -19,16 +19,15 @@ df['class'] = cancer.target
 # Pair plot with mean features
 # 각 10개 속성이 평균, 표준편차, 최악값을 나타내고 있기 때문에 속성이 30개임
 # 평균과 표준편차, 최악 속성들만 따로 모아서 class속성과 비교하는 페어플롯 표출
-#sns.pairplot(df[['class'] + list(df.columns[:10])])
-#plt.show()
+sns.pairplot(df[['class'] + list(df.columns[:10])])
+plt.show()
 
 # 각 속성별 샘플의 점들이 0번 클래스에 해당하는 경우 아래쪽에 1번 클래스에
 # 해당하는 경우 위쪽으로 찍혀 있음
-# 만약 이 점들의 클래스별 그룹이 특정값을 기준으로 명확하게 나눠진다면 좋다는
-# 것을 확인
+# 만약 이 점들의 클래스별 그룹이 특정값을 기준으로 명확하게 나눠진다면 좋다는 것을 확인
 # Pair plot with std features
-#sns.pairplot(df[['class'] + list(df.columns[10:20])])
-# plt.show()
+sns.pairplot(df[['class'] + list(df.columns[10:20])])
+plt.show()
 
 # Pair plot with worst features
 sns.pairplot(df[['class'] + list(df.columns[20:30])])
@@ -40,15 +39,12 @@ cols = ["mean radius", "mean texture",
         "worst smoothness", "worst compactness", "worst concave points",
         "class"]
 
-# 0번 클래스는 파란색, 1번 클래스는 주황색으로 표시. 겹치는 영역이 적을수록 좋은
-# 속성임
-
+# 0번 클래스는 파란색, 1번 클래스는 주황색으로 표시. 겹치는 영역이 적을수록 좋은 속성임
 for c in cols[:-1]:
     sns.histplot(df, x=c, hue=cols[-1], bins=50, stat='probability')
     #plt.show()
 
 # Train Model with PyTorch
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -68,10 +64,9 @@ n_epochs = 20000000
 learning_rate = 1e-2
 print_interval = 200000
 
-# nn.Module을 상속받은 자식 클래스를 정의할 때에는 보통 두개의 함수(메서드)를
-# 오버라이드함. 또한 __init__ 함수를 통해 모델을 구성하는데 필요한 내부모듈
-# (선형계층)을 미리 선언함. forward함수는 미리 선언된 내부 모듈을 활용하여 
-# 계산을 수행함
+# nn.Module을 상속받은 자식 클래스를 정의할 때에는 보통 두개의 함수(메서드)를 오버라이드함. 
+# 또한 __init__ 함수를 통해 모델을 구성하는데 필요한 내부모듈(선형계층)을 미리 선언함.
+# forward함수는 미리 선언된 내부 모듈을 활용하여 계산을 수행함
 class MyModel(nn.Module):
 
     def __init__(self, input_dim, output_dim):
@@ -90,6 +85,9 @@ class MyModel(nn.Module):
 
         return y
 
+# 로지스틱 회귀 모델 클래스를 생성하고 BCE 손실함수와 옵티마이저도 준비합니다. 선형회귀와
+# 마찬가지로 모델의 입력 크기는 텐서 X의 마지막 차원 크기가 되고 출력크기는 텐서Y의 
+# 마지막 크기가 됨
 model = MyModel(input_dim=x.size(-1),
                 output_dim=y.size(-1))
 crit = nn.BCELoss()
@@ -97,6 +95,7 @@ crit = nn.BCELoss()
 optimizer = optim.SGD(model.parameters(),
                       lr=learning_rate)
 
+# 선형회귀와 똑같은 코드로 학습을 진행함
 for i in range(n_epochs):
     y_hat = model(x)
     loss = crit(y_hat, y)
@@ -134,6 +133,7 @@ Epoch 190000: loss=1.1688e-01
 Epoch 200000: loss=1.1573e-01
 '''
 # Let's see the result!
+# y와 y_hat을 비교하여 정확도 계산
 correct_cnt = (y == (y_hat > .5)).sum()
 total_cnt = float(y.size(0))
 
