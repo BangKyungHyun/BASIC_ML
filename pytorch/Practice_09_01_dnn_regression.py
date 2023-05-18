@@ -51,7 +51,27 @@ print_interval = 5000
 # Build Model using nn.Module
 
 relu = nn.ReLU()
- leaky_relu = nn.LeakyReLU(0.1)
+leaky_relu = nn.LeakyReLU(0.1)
+
+# 심층 신경망 정의
+# nn.Module을 상속받아 Mymodel 이라는 나만이 모델 클래스를 정의함
+# 이러한 심층신경망은 4개의 선형 계층과 비선형을 함수를 갖도록 함
+# __init__함수를 살펴보면 선형계층은 각각 linear1,linear2,linear3,linear4라는 이름을
+# 가지도록 선언 했음. 비선형 함수는 ReLU을 사용함.
+# 다만 선형계층들은 각각 다른 가중치 파리미터를 가지게 되므로 다른 객체로 선언
+# 이와 달이 비선형 활성 함수의 경우에는 학습되는 파라미터를 갖지 않았기 때문에 모든 계층에서
+# 동일하게 동작하므로 한 개만 선언하여 재활용함
+# 각 선형 계층의 입출력 크기는 최초 입력 자원(input_im)과 최종 출력 차원(output_dim)을
+# 제외하고는 임의로 정함
+#
+# forward함수에서는 앞서 선언된 내부 모듈들을 활용하여 피드포워드 연산을 수행할 수 있도록 함
+# x라는 샘플 갯수 곱하기 입력 차원(batch_size, input_dim) 크기의 2차원 텐서가 주어지면
+# 최종적으로 샘플 갯수 곱하기 출력 차원원(batch_size, output_dim)크기의 2차원 텐서로 뱉어
+# 내는 함수가 됨
+# 여기에서 input_dim과 output_dim은 __init__함수에서 미리 입력 받는 것을 볼 수 있음
+##############################################################################
+# 마지막 계층에서는 활성함수를 씌우지 않도록 주의해야 함
+##############################################################################
 
 class MyModel(nn.Module):
 
@@ -80,7 +100,6 @@ model = MyModel(x.size(-1), y.size(-1))
 print('model 1 =  ', model)
 
 # Build Model with LeakyReLU using nn.Sequential
-
 model = nn.Sequential(
     nn.Linear(x.size(-1), 3),
     nn.LeakyReLU(),
