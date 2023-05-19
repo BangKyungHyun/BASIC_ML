@@ -1,4 +1,3 @@
-
 # Regression using Deep Neural Networks
 # Load Dataset from sklearn
 import pandas as pd
@@ -7,7 +6,6 @@ import matplotlib.pyplot as plt
 import datetime
 
 from sklearn.preprocessing import StandardScaler
-
 from sklearn.datasets import load_boston
 boston = load_boston()
 
@@ -15,6 +13,15 @@ df = pd.DataFrame(boston.data, columns=boston.feature_names)
 # 출력값은 TARGET속성으로 저장되도록 함
 df["TARGET"] = boston.target
 print('df.tail() =\n',df.tail())
+# df.tail() =
+#          CRIM   ZN  INDUS  CHAS    NOX  ...    TAX  PTRATIO       B  LSTAT  TARGET
+# 501  0.06263  0.0  11.93   0.0  0.573  ...  273.0     21.0  391.99   9.67    22.4
+# 502  0.04527  0.0  11.93   0.0  0.573  ...  273.0     21.0  396.90   9.08    20.6
+# 503  0.06076  0.0  11.93   0.0  0.573  ...  273.0     21.0  396.90   5.64    23.9
+# 504  0.10959  0.0  11.93   0.0  0.573  ...  273.0     21.0  393.45   6.48    22.0
+# 505  0.04741  0.0  11.93   0.0  0.573  ...  273.0     21.0  396.90   7.88    11.9
+
+# [5 rows x 14 columns]
 
 # 보스톤 주택 가격 데이터넷은 13개의 속성을 가지며 506개의 샘플로 구성되어 있음.
 # 일부 속성만을 활용하여 선형 회귀를 학습했던 것과 달리 이번에는 전체 속성들을 활용하여 
@@ -26,6 +33,15 @@ scalar = StandardScaler()
 scalar.fit(df.values[:, :-1])
 df.values[:, :-1] = scalar.transform(df.values[:, :-1]).round(4)
 print('df.tail() =\n',df.tail())
+# df.tail() =
+#         CRIM      ZN   INDUS    CHAS  ...  PTRATIO       B   LSTAT  TARGET
+# 501 -0.4132 -0.4877  0.1157 -0.2726  ...   1.1765  0.3872 -0.4181    22.4
+# 502 -0.4152 -0.4877  0.1157 -0.2726  ...   1.1765  0.4411 -0.5008    20.6
+# 503 -0.4134 -0.4877  0.1157 -0.2726  ...   1.1765  0.4411 -0.9830    23.9
+# 504 -0.4078 -0.4877  0.1157 -0.2726  ...   1.1765  0.4032 -0.8653    22.0
+# 505 -0.4150 -0.4877  0.1157 -0.2726  ...   1.1765  0.4411 -0.6691    11.9
+#
+# [5 rows x 14 columns]
 
 # Train Model with PyTorch
 import torch
@@ -42,6 +58,7 @@ print('data.shape = ',data.shape)
 x = data[:, -1:]
 y = data[:, :-1]
 print('x.shape, y.shape = ',x.shape, y.shape)
+# x.shape, y.shape =  torch.Size([506, 1]) torch.Size([506, 13])
 
 n_epochs = 100000
 learning_rate = 1e-4
@@ -49,7 +66,6 @@ print_interval = 5000
 
 # Build Models
 # Build Model using nn.Module
-
 relu = nn.ReLU()
 leaky_relu = nn.LeakyReLU(0.1)
 
@@ -99,7 +115,23 @@ class MyModel(nn.Module):
 model = MyModel(x.size(-1), y.size(-1))
 print('model 1 =  ', model)
 
+# model 1 =   MyModel(
+#   (linear1): Linear(in_features=1, out_features=3, bias=True)
+#   (linear2): Linear(in_features=3, out_features=3, bias=True)
+#   (linear3): Linear(in_features=3, out_features=13, bias=True)
+#   (act): ReLU()
+# )
+
 # Build Model with LeakyReLU using nn.Sequential
+# 앞서와 같은 방법으로 직접 나만의 모델 클래스를 정의하는 방법도 아주 좋은 방법입니다.
+# 하지만 지금은 모델 구조가 매우 단순한 편입니다. 입력 텐서를 받아 단순하게 순차적으로
+# 앞으로 하나씩 계산해나가는 것에 불과하기 때문입니다. 이 경우에는 나만의 모델 클래스를
+# 정의하는 대신, 다음과 같이 nn.Sequential 클래스를 활용하여 훨씬 더 쉽게 모델 객체를
+# 선언할 수 있습니다. 다음은 앞서 MyModel 클래스와 똑같은 구조를 갖는 심층신경망을
+# nn.Sequential 클래스를 활용하여 정의하는 모습입니다. 단순히 내가 원하는 연산을 수행할
+# 내부 모듈들을 nn.Sequential을 생성할 때, 순차적으로 넣어주는 것을 볼 수 있습니다.
+# 당연한 것이지만 앞 쪽에 넣은 모듈들의 출력이 바로 뒷 모듈의 입력에 될 수 있도록,
+# 내부 모듈들의 입출력 크기를 잘 적어주어야 할 것입니다
 model = nn.Sequential(
     nn.Linear(x.size(-1), 3),
     nn.LeakyReLU(),
@@ -113,9 +145,18 @@ model = nn.Sequential(
 )
 
 print('model  2 = ', model)
-
-optimizer = optim.SGD(model.parameters(),
-                      lr = learning_rate)
+# model  2 =  Sequential(
+#   (0): Linear(in_features=1, out_features=3, bias=True)
+#   (1): LeakyReLU(negative_slope=0.01)
+#   (2): Linear(in_features=3, out_features=3, bias=True)
+#   (3): LeakyReLU(negative_slope=0.01)
+#   (4): Linear(in_features=3, out_features=3, bias=True)
+#   (5): LeakyReLU(negative_slope=0.01)
+#   (6): Linear(in_features=3, out_features=3, bias=True)
+#   (7): LeakyReLU(negative_slope=0.01)
+#   (8): Linear(in_features=3, out_features=13, bias=True)
+# )
+optimizer = optim.SGD(model.parameters(),lr=learning_rate)
 
 for i in range(n_epochs):
     y_hat = model(x)
@@ -127,9 +168,32 @@ for i in range(n_epochs):
     optimizer.step()
 
     if ( i + 1) % print_interval == 0:
-
         now = datetime.datetime.now()
         nowDatetime = now.strftime('%Y-%m-%d %H:%M:%S')
         print(nowDatetime,'Epoch %d: loss=%.4e' % (i + 1, loss))
-
-# Let's see the result!
+# 2023-05-19 09:50:25 Epoch 5000: loss=1.0746e+00
+# 2023-05-19 09:50:32 Epoch 10000: loss=1.0616e+00
+# 2023-05-19 09:50:39 Epoch 15000: loss=1.0522e+00
+# 2023-05-19 09:50:45 Epoch 20000: loss=1.0445e+00
+# 2023-05-19 09:50:51 Epoch 25000: loss=1.0379e+00
+# 2023-05-19 09:50:57 Epoch 30000: loss=1.0324e+00
+# 2023-05-19 09:51:04 Epoch 35000: loss=1.0276e+00
+# 2023-05-19 09:51:10 Epoch 40000: loss=1.0236e+00
+# 2023-05-19 09:51:17 Epoch 45000: loss=1.0202e+00
+# 2023-05-19 09:51:27 Epoch 50000: loss=1.0172e+00
+# 2023-05-19 09:51:37 Epoch 55000: loss=1.0147e+00
+# 2023-05-19 09:51:45 Epoch 60000: loss=1.0125e+00
+# 2023-05-19 09:51:53 Epoch 65000: loss=1.0105e+00
+# 2023-05-19 09:52:00 Epoch 70000: loss=1.0088e+00
+# 2023-05-19 09:52:07 Epoch 75000: loss=1.0074e+00
+# 2023-05-19 09:52:14 Epoch 80000: loss=1.0060e+00
+# 2023-05-19 09:52:24 Epoch 85000: loss=1.0048e+00
+# 2023-05-19 09:52:31 Epoch 90000: loss=1.0038e+00
+# 2023-05-19 09:52:38 Epoch 95000: loss=1.0028e+00
+# 2023-05-19 09:52:45 Epoch 100000: loss=1.0019e+00
+# Let's see the result!  (샘플대로 했으나 오류 발생)
+# df = pd.DataFrame(torch.cat([y, y_hat], dim=1).detach().numpy(),
+#                   columns=["y", "y_hat"])
+#
+# sns.pairplot(df, height=5)
+# plt.show()
