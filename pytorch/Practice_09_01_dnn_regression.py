@@ -5,10 +5,17 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import datetime
 
+# StandardScaler는 모든 피처들을 평균이 0, 분산이 1인 정규분포를 갖도록 만듬
 from sklearn.preprocessing import StandardScaler
+
+# scikit-learn dataset에서 boston dataset을 load
+# scikit-learn의 datasets에서 sample data import
 from sklearn.datasets import load_boston
+
+# boston dataset load
 boston = load_boston()
 
+# 데이터 프레임으로 변환
 df = pd.DataFrame(boston.data, columns=boston.feature_names)
 
 # 출력값은 TARGET속성으로 저장되도록 함
@@ -30,9 +37,31 @@ print('df.tail() =\n',df.tail())
 # 조금 더 쉽고 수월한 최적화 및 성능향샹을 위해 표준 스케줄링을 통해 입력값을 정규화 함
 # 보스턴 주택 가격 데이터셋의 각 열이 정규분포를 따른다고 가정하고 표준 스케줄링을 적용함
 # 다음 테이블은 표준 스케일링을 적용한 결과를 보여 줌
+
+# missing value 검사
+print('df.isnull().sum() = \n', df.isnull().sum())
+
+# df.isnull().sum() =
+#  CRIM       0
+# ZN         0
+# INDUS      0
+# CHAS       0
+# NOX        0
+# RM         0
+# AGE        0
+# DIS        0
+# RAD        0
+# TAX        0
+# PTRATIO    0
+# B          0
+# LSTAT      0
+# TARGET     0
+# dtype: int64
+
 scalar = StandardScaler()
 scalar.fit(df.values[:, :-1])
 df.values[:, :-1] = scalar.transform(df.values[:, :-1]).round(4)
+
 print('df.tail() =\n',df.tail())
 # df.tail() =
 #         CRIM      ZN   INDUS    CHAS  ...  PTRATIO       B   LSTAT  TARGET

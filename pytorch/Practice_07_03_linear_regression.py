@@ -32,8 +32,8 @@ print('list(df.columns) = ', list(df.columns))
 # 'TAX', 'PTRATIO', 'B', 'LSTAT', 'TARGET']
 
 # 각 속성의 분포와 속성 사이의 선형적 관계 유무를 파악하기 위해 페어플롯을 그림
-sns.pairplot(df)
-plt.show()
+# sns.pairplot(df)
+# plt.show()
 
 # Target 속성에 대응하는 맨 마지막을 줄을 살펴보면 일부 속성들이 Target 속성과
 # 약간의 선형적 관계를 띄는 것을 볼 수 있음
@@ -43,8 +43,8 @@ cols = ["TARGET", "INDUS", "RM", "LSTAT", "NOX", "DIS"]
 
 df[cols].describe()
 
-sns.pairplot(df[cols])
-plt.show()
+# sns.pairplot(df[cols])
+# plt.show()
 
 import torch
 import torch.nn as nn
@@ -125,7 +125,7 @@ for i in range(n_epochs):
     optimizer.step()
 
     if (i + 1) % print_interval == 0:
-        print('Epoch %d: loss=%.4e' % (i + 1, loss))
+        print('Epoch %d: loss=%.6e' % (i + 1, loss))
 
 # 결과 확인
 # 모델을 통과한 y_hat를 가져와서 실제 y와 비교하기 위한 페어 플롯을 그림 
@@ -135,5 +135,5 @@ df = pd.DataFrame(torch.cat([y, y_hat], dim=1).detach_().numpy(),
 # 왼쪽 위에 그려진 y의 분포와 오른쪽 아래에 그려진 y_hat의 분포가 약간은 다르게 나타난 것을
 # 볼수 있음. 하지만 오른쪽 위에 그려진 y와 왼쪽 아래의 y_hat과의 비교에서는 대부분의 점들이
 # 빨간색 점선 부근에 나타나 있는 것을 확인할 수 있음
-sns.pairplot(df, height=5)
-plt.show()
+# sns.pairplot(df, height=5)
+# plt.show()
