@@ -5,6 +5,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 # 실습에서 사용할 데이터셋을 불러옴
+# Create Pandas Dataframe
 from sklearn.datasets import load_boston
 boston = load_boston()
 
@@ -17,6 +18,18 @@ df = pd.DataFrame(boston.data, columns=boston.feature_names)
 df["TARGET"] = boston.target
 df.tail()
 print("df.tail()\n", df.tail())
+
+# Use the `shape` property
+print('df.shape = ', df.shape)
+# df.shape =  (506, 14)
+
+# Or use the `len()` function with the `index` property
+print('len(df.index) = ', len(df.index))
+# len(df.index) =  506
+
+print('list(df.columns) = ', list(df.columns))
+# list(df.columns) =  ['CRIM', 'ZN', 'INDUS', 'CHAS', 'NOX', 'RM', 'AGE', 'DIS', 'RAD',
+# 'TAX', 'PTRATIO', 'B', 'LSTAT', 'TARGET']
 
 # 각 속성의 분포와 속성 사이의 선형적 관계 유무를 파악하기 위해 페어플롯을 그림
 sns.pairplot(df)
@@ -42,15 +55,16 @@ import torch.optim as optim
 data = torch.from_numpy(df[cols].values).float()
 
 print("data.shape = ", data.shape)
+#data.shape =  torch.Size([506, 6])
 
 # 데이터를 입력 x와 출력 y로 나눔
-y = data[:, :1]
 x = data[:, 1:]
+y = data[:, :1]
 
 print("x.shape = ", x.shape, "y.shape = ", y.shape)
+# x.shape =  torch.Size([506, 5]) y.shape =  torch.Size([506, 1])
 
-# 학습에 필요한 설정값을 정함
-
+# 학습에 필요한 설정값 정함
 n_epochs = 2000
 learning_rate = 1e-3
 print_interval = 100
@@ -59,24 +73,55 @@ print_interval = 100
 # 텐서 y의 마지막 차원의 크기를 선형 계층의 출력 크기로 함
 model = nn.Linear(x.size(-1), y.size(-1))
 
-model
+print('model =', model)
+# model = Linear(in_features=5, out_features=1, bias=True)
 
 # Instead of implement gradient equation,
 # we can use <optim class> to update model parameters, automatically.
 # 옵티마이져 생성. 파이토치에서 제공하는 옵티마이저 클래스를 통해 최적화 작업을 수행
 # backward함수를 호출한 후 옵티마이저 객체에서 step 함수를 호출하면 경사하강을
 # 1회 수행한다.
-optimizer = optim.SGD(model.parameters(),
-                      lr=learning_rate)
+
+# SGD : 확률적 경사 하강법(Stochastic Gradient Descent)
+# 가중치를 업데이트할 때 미분을 통해 기울기를 구한 다음 기울기가 낮은 쪽으로 업데이트하겠다는 뜻이고,
+# 확률적(Stochastic)은 전체를 한번에 계산하지 않고 확률적으로 일부 샘플을 구해서 조금씩 나눠서 계산하겠다는 뜻
+# n=1이고 남은 이미지에서 훈련 샘플을 무작위로 선택하는 경우, 이 프로세스를 확률적 경사 하강법
+# (SGD, stochastic gradient descent)이라고 하는데, 이는 구현하고 시각화하기는 쉽지만 훈련 속도가 느리고
+# (업데이트 과정이 많을수록) ‘노이즈가 많다’. 보통 ‘미니 배치 확률적 경사 하강법(mini-batch stochastic
+# gradient descent)’을 선호하는 경향이 있다.
+
+# Loss Function을 계산할 때 전체 Train-Set을 사용하는 것을 Batch Gradient Descent라고 한다.
+# 그러나 이렇게 계산하면 한번 step을 내딛을 때, 전체 데이터에 대해 Loss Function을 계산해야 하므로 너무 많은 계산양을
+# 필요로 한다. 이를 방지하기 위해 보통은 Stochastic Gradient Desenct(SGD)라는 방법을 사용한다. 이 방법에서는
+# Loss Function을 계산할 때, 전체 데이터(Batch) 대신 일부 데이터의 모음(Mini-Batch)를 사용하여 Loss Function을
+# 계산한다. Batch Gradient Descent보다 다소 부정확할 수는 있지만, 계산 속도가 훨씬 빠르기 때문에 같은 시간에 더 많은
+# step을 갈 수 있으며, 여러 번 반복할 경우 Batch 처리한 결과로 수렴한다. 또한 Batch Gradient Descent에서 빠질
+# Local Minima에 빠지지 않고 더 좋은 방향으로 수렴할 가능성도 높다. 여기에 더해 SGD를 변형시킨 여러 알고리즘들을 활용하면
+# 훨씬 좋은 성능을 낼 수 있고, 변형된 알고리즘으로 Naive Stochastic Gradient Descent 알고리즘이고, Momentum, NAG,
+# Adagrad, AdaDelta, RMSprop 등이 있다.
+
+# torch.optim.SGD(params,lr,momentum,dampening = 0,weight_decay = 0, nesterov = False
+# - params : 파라미터 그룹을 정의하거나 최적화하기 위한 파라미터의 반복 기능, 즉 모델의 파라미터를 넣어주면 된다.
+# - Ir : learning rate의 약자이다.
+# - momentum : 기본 값이 0인 momentum factor이다.
+# - weight_decay :  가중치 감소로 기본 값이 0이다.
+# - dampening : momentum을 위한 dampening이다. 기본 값 0
+# - nesterov : Nesterov momentum을 사용할지 말 지를 결정한다. 기본 값 0
+
+optimizer = optim.SGD(model.parameters(), lr=learning_rate)
 
 # 정해진 에폭만큼 for 반복문을 통해 최적화를 수행
 for i in range(n_epochs):
+
     y_hat = model(x)
     loss = F.mse_loss(y_hat, y)
-
+    # optimizer.zero_grad() 는 반복 시에 전에 계산했던 기울기를 0 으로 초기화하는 함수이다.
+    # 즉 최적화된 모든 torch의 기울기를 0으로 바꾼다.
+    # 기울기를 초기화해야 새로운 가중치와 편차에 대해서 새로운 기울기를 구할 수 있기 때문이다.
     optimizer.zero_grad()
+    # w와 b에 대한 기울기 계산
     loss.backward()
-
+    # model.paramters()에서 리턴되는 변수들의 기울기에 학습률을 곱해서 빼준 뒤에 업데이트한다.
     optimizer.step()
 
     if (i + 1) % print_interval == 0:
