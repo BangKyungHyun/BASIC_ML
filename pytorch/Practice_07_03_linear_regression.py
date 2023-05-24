@@ -135,5 +135,5 @@ df = pd.DataFrame(torch.cat([y, y_hat], dim=1).detach_().numpy(),
 # 왼쪽 위에 그려진 y의 분포와 오른쪽 아래에 그려진 y_hat의 분포가 약간은 다르게 나타난 것을
 # 볼수 있음. 하지만 오른쪽 위에 그려진 y와 왼쪽 아래의 y_hat과의 비교에서는 대부분의 점들이
 # 빨간색 점선 부근에 나타나 있는 것을 확인할 수 있음
-# sns.pairplot(df, height=5)
-# plt.show()
+sns.pairplot(df, height=5)
+plt.show()
