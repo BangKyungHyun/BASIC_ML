@@ -1,3 +1,7 @@
+###############################################################################################
+    # 1. 데이터 준비
+###############################################################################################
+
 import torch
 import torch.nn as nn
 import pandas as pd
@@ -51,17 +55,17 @@ print('list(df.columns[:10]) =',list(df.columns[:10]))
 # Pair plot with mean features
 # 평균 속성들만 따로 모아서 class속성과 비교하는 페어플롯 표출
 sns.pairplot(df[['class'] + list(df.columns[:10])])
-plt.show()
+# plt.show()
 
 # Pair plot with std features
 # 표준편차들만 따로 모아서 class(lable)속성과 비교하는 페어플롯 표출
 sns.pairplot(df[['class'] + list(df.columns[10:20])])
-plt.show()
+# plt.show()
 
 # Pair plot with worst features
 # 최악값들만 따로 모아서 class(lable)속성과 비교하는 페어플롯 표출
 sns.pairplot(df[['class'] + list(df.columns[20:30])])
-plt.show()
+# plt.show()
 
 # select features
 cols = ["mean radius", "mean texture",
@@ -90,6 +94,10 @@ x = data[:, :-1]
 y = data[:, -1:]
 print('x.shape, y.shape =',x.shape, y.shape)
 # x.shape, y.shape = torch.Size([569, 10]) torch.Size([569, 1])
+
+###############################################################################################
+# 2. 학습 수행
+###############################################################################################
 
 n_epochs = 2000000
 learning_rate = 1e-2
@@ -172,6 +180,7 @@ print_interval = 200000
 # 또한 __init__ 함수를 통해 모델을 구성하는데 필요한 내부모듈(선형계층)을 미리 선언함.
 # forward함수는 미리 선언된 내부 모듈을 활용하여 계산을 수행함
 ###############################################################################################
+
 class MyModel(nn.Module):
 
     def __init__(self, input_dim, output_dim):
@@ -190,18 +199,22 @@ class MyModel(nn.Module):
 
         return y
 
-# 로지스틱 회귀 모델 클래스를 생성하고 BCE 손실함수와 옵티마이저도 준비합니다. 선형회귀와
-# 마찬가지로 모델의 입력 크기는 텐서 X의 마지막 차원 크기가 되고 출력크기는 텐서Y의 
-# 마지막 크기가 됨
-model = MyModel(input_dim=x.size(-1),
-                output_dim=y.size(-1))
-crit = nn.BCELoss()
+# 로지스틱 회귀 모델 클래스를 생성하고 BCE 손실함수와 옵티마이저 준비
+# 모델의 입력 크기는 텐서 X의 마지막 차원 크기가 되고 출력크기는 텐서 Y의 마지막 크기가 됨
+model = MyModel(input_dim=x.size(-1),output_dim=y.size(-1))
 
-optimizer = optim.SGD(model.parameters(),
-                      lr=learning_rate)
+crit = nn.BCELoss() # MSE 대신 BCE 함수 선언
+
+optimizer = optim.SGD(model.parameters(),lr=learning_rate)
 
 # 선형회귀와 똑같은 코드로 학습을 진행함
+
+now = datetime.datetime.now()
+nowDatetime = now.strftime('%Y-%m-%d %H:%M:%S')
+print(nowDatetime)
+
 for i in range(n_epochs):
+
     y_hat = model(x)
     loss = crit(y_hat, y)
 
