@@ -3,7 +3,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import datetime
 
-from sklearn.preprocessing import  StandardScaler
+from sklearn.preprocessing import StandardScaler
 
 from sklearn.datasets import fetch_california_housing
 califonia = fetch_california_housing()
