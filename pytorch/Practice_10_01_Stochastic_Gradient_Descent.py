@@ -13,17 +13,17 @@ df["Target"] = califonia.target
 print('df.tail() = \n',df.tail())
 
 sns.pairplot(df.sample(1000))
-plt.show()
+# plt.show()
 
+# 정규화
 scalar = StandardScaler()
 scalar.fit(df.values[:, :0-1])
 df.values[:, :-1] = scalar.transform(df.values[:, :-1])
 
 sns.pairplot(df.sample(1000))
-plt.show()
+# plt.show()
 
 # Train Model with PyTorch
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -55,6 +55,7 @@ model = nn.Sequential(
 )
 print('model =', model)
 
+# 옵티마이저 정의
 optimizer = optim.SGD(model.parameters(), lr = learning_rate)
 
 # |x| = = (total_size, input_dim)
