@@ -99,5 +99,11 @@ y = torch.cat(y_, dim=0)
 # |y_hat| = (total_size, output_dim)
 # |y| = (total_size, output_dim)
 
+# Let's see the result!
 
+df = pd.DataFrame(torch.cat([y, y_hat], dim=1).detach().numpy(),
+                  columns=["y", "y_hat"])
+
+sns.pairplot(df, height=5)
+plt.show()
 
