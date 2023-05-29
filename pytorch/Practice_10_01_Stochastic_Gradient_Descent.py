@@ -29,17 +29,30 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 
+# 정제된 데이터를 파이토치 텐서로 변환하고 크기를 확인
 data = torch.from_numpy(df.values).float()
 print('data.shape = ',data.shape)
+# data.shape =  torch.Size([20640, 9])
 
+# 입력 데이터와 출력 데이터를 분리하여 각각 x와 y에 저장
 x = data[:, :-1]
 y = data[:, -1:]
 print('x.shape, y.shape = ',x.shape, y.shape)
+# x.shape, y.shape =  torch.Size([20640, 8]) torch.Size([20640, 1])
 
-n_epochs = 400000
+# 학습에 필요한 하이퍼파라미터 설정
+# 모덱은 전체 데이터셋의 모든 샘플을 만번 학습, 배치사이즈는 256, 학습률은 0.01로 지정
+n_epochs = 10000
 batch_size = 256
-print_interval = 20000
+print_interval = 500
 learning_rate = 1e-2
+
+# nn.Sequential 클래스를 활용하여 심층신경망을 구성.nn.Sequential을
+# 선언할 때, 선형 계층 nn.Linear와 활성함수 nn.LeakyReLU를 선언
+# 주의할 점
+# 1) 선형계층과 마지막 선형 계층은 실제 데이터셋 텐서 x의 크기(8)와 y의 크기(1)를
+#    입출력 크기로 갖도록 정함
+# 2) 내부의 선형 계층들은 서로 입출력 크기가 호환 되도록 되어 있다는 점에도 주목
 
 # Build models
 model = nn.Sequential(
@@ -55,18 +68,69 @@ model = nn.Sequential(
 )
 print('model =', model)
 
+# model = Sequential(
+#   (0): Linear(in_features=8, out_features=6, bias=True)
+#   (1): LeakyReLU(negative_slope=0.01)
+#   (2): Linear(in_features=6, out_features=5, bias=True)
+#   (3): LeakyReLU(negative_slope=0.01)
+#   (4): Linear(in_features=5, out_features=4, bias=True)
+#   (5): LeakyReLU(negative_slope=0.01)
+#   (6): Linear(in_features=4, out_features=3, bias=True)
+#   (7): LeakyReLU(negative_slope=0.01)
+#   (8): Linear(in_features=3, out_features=1, bias=True)
+# )
+
 # 옵티마이저 정의
-optimizer = optim.SGD(model.parameters(), lr = learning_rate)
+optimizer = optim.SGD(model.parameters(), lr=learning_rate)
 
 # |x| = = (total_size, input_dim)
 # |y| = = (total_size, output_dim)
+now = datetime.datetime.now()
+nowDatetime = now.strftime('%Y-%m-%d %H:%M:%S')
+print(nowDatetime)
+
+# 바깥쪽 for 반복문은 정해진 최대 에포크 수 만큼 반복을 수행하여, 모델이 데이터셋을
+# n_epochs 만큼 반복해서 학습
+#
+# 안쪽 for 반복문은 미니배치에 대해서 피드포워딩(feed-forwarding)과 역전파
+# (back-propagation), 그리고 경사하강(gradient descent)을 수행
+#
+# 안쪽 for 반복문 앞을 보면 매 에포크마다 데이터셋을 랜덤하게 섞어(셔플링shuffling)
+# 주고 미니배치로 나눔
+#
+# 이때 중요한 점은 입력 텐서 x와 출력 텐서 y를 각각 따로 셔플링을 수행하는 것이 아니라,
+# 함께 동일하게 섞음
+#
+# 만약 따로 섞어주게 된다면 x와 y의 관계가 끊어지게되어 아무 의미없는
+# 노이즈로 가득찬 데이터가 됨
+#
+# 이 과정을 좀 더 자세히 살펴보면 randperm 함수를 통해서 새롭게 섞어줄 데이터셋의 인덱스
+# 순서를 정함
+
+# 그리고 index_select 함수를 통해서 이 임의의 순서로 섞인 인덱스 순서대로 데이터셋을
+# 섞어줍니다.
+# 마지막으로 split 함수를 활용하여 원하는 배치사이즈로 텐서를 나누어주면 미니배치를 만드는
+# 작업이 끝납니다.
+#
+# 안쪽 for 반복문은 전체 데이터셋 대신에 미니배치 데이터를 모델에 학습시킨다는 점이 다를 뿐,
+# 앞서 챕터들에서 보았던 코드들과 동일합니다.
+# 하나 추가된 점은 y_hat이라는 빈 리스트를 만들어, 미니배치마다 y_hat_i 변수에
+# 피드포워딩 결과가 나오면 y_hat에 차례대로 저장합니다.
+# 그리고 마지막 에포크가 끝나면 이 y_hat 리스트를 파이토치 cat 함수를 활용하여
+# 이어붙여 하나의 텐서로 만든 후, 실제 정답과 비교합니다.
 
 for i in range(n_epochs):
-    #suffle thn index to feed-forward
+
+    # suffle the index to feed-forward
+    # randperm 함수를 통해서 새롭게 섞어줄 데이터셋의 인덱스 순서를 정함
     indices = torch.randperm(x.size(0))
+
+    # index_select 함수를 통해서 이 임의의 순서로 섞인 인덱스 순서대로 데이터셋을 섞음
     x_ = torch.index_select(x, dim=0, index=indices)
     y_ = torch.index_select(y, dim=0, index=indices)
 
+    # split 함수를 활용하여 원하는 배치사이즈로 텐서를 나누어 주면 미니배치를 만드는
+    # ㄴ작업이 끝남
     x_ = x_.split(batch_size, dim=0)
     y_ = y_.split(batch_size, dim=0)
     # |x_[i]| = = (total_size, input_dim)
@@ -86,14 +150,15 @@ for i in range(n_epochs):
 
         optimizer.step()
 
-        total_loss += float(loss) # This is very important to prevent memory leak
+        total_loss += float(loss) #This is very important to prevent memory leak
         y_hat += [y_hat_i]
 
-    total_loss = total_loss / len(x_)
+        total_loss = total_loss / len(x_)
+
     if( i + 1 ) % print_interval == 0:
         now = datetime.datetime.now()
         nowDatetime = now.strftime('%Y-%m-%d %H:%M:%S')
-        print(nowDatetime, 'Epoch %d: loss=%.4e' % (i + 1, total_loss))
+        print(nowDatetime, 'Epoch %d,: loss=%.4e' % (i + 1, total_loss))
 
 y_hat = torch.cat(y_hat, dim=0)
 y = torch.cat(y_, dim=0)
@@ -105,5 +170,5 @@ y = torch.cat(y_, dim=0)
 df = pd.DataFrame(torch.cat([y, y_hat], dim=1).detach().numpy(),columns=["y", "y_hat"])
 
 sns.pairplot(df, height=5)
-plt.show()
+# plt.show()
 
