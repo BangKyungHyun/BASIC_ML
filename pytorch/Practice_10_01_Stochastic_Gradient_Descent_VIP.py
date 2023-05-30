@@ -2,6 +2,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import datetime
+import time
 
 from sklearn.preprocessing import StandardScaler
 
@@ -41,11 +42,14 @@ print('x.shape, y.shape = ',x.shape, y.shape)
 # x.shape, y.shape =  torch.Size([20640, 8]) torch.Size([20640, 1])
 
 # 학습에 필요한 하이퍼파라미터 설정
-# 모덱은 전체 데이터셋의 모든 샘플을 만번 학습, 배치사이즈는 256, 학습률은 0.01로 지정
-n_epochs = 10000
+# 모덱은 전체 데이터셋의 모든 샘플을 천번 학습, 배치사이즈는 256, 학습률은 0.01로 지정
+n_epochs = 1000
 batch_size = 256
-print_interval = 500
+print_interval = 50
 learning_rate = 1e-2
+
+# print('\nLearning hyper parameter => Epoch = %d,: print_interval = %d \n' % (n_epochs, print_interval))
+print('\nLearning hyper parameter => Epoch = ', format(n_epochs,','),'print_interval = ',format(print_interval,','))
 
 # nn.Sequential 클래스를 활용하여 심층신경망을 구성.nn.Sequential을
 # 선언할 때, 선형 계층 nn.Linear와 활성함수 nn.LeakyReLU를 선언
@@ -85,9 +89,6 @@ optimizer = optim.SGD(model.parameters(), lr=learning_rate)
 
 # |x| = = (total_size, input_dim)
 # |y| = = (total_size, output_dim)
-now = datetime.datetime.now()
-nowDatetime = now.strftime('%Y-%m-%d %H:%M:%S')
-print(nowDatetime)
 
 # 바깥쪽 for 반복문은 정해진 최대 에포크 수 만큼 반복을 수행하여, 모델이 데이터셋을
 # n_epochs 만큼 반복해서 학습
@@ -116,8 +117,13 @@ print(nowDatetime)
 # 앞서 챕터들에서 보았던 코드들과 동일합니다.
 # 하나 추가된 점은 y_hat이라는 빈 리스트를 만들어, 미니배치마다 y_hat_i 변수에
 # 피드포워딩 결과가 나오면 y_hat에 차례대로 저장합니다.
+
 # 그리고 마지막 에포크가 끝나면 이 y_hat 리스트를 파이토치 cat 함수를 활용하여
 # 이어붙여 하나의 텐서로 만든 후, 실제 정답과 비교합니다.
+
+now = datetime.datetime.now()
+time1 = now.strftime('%Y-%m-%d %H:%M:%S')
+print('start time =',time1)
 
 for i in range(n_epochs):
 
@@ -130,7 +136,7 @@ for i in range(n_epochs):
     y_ = torch.index_select(y, dim=0, index=indices)
 
     # split 함수를 활용하여 원하는 배치사이즈로 텐서를 나누어 주면 미니배치를 만드는
-    # ㄴ작업이 끝남
+    # 작업이 끝남
     x_ = x_.split(batch_size, dim=0)
     y_ = y_.split(batch_size, dim=0)
     # |x_[i]| = = (total_size, input_dim)
@@ -142,15 +148,42 @@ for i in range(n_epochs):
     for x_i, y_i in zip(x_, y_):
         # |x_i| = |x_[i]|
         # |y_i| = |y_[i]|
+
+        # 신경망 모델 결과를 y_hat_i에 할당
         y_hat_i = model(x_i)
+
+        # 실제 target(label)과 학습결과간의 차이(비용, 손실)을 계산
         loss = F.mse_loss(y_hat_i, y_i)
 
+        # optimizer.zero_grad() 는 반복 시에 전에 계산했던 기울기를 0 으로 초기화 하는 함수
+        # 즉 최적화된 모든 torch의 기울기를 0으로 바꾼다.
+        # 기울기를 초기화 해야 새로운 가중치와 편차에 대해서 새로운 기울기를 구할 수 있기 때문
         optimizer.zero_grad()
+
+        # w와 b에 대한 기울기 계산
         loss.backward()
 
+        # model.paramters()에서 리턴되는 변수들의 기울기에 학습률을 곱해서 빼준 뒤에 업데이트한다.
         optimizer.step()
 
+        # loss 변수에 담긴 손실 값 텐서를 float type casting을 통해 단순 float 타입으로 변환하여
+        # total_loss 변수에 더하는 것을 볼 수 있음.이 부분이 매우 중요함
+        # 타입캐스팅 이전의 loss 변수는 파이토치 텐서 타입으로 그래디언트를 가지고 있음
+        # 파이토치의 AutoGrad 동작 원리에 의해서 loss 변수가 계산될 때까지 활용된 파이토치 텐서 변수들이
+        # loss 변수에 줄줄이 엮여 있음
+        # 따라서 만약 float 타입캐스팅이 없다면 total_loss도 파이토치 텐서가 될 것이고,
+        # 이 total_loss 변수는 해당 에포크의 모든 loss 변수를 엮고 있음
+        # 결과적으로 total_loss가 메모리에서 없어지지 않는다면 loss 변수와 그에 엮인 텐서 변수들 모두가
+        # 아직 참조 중인 상태이므로 파이썬 garbage collector에 의해서 메모리에서 해제되지 않음
+        # 즉, memory leak이 발생하게 됨
+        # 더욱이 추후 실습에서처럼 손실 곡선을 그려보기 위해서 total_loss 변수를 따로 또 저장하기라도
+        # 한다면 학습이 끝날때까지 학습에 사용된 대부분의 파이토치 텐서 변수들이 메모리에서 해제되지 않는
+        # 최악의 상황이 발생할 수도 있음.
+        # 그러므로 앞서와 같은 상황에서는 float 타입캐스팅 또는 detach 함수를 통해 AutoGrad를 위해
+        # 연결된 그래프를 잘라내는 작업이 필요
         total_loss += float(loss) #This is very important to prevent memory leak
+
+        # 미니배치마다 y_hat_i 변수에 피드포워딩 결과가 나오면 y_hat에 차례대로 저장
         y_hat += [y_hat_i]
 
         total_loss = total_loss / len(x_)
@@ -158,17 +191,22 @@ for i in range(n_epochs):
     if( i + 1 ) % print_interval == 0:
         now = datetime.datetime.now()
         nowDatetime = now.strftime('%Y-%m-%d %H:%M:%S')
-        print(nowDatetime, 'Epoch %d,: loss=%.4e' % (i + 1, total_loss))
+        print(nowDatetime, 'Epoch = ', format(i + 1,',') , ' loss=','%.4e'%total_loss)
 
+now = datetime.datetime.now()
+time2 = now.strftime('%Y-%m-%d %H:%M:%S')
+print('end time =',time2)
+
+# 마지막 에포크가 끝나면 이 y_hat 리스트를 파이토치 cat 함수를 활용하여 이어붙여 하나의 텐서로 만든 후, 실제 정답과 비교합니다.
 y_hat = torch.cat(y_hat, dim=0)
 y = torch.cat(y_, dim=0)
 # |y_hat| = (total_size, output_dim)
 # |y| = (total_size, output_dim)
 
 # Let's see the result!
-
 df = pd.DataFrame(torch.cat([y, y_hat], dim=1).detach().numpy(),columns=["y", "y_hat"])
 
-sns.pairplot(df, height=5)
-# plt.show()
+# 페어플랏을 통해 확인해보면, 조금 넓게 퍼져있긴하지만, 대체로 중앙을 통과하는 대각선 주변으로 점들이 분포하고 있는 것을 볼 수 있음
+ sns.pairplot(df, height=5)
+plt.show()
 
