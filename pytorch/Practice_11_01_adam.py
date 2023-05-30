@@ -75,7 +75,7 @@ for i in range(n_epochs):
     for x_i, y_i in zip(x_, y_):
         # |x_i| = |x_[i]|
         # |y_i| = |y_[i]|
-        y_hat_i = model(x_i)
+        # y_hat_i = model(x_i)
         loss = F.mse_loss(y_hat_i, y_i)
 
         optimizer.zero_grad()
@@ -93,6 +93,18 @@ for i in range(n_epochs):
         nowDatetime = now.strftime('%Y-%m-%d %H:%M:%S')
         print(nowDatetime, 'Epoch = ', format(i + 1, ','), ' loss=', '%.4e' % total_loss)
 
+# 아래 모델 사용시 cost(loss) value
+# model = nn.Sequential(
+#     nn.Linear(x.size(-1), 6),
+#     nn.LeakyReLU(),
+#     nn.Linear(6, 5),
+#     nn.LeakyReLU(),
+#     nn.Linear(5, 4),
+#     nn.LeakyReLU(),
+#     nn.Linear(4, 3),
+#     nn.LeakyReLU(),
+#     nn.Linear(3, y.size(-1)),
+# )
 # 2023-05-30 17:46:27 Epoch 200: loss=3.4402e-01
 # 2023-05-30 17:47:01 Epoch 400: loss=3.4021e-01
 # 2023-05-30 17:47:33 Epoch 600: loss=3.3977e-01
