@@ -17,8 +17,6 @@ df.values[:,:-1] = scalar.transform(df.values[:,:-1])
 print('df.tail =', df.tail)
 
 # Train Model with PyTorch
-
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -31,27 +29,35 @@ x = data[:, :-1]
 y = data[:, -1:]
 print('x.shape, y.shape =',x.shape, y.shape)
 
-n_epochs = 40
+n_epochs = 4000
 batch_size = 256
 print_interval = 200
 
+print('\nLearning hyper parameter => Epoch = ', format(n_epochs,','),'print_interval = ',format(print_interval,','))
+
 #Build Model
 model = nn.Sequential(
-    nn.Linear(x.size(-1), 6),
+    nn.Linear(x.size(-1), 10),
     nn.LeakyReLU(),
-    nn.Linear(6, 5),
+    nn.Linear(10, 9),
     nn.LeakyReLU(),
-    nn.Linear(5, 4),
+    nn.Linear(9, 8),
     nn.LeakyReLU(),
-    nn.Linear(4, 3),
+    nn.Linear(8, 7),
     nn.LeakyReLU(),
-    nn.Linear(3, y.size(-1)),
+    nn.Linear(7, 6),
+    nn.LeakyReLU(),
+    nn.Linear(6, y.size(-1)),
 )
 
 print('model =', model)
 
 # We don't need learning rate hyper-parameter
 optimizer = optim.Adam(model.parameters())
+
+now = datetime.datetime.now()
+time1 = now.strftime('%Y-%m-%d %H:%M:%S')
+print('start time =',time1)
 
 for i in range(n_epochs):
     #Suffle the index to feed-forward
@@ -81,10 +87,26 @@ for i in range(n_epochs):
         y_hat += [y_hat_i]
 
     total_loss = total_loss / len(x_)
-    if( i + 1 ) % print_interval == 0:
+
+    if (i + 1) % print_interval == 0:
         now = datetime.datetime.now()
         nowDatetime = now.strftime('%Y-%m-%d %H:%M:%S')
-        print(nowDatetime, 'Epoch %d: loss=%.4e' % (i + 1, total_loss))
+        print(nowDatetime, 'Epoch = ', format(i + 1, ','), ' loss=', '%.4e' % total_loss)
+
+# 2023-05-30 17:46:27 Epoch 200: loss=3.4402e-01
+# 2023-05-30 17:47:01 Epoch 400: loss=3.4021e-01
+# 2023-05-30 17:47:33 Epoch 600: loss=3.3977e-01
+# 2023-05-30 17:48:07 Epoch 800: loss=3.3885e-01
+# 2023-05-30 17:48:54 Epoch 1000: loss=3.3830e-01
+# 2023-05-30 17:49:47 Epoch 1200: loss=3.3887e-01
+# 2023-05-30 17:50:35 Epoch 1400: loss=3.3832e-01
+# 2023-05-30 17:51:09 Epoch 1600: loss=3.3888e-01
+# 2023-05-30 17:51:46 Epoch 1800: loss=3.3059e-01
+# 2023-05-30 17:52:33 Epoch 2000: loss=3.2038e-01
+
+now = datetime.datetime.now()
+time2 = now.strftime('%Y-%m-%d %H:%M:%S')
+print('end time =',time2)
 
 y_hat = torch.cat(y_hat, dim=0)
 y = torch.cat(y_, dim=0)
@@ -94,8 +116,3 @@ y = torch.cat(y_, dim=0)
 df = pd.DataFrame(torch.cat([y,y_hat], dim=1).detach().numpy(),columns=["y","y_hat"])
 sns.pairplot(df, height=5)
 plt.show()
-
-
-
-
-
