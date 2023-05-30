@@ -109,17 +109,17 @@ optimizer = optim.SGD(model.parameters(), lr=learning_rate)
 # 순서를 정함
 
 # 그리고 index_select 함수를 통해서 이 임의의 순서로 섞인 인덱스 순서대로 데이터셋을
-# 섞어줍니다.
+# 섞어 줌
 # 마지막으로 split 함수를 활용하여 원하는 배치사이즈로 텐서를 나누어주면 미니배치를 만드는
-# 작업이 끝납니다.
+# 작업이 끝남
 #
 # 안쪽 for 반복문은 전체 데이터셋 대신에 미니배치 데이터를 모델에 학습시킨다는 점이 다를 뿐,
-# 앞서 챕터들에서 보았던 코드들과 동일합니다.
+# 앞서 챕터들에서 보았던 코드들과 동일
 # 하나 추가된 점은 y_hat이라는 빈 리스트를 만들어, 미니배치마다 y_hat_i 변수에
-# 피드포워딩 결과가 나오면 y_hat에 차례대로 저장합니다.
+# 피드포워딩 결과가 나오면 y_hat에 차례대로 저장
 
 # 그리고 마지막 에포크가 끝나면 이 y_hat 리스트를 파이토치 cat 함수를 활용하여
-# 이어붙여 하나의 텐서로 만든 후, 실제 정답과 비교합니다.
+# 이어 붙여 하나의 텐서로 만든 후, 실제 정답과 비교
 
 now = datetime.datetime.now()
 time1 = now.strftime('%Y-%m-%d %H:%M:%S')
@@ -156,7 +156,7 @@ for i in range(n_epochs):
         loss = F.mse_loss(y_hat_i, y_i)
 
         # optimizer.zero_grad() 는 반복 시에 전에 계산했던 기울기를 0 으로 초기화 하는 함수
-        # 즉 최적화된 모든 torch의 기울기를 0으로 바꾼다.
+        # 즉 최적화된 모든 torch의 기울기를 0으로 바꿈
         # 기울기를 초기화 해야 새로운 가중치와 편차에 대해서 새로운 기울기를 구할 수 있기 때문
         optimizer.zero_grad()
 
@@ -197,7 +197,8 @@ now = datetime.datetime.now()
 time2 = now.strftime('%Y-%m-%d %H:%M:%S')
 print('end time =',time2)
 
-# 마지막 에포크가 끝나면 이 y_hat 리스트를 파이토치 cat 함수를 활용하여 이어붙여 하나의 텐서로 만든 후, 실제 정답과 비교합니다.
+# 마지막 에포크가 끝나면 이 y_hat 리스트를 파이토치 cat 함수를 활용하여 이어붙여
+# 하나의 텐서로 만든 후, 실제 정답과 비교
 y_hat = torch.cat(y_hat, dim=0)
 y = torch.cat(y_, dim=0)
 # |y_hat| = (total_size, output_dim)
@@ -206,7 +207,8 @@ y = torch.cat(y_, dim=0)
 # Let's see the result!
 df = pd.DataFrame(torch.cat([y, y_hat], dim=1).detach().numpy(),columns=["y", "y_hat"])
 
-# 페어플랏을 통해 확인해보면, 조금 넓게 퍼져있긴하지만, 대체로 중앙을 통과하는 대각선 주변으로 점들이 분포하고 있는 것을 볼 수 있음
+# 페어플랏을 통해 확인해보면, 조금 넓게 퍼져있긴하지만, 대체로 중앙을 통과하는
+# 대각선 주변으로 점들이 분포하고 있는 것을 볼 수 있음
  sns.pairplot(df, height=5)
 plt.show()
 
