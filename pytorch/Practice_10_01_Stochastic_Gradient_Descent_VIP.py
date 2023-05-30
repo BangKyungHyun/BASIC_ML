@@ -210,7 +210,7 @@ y = torch.cat(y_, dim=0)
 # Let's see the result!
 df = pd.DataFrame(torch.cat([y, y_hat], dim=1).detach().numpy(),columns=["y", "y_hat"])
 
-# 페어플랏을 통해 확인해보면, 조금 넓게 퍼져있긴하지만, 대체로 중앙을 통과하는
+# 페어플랏을 통해 확인해보면, 조금 넓게 퍼져있긴 하지만, 대체로 중앙을 통과하는
 # 대각선 주변으로 점들이 분포하고 있는 것을 볼 수 있음
  sns.pairplot(df, height=5)
 plt.show()

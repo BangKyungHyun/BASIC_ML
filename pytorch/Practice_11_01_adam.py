@@ -89,7 +89,10 @@ print('model =', model)
 # 2023-05-31 04:59:02 Epoch =  4,000  loss= 2.3330e-01
 # end time = 2023-05-31 04:59:02
 
+
+################################################################################
 # We don't need learning rate hyper-parameter
+################################################################################
 optimizer = optim.Adam(model.parameters())
 
 now = datetime.datetime.now()
