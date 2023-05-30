@@ -1,3 +1,6 @@
+# SGD는 비복원 추출을 통해 일부 샘플을 뽑아 미니배치를 구성하고
+# 피드포워딩 및 파라미터(가중치) 업데이트를 수행하는 방법
+# 기존 전체 데이터셋을 활용하는 방식에 비해 파라미터(가중치) 업데이트를 효율적으로 수행할 수 있음
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt

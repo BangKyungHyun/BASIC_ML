@@ -52,6 +52,43 @@ model = nn.Sequential(
 
 print('model =', model)
 
+# model = Sequential(
+#   (0): Linear(in_features=8, out_features=10, bias=True)
+#   (1): LeakyReLU(negative_slope=0.01)
+#   (2): Linear(in_features=10, out_features=9, bias=True)
+#   (3): LeakyReLU(negative_slope=0.01)
+#   (4): Linear(in_features=9, out_features=8, bias=True)
+#   (5): LeakyReLU(negative_slope=0.01)
+#   (6): Linear(in_features=8, out_features=7, bias=True)
+#   (7): LeakyReLU(negative_slope=0.01)
+#   (8): Linear(in_features=7, out_features=6, bias=True)
+#   (9): LeakyReLU(negative_slope=0.01)
+#   (10): Linear(in_features=6, out_features=1, bias=True)
+# )
+# 위 모델 사용시 cost(loss) value
+# start time = 2023-05-31 04:47:57
+# 2023-05-31 04:48:26 Epoch =  200  loss= 2.8430e-01
+# 2023-05-31 04:48:56 Epoch =  400  loss= 2.7760e-01
+# 2023-05-31 04:49:28 Epoch =  600  loss= 2.6646e-01
+# 2023-05-31 04:50:02 Epoch =  800  loss= 2.6052e-01
+# 2023-05-31 04:50:36 Epoch =  1,000  loss= 2.5804e-01
+# 2023-05-31 04:51:12 Epoch =  1,200  loss= 2.5250e-01
+# 2023-05-31 04:51:47 Epoch =  1,400  loss= 2.4967e-01
+# 2023-05-31 04:52:20 Epoch =  1,600  loss= 2.4607e-01
+# 2023-05-31 04:52:53 Epoch =  1,800  loss= 2.4620e-01
+# 2023-05-31 04:53:27 Epoch =  2,000  loss= 2.4542e-01
+# 2023-05-31 04:54:00 Epoch =  2,200  loss= 2.4289e-01
+# 2023-05-31 04:54:35 Epoch =  2,400  loss= 2.4464e-01
+# 2023-05-31 04:55:08 Epoch =  2,600  loss= 2.4167e-01
+# 2023-05-31 04:55:41 Epoch =  2,800  loss= 2.3865e-01
+# 2023-05-31 04:56:15 Epoch =  3,000  loss= 2.3928e-01
+# 2023-05-31 04:56:49 Epoch =  3,200  loss= 2.3667e-01
+# 2023-05-31 04:57:22 Epoch =  3,400  loss= 2.3696e-01
+# 2023-05-31 04:57:55 Epoch =  3,600  loss= 2.3757e-01
+# 2023-05-31 04:58:29 Epoch =  3,800  loss= 2.3426e-01
+# 2023-05-31 04:59:02 Epoch =  4,000  loss= 2.3330e-01
+# end time = 2023-05-31 04:59:02
+
 # We don't need learning rate hyper-parameter
 optimizer = optim.Adam(model.parameters())
 
@@ -75,7 +112,8 @@ for i in range(n_epochs):
     for x_i, y_i in zip(x_, y_):
         # |x_i| = |x_[i]|
         # |y_i| = |y_[i]|
-        # y_hat_i = model(x_i)
+
+        y_hat_i = model(x_i)
         loss = F.mse_loss(y_hat_i, y_i)
 
         optimizer.zero_grad()
@@ -127,4 +165,4 @@ y = torch.cat(y_, dim=0)
 
 df = pd.DataFrame(torch.cat([y,y_hat], dim=1).detach().numpy(),columns=["y","y_hat"])
 sns.pairplot(df, height=5)
-plt.show()
+# plt.show()
