@@ -182,4 +182,4 @@ y = torch.cat(y_, dim=0)
 
 df = pd.DataFrame(torch.cat([y,y_hat], dim=1).detach().numpy(),columns=["y","y_hat"])
 sns.pairplot(df, height=5)
-# plt.show()
+plt.show()
