@@ -63,16 +63,19 @@ print('\nLearning hyper parameter => Epoch = ', format(n_epochs,','),'print_inte
 
 # Build models
 model = nn.Sequential(
-    nn.Linear(x.size(-1), 6),
+    nn.Linear(x.size(-1), 10),
     nn.LeakyReLU(),
-    nn.Linear(6, 5),
+    nn.Linear(10, 9),
     nn.LeakyReLU(),
-    nn.Linear(5, 4),
+    nn.Linear(9, 8),
     nn.LeakyReLU(),
-    nn.Linear(4, 3),
+    nn.Linear(8, 7),
     nn.LeakyReLU(),
-    nn.Linear(3, y.size(-1)),
+    nn.Linear(7, 6),
+    nn.LeakyReLU(),
+    nn.Linear(6, y.size(-1)),
 )
+
 print('model =', model)
 
 # model = Sequential(
@@ -169,21 +172,29 @@ for i in range(n_epochs):
         # model.paramters()에서 리턴되는 변수들의 기울기에 학습률을 곱해서 빼준 뒤에 업데이트한다.
         optimizer.step()
 
+        ################################################################################
         # loss 변수에 담긴 손실 값 텐서를 float type casting을 통해 단순 float 타입으로 변환하여
         # total_loss 변수에 더하는 것을 볼 수 있음.이 부분이 매우 중요함
+        ################################################################################
         # 타입캐스팅 이전의 loss 변수는 파이토치 텐서 타입으로 그래디언트를 가지고 있음
-        # 파이토치의 AutoGrad 동작 원리에 의해서 loss 변수가 계산될 때까지 활용된 파이토치 텐서 변수들이
-        # loss 변수에 줄줄이 엮여 있음
+
+        # 파이토치의 AutoGrad 동작 원리에 의해서 loss 변수가 계산될 때까지 활용된
+        # 파이토치 텐서 변수들이 loss 변수에 줄줄이 엮여 있음
+
         # 따라서 만약 float 타입캐스팅이 없다면 total_loss도 파이토치 텐서가 될 것이고,
         # 이 total_loss 변수는 해당 에포크의 모든 loss 변수를 엮고 있음
+
         # 결과적으로 total_loss가 메모리에서 없어지지 않는다면 loss 변수와 그에 엮인 텐서 변수들 모두가
         # 아직 참조 중인 상태이므로 파이썬 garbage collector에 의해서 메모리에서 해제되지 않음
         # 즉, memory leak이 발생하게 됨
+
         # 더욱이 추후 실습에서처럼 손실 곡선을 그려보기 위해서 total_loss 변수를 따로 또 저장하기라도
         # 한다면 학습이 끝날때까지 학습에 사용된 대부분의 파이토치 텐서 변수들이 메모리에서 해제되지 않는
         # 최악의 상황이 발생할 수도 있음.
+
         # 그러므로 앞서와 같은 상황에서는 float 타입캐스팅 또는 detach 함수를 통해 AutoGrad를 위해
         # 연결된 그래프를 잘라내는 작업이 필요
+
         total_loss += float(loss) #This is very important to prevent memory leak
 
         # 미니배치마다 y_hat_i 변수에 피드포워딩 결과가 나오면 y_hat에 차례대로 저장
@@ -212,6 +223,6 @@ df = pd.DataFrame(torch.cat([y, y_hat], dim=1).detach().numpy(),columns=["y", "y
 
 # 페어플랏을 통해 확인해보면, 조금 넓게 퍼져있긴 하지만, 대체로 중앙을 통과하는
 # 대각선 주변으로 점들이 분포하고 있는 것을 볼 수 있음
- sns.pairplot(df, height=5)
+sns.pairplot(df, height=5)
 plt.show()
 

@@ -102,8 +102,7 @@ for x_i, y_i in zip(x, y):
 # 이후에 해당 스케일러를 활용하여 학습(x[0]), 검증(x[1]), 테스트(x[2]) 데이터에 대해서
 # 정규화를 진행하는 것을 볼 수 있음
 
-# 이처럼 학습 데이터만을 활용하여 정규화를 진행하는 것은 매우 중요하고 실수가 잦은 부분이오니,
-# 주의깊게 살피고 유념 바람
+# 이처럼 학습 데이터만을 활용하여 정규화를 진행하는 것은 매우 중요하고 실수가 잦은 부분이니 주의
 
 scaler = StandardScaler()
 scaler.fit(x[0].numpy()) # You must fit with train data only.
@@ -118,18 +117,20 @@ print('df.tail() = \n',df.tail())
 ################################################################################
 #Build Model & Optimizer
 ################################################################################
-# 앞서와 똑같이 nn.Sequential을 활용하여 모델을 선언하고, 아담 옵티마이저에 등록
+# nn.Sequential을 활용하여 모델을 선언하고, 아담 옵티마이저에 등록
 
 model = nn.Sequential(
-    nn.Linear(x[0].size(-1), 6),
+    nn.Linear(x[0].size(-1), 10),
     nn.LeakyReLU(),
-    nn.Linear(6, 5),
+    nn.Linear(10, 9),
     nn.LeakyReLU(),
-    nn.Linear(5, 4),
+    nn.Linear(9, 8),
     nn.LeakyReLU(),
-    nn.Linear(4, 3),
+    nn.Linear(8, 7),
     nn.LeakyReLU(),
-    nn.Linear(3, y[0].size(-1)),
+    nn.Linear(7, 6),
+    nn.LeakyReLU(),
+    nn.Linear(6, y[0].size(-1)),
 )
 
 print('model = \n', model)
@@ -141,56 +142,76 @@ optimizer = optim.Adam(model.parameters())
 ################################################################################
 # 모델 학습에 필요한 셋팅 값을 설정
 
-n_epochs = 4000
+n_epochs = 60000
 batch_size = 256
-print_interval = 100
+print_interval = 1000
 
-# 앞서 이론 파트에서 우리가 원하는 모델은 가장 낮은 검증 손실 값(validation loss)을 갖는
-# 모델이라고 이야기함.
+print('\nLearning hyper parameter => Epoch = ', format(n_epochs,','),'print_interval = ',format(print_interval,','))
+
+# 우리가 원하는 모델은 가장 낮은 검증 손실 값(validation loss)을 갖는 모델임
 #
-# 따라서 매 epoch마다 학습이 끝날 때, 검증 데이터셋을 똑같이feed-forwarding하여 검증 데이터셋
-# 전체에 대한 평균 손실 값을 구하고, 이전 에포크의 검증 손실 값과 비교하는 작업을 수행해야 함
+# 매 epoch마다 학습이 끝날 때, 검증 데이터셋을 똑같이 feed-forwarding하여
+# 검증 데이터셋 전체에 대한 평균 손실 값을 구하고, 이전 에포크의 검증 손실 값과
+# 비교하는 작업을 수행해야 함
 
-# 만약 현재 에포크의 검증 손실 값이 이전 에포크 까지의 최저(lowest) 검증 손실 값보다 더 낮다면,
-# 최저 검증 손실 값은 새롭게 갱신되고, 현재 에포크의 모델은 따로 저장되어야 할 것입니다.
-# 또는 현재 에포크의 검증 손실 값이 이전 에포크 까지의 최저 검증 손실 값보다 크다면,
-# 그냥 이번 에포크의 모델을 따로 저장할 필요 없이 넘어가면 됨. 그렇게 학습이 모두 끝났을 때,
-# 정해진 에포크가 n_epochs 번 진행되는 동안 최저 검증 손실 값을 뱉어냈던 모델이 우리가 원하는
-# 잘 일반화(generaliztaion)된 모델이라고 볼 수 있음
+# 만약 현재 에포크의 검증 손실 값이 이전 에포크 까지의 최저(lowest) 검증 손실 값보다
+# 더 낮다면, 최저 검증 손실 값은 새롭게 갱신되고, 현재 에포크의 모델은 따로 저장되어야 할 것임
+
+# 현재 에포크의 검증 손실 값이 이전 에포크 까지의 최저 검증 손실 값보다 크다면,
+# 그냥 이번 에포크의 모델을 따로 저장할 필요 없이 넘어가면 됨.
+
+# 그렇게 학습이 모두 끝났을 때, 정해진 에포크가 n_epochs 번 진행되는 동안 최저 검증 손실 값을
+# 뱉어냈던 모델이 우리가 원하는 잘 일반화(generaliztaion)된 모델이라고 볼 수 있음
+
 # 따라서 학습이 종료되고 나면 최저 검증 손실 값의 모델을 다시 복원하고 사용자에게 반환하면 됨
 
-# 이를 위해서 다음 코드들은 최저 검증 손실을 추적하기 위한 변수 lowest_loss와 최저 검증 손실 값을
+# 이를 위해서 최저 검증 손실을 추적하기 위한 변수 lowest_loss와 최저 검증 손실 값을
 # 뱉어낸 모델을 저장하기 위한 변수 best_model을 미리 생성하는 모습임
-# 이때 best_model에 단순히 현재 모델을 저장한다면 얇은 복사shallow copy가 수행되어 주소값이
-# 저장되므로, 깊은 복사(deep copy)를 통해 값 자체를 복사하여 저장해야 합니다.
-# 이를 위해서 copy 패키지의 deepcopy 함수를 불러오는 것을 볼 수 있습니다.
+
+# 이때 best_model에 단순히 현재 모델을 저장한다면 얇은 복사(shallow copy)가 수행되어
+# 주소값이 저장되므로, 깊은 복사(deep copy)를 통해 값 자체를 복사하여 저장해야 함
+
+#  깊은 복사(deep copy)를 통해 값 자체를 복사하여 저장하기 위해
+#  copy 패키지의 deepcopy 함수를 불러옴
 
 from copy import deepcopy
 lowest_loss = np.inf
 best_model = None
 
-early_stop = 100
+# 학습 조기 종료(early stopping)을 위한 셋팅 값과,가장 낮은 검증손실 값을 찾아내는 에포크를
+# 저장하기 위한 변수 lowest_epoch도 선언함
+
+early_stop = 4000
 lowest_epoch = np.inf
 
-# 또한 학습 조기 종료early stopping을 위한 셋팅 값과, 가장 낮은 검증 손실 값을 뱉어낸 에포크를
-# 저장하기 위한 변수 lowest_epoch도 선언합니다.
-#
-# 이제 본격 학습을 위한 for 반복문을 수행합니다. 이전까지의 실습과 달라진 점은 바깥 for 반복문의
-# 후반부에 검증 작업을 위한 코드가 추가되었다는 점입니다. 따라서 코드가 굉장히 길어지게 되는데요.
-# 설명을 위해 같은 for 반복문 안쪽에 있지만, 검증 작업을 위한 코드는 따로 떼어내보겠습니다.
-# 그럼 앞서 우리가 보았던 코드와 상당히 유사한 코드가 나타납니다.
-# 새롭게 추가된 코드는 학습/검증 손실 값 히스토리를 저장하기 위한 train_history와 valid_history 변수가 추가되었다는 것 정도입니다.
+print('\nearly_stop hyper parameter => early_stop = ', format(early_stop,','))
+
+# 이제 본격 학습을 위한 for 반복문을 수행
+
+# 달라진 점은 바깥 for 반복문의 후반부에 검증 작업을 위한 코드가 추가된 점.
+# 따라서 코드가 굉장히 길어지게 되는데요.
+
+# 설명을 위해 같은 for 반복문 안쪽에 있지만, 검증 작업을 위한 코드는 따로 떼어냄.
+
+# 새롭게 추가된 코드는 학습/검증 손실 값 히스토리를 저장하기 위한 train_history와
+# valid_history 변수가 추가 되었다는 것 정도임.
 
 train_history, valid_history = [], []
 
 for i in range(n_epochs):
+
     # Shuffle before mini-batch split.
+    # randperm 함수를 통해서 새롭게 섞어줄 데이터셋의 인덱스 순서를 정함
     indices = torch.randperm(x[0].size(0))
+
+    # index_select 함수를 통해서 이 임의의 순서로 섞인 인덱스 순서대로 데이터셋을 섞음
     x_ = torch.index_select(x[0], dim=0, index=indices)
     y_ = torch.index_select(y[0], dim=0, index=indices)
     # |x_| = (total_size, input_dim)
     # |y_| = (total_size, output_dim)
 
+    # split 함수를 활용하여 원하는 배치사이즈로 텐서를 나누어 주면 미니배치를 만드는
+    # 작업이 끝남
     x_ = x_.split(batch_size, dim=0)
     y_ = y_.split(batch_size, dim=0)
     # |x_[i]| = (batch_size, input_dim)
@@ -200,31 +221,74 @@ for i in range(n_epochs):
     y_hat = []
 
     for x_i, y_i in zip(x_, y_):
+
+        # 신경망 모델 결과를 y_hat_i에 할당
         # |x_i| = |x_[i]|
         # |y_i| = |y_[i]|
         y_hat_i = model(x_i)
+
+        # 실제 target(label)과 학습결과간의 차이(비용, 손실)을 계산
         loss = F.mse_loss(y_hat_i, y_i)
 
+        # optimizer.zero_grad() 는 반복 시에 전에 계산했던 기울기를 0 으로 초기화 하는 함수
+        # 즉 최적화된 모든 torch의 기울기를 0으로 바꿈
+        # 기울기를 초기화 해야 새로운 가중치와 편차에 대해서 새로운 기울기를 구할 수 있기 때문
         optimizer.zero_grad()
+
+        # w와 b에 대한 기울기 계산
         loss.backward()
 
+        # model.paramters()에서 리턴되는 변수들의 기울기에 학습률을 곱해서 빼준 뒤에 업데이트
         optimizer.step()
+        
+        ################################################################################
+        # loss 변수에 담긴 손실 값 텐서를 float type casting을 통해 단순 float 타입으로 변환하여
+        # total_loss 변수에 더하는 것을 볼 수 있음.이 부분이 매우 중요함
+        ################################################################################
+        # 타입캐스팅 이전의 loss 변수는 파이토치 텐서 타입으로 gradient를 가지고 있음
+
+        # 파이토치의 AutoGrad 동작 원리에 의해서 loss 변수가 계산될 때까지 활용된
+        # 파이토치 텐서 변수들이 loss 변수에 줄줄이 엮여 있음
+
+        # 따라서 만약 float 타입캐스팅이 없다면 total_loss도 파이토치 텐서가 될 것이고,
+        # 이 total_loss 변수는 해당 에포크의 모든 loss 변수를 엮고 있음
+
+        # 결과적으로 total_loss가 메모리에서 없어지지 않는다면 loss 변수와 그에 엮인 텐서 변수들
+        # 모두가 아직 참조 중인 상태이므로 파이썬 garbage collector에 의해서 메모리에서 해제되지 않음
+        # 즉, memory leak이 발생하게 됨
+
+        # 더욱이 추후 실습에서 처럼 손실 곡선을 그려보기 위해서 total_loss 변수를 따로
+        # 또 저장하기라도 한다면 학습이 끝날때까지 학습에 사용된 대부분의 파이토치 텐서 변수들이
+        # 메모리에서 해제되지 않는 최악의 상황이 발생할 수도 있음.
+
+        # 그러므로 앞서와 같은 상황에서는 float 타입캐스팅 또는 detach 함수를 통해 AutoGrad를 위해
+        # 연결된 그래프를 잘라내는 작업이 필요
+
         train_loss += float(loss)
 
     train_loss = train_loss / len(x_)
 
-    # 이처럼 학습 데이터셋을 미니배치로 나누어 한바퀴 학습하고 나면, 검증 데이터셋을 활용하여 검증 작업을  수행합니다.학습과
-    # 달리 검증 작업은 역전파back - propagation를 활용하여 학습을 수행하지 않습니다.따라서 그래디언트를 계산할
-    # 필요가 없기 때문에, torch.no_grad 함수를 호출하여 with 내부에서 검증 작업을 진행합니다.그럼 그래디언트를 계산하기위한
-    # 배후 작업들이 없어지기 때문에 계산 오버헤드가 줄어들어 속도가 빨라지고 메모리 사용량도 줄어들게 됩니다.
+    # 이처럼 학습 데이터셋을 미니배치로 나누어 한바퀴(epoche) 학습하고 나면, 검증 데이터셋을
+    # 활용하여 검증 작업을  수행
+    # 학습과 달리 검증 작업은 역전파back - propagation를 활용하여 학습을 수행하지 않음.
+    # 따라서 gradient를 계산할 필요가 없기 때문에, torch.no_grad 함수를 호출하여
+    # with 내부에서 검증 작업을 진행함
+
+    # gradient를 계산하기 위한 배후 작업들이 없어지기 때문에 계산 오버헤드가 줄어들어
+    # 속도가 빨라지고 메모리 사용량도 줄어듬
     #
-    # 그럼 with 내부를 살펴보겠습니다.split 함수를 써서 미니배치 크기로 나눠주는 것을 볼 수 있습니다.
-    # 앞서 이야기한 것처럼 검증 작업은 메모리 사용량이 적기 때문에, 검증 작업을 위한 미니배치 크기는 학습용보다 더 크게 가져가도 됩니다만,
-    # 간편함을 위해서 그냥 기존 학습용 미니배치 크기와 같은 크기를 사용하였습니다.
+    # with 내부를 살펴보겠습니다.split 함수를 써서 미니배치 크기로 나눠주는 것을 볼 수 있음
+    # 앞서 이야기한 것처럼 검증 작업은 메모리 사용량이 적기 때문에, 검증 작업을 위한
+    # 미니배치 크기는 학습용보다 더 크게 가져가도 됩니다만,
+    # 간편함을 위해서 그냥 기존 학습용 미니배치 크기와 같은 크기를 사용함.
     # 그리고 학습과 달리 셔플링shuffling 작업이 빠진 것을 볼 수 있습니다.
-    # 또한 for 반복문 내부에서도 피드포워드feed-forward만 있고, 역전파back-propagation 관련 코드는 없는 것을 볼 수 있습니다.
+    # 또한 for 반복문 내부에서도 피드포워드feed-forward만 있고,
+    # 역전파back-propagation 관련 코드는 없는 것을 볼 수 있음
 
     # You need to declare to PYTORCH to stop build the computation graph.
+
+    # 계산 그래프 빌드를 중지하려면 PYTORCH에 선언해야 합니다.
+
     with torch.no_grad():
         # You don't need to shuffle the validation set.
         # Only split is needed.
@@ -254,38 +318,59 @@ for i in range(n_epochs):
             valid_loss,
             lowest_loss,
         ))
-    # 앞서와 같이 학습과 검증 작업이 끝나고 나면, 검증 손실 값을 기준으로 모델 저장 여부를 결정합니다.우리가
-    # 원하는 것은 검증 손실을 낮추는 것입니다.따라서 기존 최소 손실 값 변수 lowest_loss와 현재 검증 손실
-    # 값 valid_loss를 비교하여 최소 손실 값이 갱신될 경우, 현재 에포크의 모델을 저장합니다.[1]
-    # 또한 정해진 기간(early_stop 변수)동안 최소 검증 손실 값의 갱신이 없을 경우, 학습을 종료합니다.이
-    # 조기 종료early stopping 파라미터  또한 하이퍼 파라미터임을  잊지 마세요.
+    # Epoch    400: train  loss = 3.3823e-01 valid_loss = 3.7201e-01    lowest_loss = 3.6391e-01
+    # Epoch    800: train  loss = 3.2896e-01 valid_loss = 3.4263e-01    lowest_loss = 3.4245e-01
+    # Epoch   1200: train  loss = 3.0605e-01 valid_loss = 3.2399e-01    lowest_loss = 3.2185e-01
+    # Epoch   1600: train  loss = 2.9349e-01 valid_loss = 3.0849e-01    lowest_loss = 3.0795e-01
+    # Epoch   2000: train  loss = 2.9202e-01 valid_loss = 3.0720e-01    lowest_loss = 3.0113e-01
+    # Epoch   2400: train  loss = 2.9125e-01 valid_loss = 3.0730e-01    lowest_loss = 3.0110e-01
+    # Epoch   2800: train  loss = 2.8883e-01 valid_loss = 3.2578e-01    lowest_loss = 3.0110e-01
+    # Epoch   3200: train  loss = 2.9150e-01 valid_loss = 3.1877e-01    lowest_loss = 3.0110e-01
+
+    # 앞서와 같이 학습과 검증 작업이 끝나고 나면, 검증손실 값을 기준으로 모델 저장 여부를 결정
+    # 원하는 것은 검증 손실을 낮추는 것임. 따라서 기존 최소 손실 값 변수 lowest_loss와
+    # 현재 검증 손실 값 valid_loss를 비교하여 최소 손실 값이 갱신될 경우,
+    # 현재 에포크의 모델을 저장[1]
 
     if valid_loss <= lowest_loss:
         lowest_loss = valid_loss
         lowest_epoch = i
 
         # 'state_dict()' returns model weights as key-value.
+        # 'state_dict()'는 모델 가중치를 키-값으로 반환합니다.
+
         # Take a deep copy, if the valid loss is lowest ever.
+        # 유효한 손실이 가장 낮은 경우 깊은 복사를 수행하십시오.
         best_model = deepcopy(model.state_dict())
     else:
+        # 또한 정해진 기간(early_stop 변수)동안 최소 검증 손실 값의 갱신이 없을 경우,
+        # 학습을 종료.
+        # 이 조기 종료(early stopping) 파라미터  또한 하이퍼 파라미터임을 인식해야 함
+        print("lowest epoch %d: %.4e" % (lowest_epoch + 1, lowest_loss))
+
         if early_stop > 0 and lowest_epoch + early_stop < i + 1:
             print("There is no improvement during last %d epochs." % early_stop)
+            # There is no improvement during last 1000 epochs.
             break
 
 print("The best validation loss from epoch %d: %.4e" % (lowest_epoch + 1, lowest_loss))
+# The best validation loss from epoch 2368: 3.0110e-01
+# The best validation loss from epoch 6201: 3.1013e-01
 
 # [1]: state_dict 함수가 현재 모델 파라미터를 key-value 형태로 주소값을 반환하기에,
-# 그냥 변수에 state_dict 결과값을 저장할 경우 에포크가 끝날 때마다 best_model에 저장된 값이 바뀔 수 있습니다.
-# 따라서 deepcopy를 활용하여 현재 모델의 가중치 파라미터를 복사하여 저장합니다
+# 그냥 변수에 state_dict 결과값을 저장할 경우 에포크가 끝날 때마다 best_model에 저장된 값이
+# 바뀔 수 있음
+# 따라서 deepcopy를 활용하여 현재 모델의 가중치 파라미터를 복사하여 저장
+
+# 모든 작업이 수행되고 나면, for 반복문을 빠져나와 best_model에 저장되어있던 가중치 파라미터를
+# 모델 가중치 파라미터로 복원. 그럼 우리는 최소 검증 손실 값을 얻은 모델으로 되돌릴 수 있게 됩니다.
 
 # Load best epoch's model.
 model.load_state_dict(best_model)
 
-# 모든 작업이 수행되고 나면, for 반복문을 빠져나와 best_model에 저장되어있던 가중치 파라미터를
-# 모델 가중치 파라미터로 복원합니다. 그럼 우리는 최소 검증 손실 값을 얻은 모델으로 되돌릴 수 있게 됩니다.
-#
 # 코드를 수행하면 다음과 같이 출력되는 것을 볼 수 있습니다.
-# 539번째 에포크에서 최소 검증 손실 값을 얻었음을 알 수 있습니다. 만약 여러분이 보기에 손실 값이 좀 더 떨어질 여지가 있다면,
+# 539번째 에포크에서 최소 검증 손실 값을 얻었음을 알 수 있습니다.
+# 만약 여러분이 보기에 손실 값이 좀 더 떨어질 여지가 있다면,
 # 조기 종료 파라미터를 늘릴 수도 있습니다.
 
 # Loss History
@@ -324,7 +409,7 @@ plt.show()
 # 이 과정에서 학습 데이터셋과 검증 데이터셋만 활용할 수 있었고, 중간 목표는 검증 손실 값을 낮추는 것이었습니다.
 # 이제 이렇게 얻어진 모델이 테스트 데이터셋에 대해서도 여전히 좋은 성능을 유지하는지 확인해보려 합니다.
 # 다음의 코드를 보면 검증 작업과 거의 비슷하게 진행되는 것을 볼 수 있습니다.
-# torch.no_grad 함수를 활용하여 with 내부에서 그래디언트 계산 없이 모든 작업이 수행됩니다.
+# torch.no_grad 함수를 활용하여 with 내부에서 gradient 계산 없이 모든 작업이 수행됩니다.
 # 또한 미니배치 크기로 split하여 for 반복문을 통해서 피드포워드feed-forward 합니다.
 
 test_loss = 0
@@ -364,4 +449,3 @@ sns.pairplot(df, height=5)
 plt.show()
 
 # 따라서 정말 정당한 비교를 위해서는 매번 랜덤하게 학습/검증/테스트셋을 나누기보단, 아예 테스트셋을 따로 빼두는 것도 좋습니다.
-
