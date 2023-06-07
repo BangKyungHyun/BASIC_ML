@@ -353,12 +353,12 @@ for i in range(n_epochs):
         # Take a deep copy, if the valid loss is lowest ever.
         # 유효한 손실이 가장 낮은 경우 깊은 복사를 수행
         best_model = deepcopy(model.state_dict())
-        print("1. epoch = %d: lowest epoch %d: early_stop %d: valid_loss=%.4e lowest_loss=%.4e" % (i + 1,lowest_epoch + 1, early_stop,  valid_loss, lowest_loss))
+        print("1. epoch = %d: lowest epoch %d: early_stop %d: interval %d: valid_loss=%.4e lowest_loss=%.4e" % (i + 1,lowest_epoch + 1, early_stop, (i + 1) - lowest_epoch,  valid_loss, lowest_loss))
     else:
         # 정해진 기간(early_stop 변수)동안 최소 검증 손실 값의 갱신이 없을 경우,
         # 학습을 종료
         # 이 조기 종료(early stopping) 파라미터  또한 하이퍼 파라미터임을 인식해야 함
-        print("2. epoch = %d: lowest epoch %d: early_stop %d: valid_loss=%.4e lowest_loss=%.4e" % (i + 1,lowest_epoch + 1, early_stop,  valid_loss, lowest_loss))
+        print("2. epoch = %d: lowest epoch %d: early_stop %d: interval %d: valid_loss=%.4e lowest_loss=%.4e" % (i + 1,lowest_epoch + 1, early_stop, (i + 1) - lowest_epoch,  valid_loss, lowest_loss))
         # 최소 검증 값 갱신횟수+조기중단 값이 전체 에포크 횟수보다 적을 때까지 수행
         # 즉, 최종 최소 검증 값 갱신 이후 조기중단 횟수 만큼 갱신이 일어나지 않으면 강제 종료
         if early_stop > 0 and lowest_epoch + early_stop < i + 1:
