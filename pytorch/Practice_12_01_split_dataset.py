@@ -76,7 +76,6 @@ y = y.split(cnts, dim=0)
 for x_i, y_i in zip(x, y):
     print(x_i.size(), y_i.size())
 
-
 ################################################################################
 # Preprocessing
 ################################################################################
@@ -142,7 +141,7 @@ optimizer = optim.Adam(model.parameters())
 ################################################################################
 # 모델 학습에 필요한 셋팅 값을 설정
 
-n_epochs = 60000
+n_epochs = 400000
 batch_size = 256
 print_interval = 1000
 
@@ -181,7 +180,7 @@ best_model = None
 # 학습 조기 종료(early stopping)을 위한 셋팅 값과,가장 낮은 검증손실 값을 찾아내는 에포크를
 # 저장하기 위한 변수 lowest_epoch도 선언함
 
-early_stop = 4000
+early_stop = 10000
 lowest_epoch = np.inf
 
 print('\nearly_stop hyper parameter => early_stop = ', format(early_stop,','))
@@ -218,9 +217,19 @@ for i in range(n_epochs):
     # |y_[i]| = (batch_size, output_dim)
 
     train_loss, valid_loss = 0, 0
+
     y_hat = []
 
+    # print ('x_, y_', x_, y_)
+    # 바캍쪽 for 수행 횟수
+    large_for_count = 0
+
     for x_i, y_i in zip(x_, y_):
+
+        large_for_count += 1
+        # 첫번째 에포크에서만 출력 (12,384건을 batch_size 256 나누면 49번 반복)
+        if i == 0:
+            print('large_for_count %d: ' % (large_for_count))
 
         # 신경망 모델 결과를 y_hat_i에 할당
         # |x_i| = |x_[i]|
@@ -265,6 +274,7 @@ for i in range(n_epochs):
         # 연결된 그래프를 잘라내는 작업이 필요
 
         train_loss += float(loss)
+    # end for
 
     train_loss = train_loss / len(x_)
 
@@ -287,7 +297,7 @@ for i in range(n_epochs):
 
     # You need to declare to PYTORCH to stop build the computation graph.
 
-    # 계산 그래프 빌드를 중지하려면 PYTORCH에 선언해야 합니다.
+    # 계산 그래프 빌드를 중지하려면 PYTORCH에 선언해야 함
 
     with torch.no_grad():
         # You don't need to shuffle the validation set.
@@ -328,8 +338,9 @@ for i in range(n_epochs):
     # Epoch   3200: train  loss = 2.9150e-01 valid_loss = 3.1877e-01    lowest_loss = 3.0110e-01
 
     # 앞서와 같이 학습과 검증 작업이 끝나고 나면, 검증손실 값을 기준으로 모델 저장 여부를 결정
-    # 원하는 것은 검증 손실을 낮추는 것임. 따라서 기존 최소 손실 값 변수 lowest_loss와
-    # 현재 검증 손실 값 valid_loss를 비교하여 최소 손실 값이 갱신될 경우,
+    # 원하는 것은 검증 손실을 낮추는 것임.
+
+    # 기존 최소 손실 값 변수 lowest_loss와 현재 검증 손실 값 valid_loss를 비교하여 최소 손실 값이 갱신될 경우,
     # 현재 에포크의 모델을 저장[1]
 
     if valid_loss <= lowest_loss:
@@ -337,19 +348,23 @@ for i in range(n_epochs):
         lowest_epoch = i
 
         # 'state_dict()' returns model weights as key-value.
-        # 'state_dict()'는 모델 가중치를 키-값으로 반환합니다.
+        # 'state_dict()'는 모델 가중치를 키-값으로 반환
 
         # Take a deep copy, if the valid loss is lowest ever.
-        # 유효한 손실이 가장 낮은 경우 깊은 복사를 수행하십시오.
+        # 유효한 손실이 가장 낮은 경우 깊은 복사를 수행
         best_model = deepcopy(model.state_dict())
+        print("1. epoch = %d: lowest epoch %d: early_stop %d: valid_loss=%.4e lowest_loss=%.4e" % (i + 1,lowest_epoch + 1, early_stop,  valid_loss, lowest_loss))
     else:
-        # 또한 정해진 기간(early_stop 변수)동안 최소 검증 손실 값의 갱신이 없을 경우,
-        # 학습을 종료.
+        # 정해진 기간(early_stop 변수)동안 최소 검증 손실 값의 갱신이 없을 경우,
+        # 학습을 종료
         # 이 조기 종료(early stopping) 파라미터  또한 하이퍼 파라미터임을 인식해야 함
-        print("lowest epoch %d: %.4e" % (lowest_epoch + 1, lowest_loss))
-
+        print("2. epoch = %d: lowest epoch %d: early_stop %d: valid_loss=%.4e lowest_loss=%.4e" % (i + 1,lowest_epoch + 1, early_stop,  valid_loss, lowest_loss))
+        # 최소 검증 값 갱신횟수+조기중단 값이 전체 에포크 횟수보다 적을 때까지 수행
+        # 즉, 최종 최소 검증 값 갱신 이후 조기중단 횟수 만큼 갱신이 일어나지 않으면 강제 종료
         if early_stop > 0 and lowest_epoch + early_stop < i + 1:
-            print("There is no improvement during last %d epochs." % early_stop)
+            print("최종 최소 검증 값 갱신 이후 %d 번 에포크 동안 최소 검증값 변화가 없음." % early_stop)
+            # print("There is no improvement during last %d epochs." % early_stop)
+
             # There is no improvement during last 1000 epochs.
             break
 
