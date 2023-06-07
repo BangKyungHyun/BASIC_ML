@@ -5,6 +5,9 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import datetime
+import time
+
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.datasets import fetch_california_housing
@@ -119,17 +122,24 @@ print('df.tail() = \n',df.tail())
 # nn.Sequential을 활용하여 모델을 선언하고, 아담 옵티마이저에 등록
 
 model = nn.Sequential(
-    nn.Linear(x[0].size(-1), 10),
+    nn.Linear(x[0].size(-1), 20),
     nn.LeakyReLU(),
-    nn.Linear(10, 9),
+    nn.Linear(20, 19),
     nn.LeakyReLU(),
-    nn.Linear(9, 8),
+    nn.Linear(19, 18),
     nn.LeakyReLU(),
-    nn.Linear(8, 7),
+    nn.Linear(18, 17),
     nn.LeakyReLU(),
-    nn.Linear(7, 6),
+    nn.Linear(17, 16),
     nn.LeakyReLU(),
-    nn.Linear(6, y[0].size(-1)),
+    nn.Linear(16, 15),
+    nn.LeakyReLU(),
+    nn.Linear(15, 14),
+    nn.LeakyReLU(),
+    nn.Linear(14, 13),
+    nn.LeakyReLU(),
+    nn.Linear(13, 12),
+    nn.Linear(12, y[0].size(-1)),
 )
 
 print('model = \n', model)
@@ -188,7 +198,7 @@ print('\nearly_stop hyper parameter => early_stop = ', format(early_stop,','))
 # 이제 본격 학습을 위한 for 반복문을 수행
 
 # 달라진 점은 바깥 for 반복문의 후반부에 검증 작업을 위한 코드가 추가된 점.
-# 따라서 코드가 굉장히 길어지게 되는데요.
+# 따라서 코드가 굉장히 길어짐
 
 # 설명을 위해 같은 for 반복문 안쪽에 있지만, 검증 작업을 위한 코드는 따로 떼어냄.
 
@@ -196,6 +206,10 @@ print('\nearly_stop hyper parameter => early_stop = ', format(early_stop,','))
 # valid_history 변수가 추가 되었다는 것 정도임.
 
 train_history, valid_history = [], []
+
+now = datetime.datetime.now()
+time1 = now.strftime('%Y-%m-%d %H:%M:%S')
+print('start time =',time1)
 
 for i in range(n_epochs):
 
@@ -228,8 +242,8 @@ for i in range(n_epochs):
 
         large_for_count += 1
         # 첫번째 에포크에서만 출력 (12,384건을 batch_size 256 나누면 49번 반복)
-        if i == 0:
-            print('large_for_count %d: ' % (large_for_count))
+        # if i == 0:
+        #     print('large_for_count %d: ' % (large_for_count))
 
         # 신경망 모델 결과를 y_hat_i에 할당
         # |x_i| = |x_[i]|
@@ -274,13 +288,15 @@ for i in range(n_epochs):
         # 연결된 그래프를 잘라내는 작업이 필요
 
         train_loss += float(loss)
-    # end for
+    ################################################################################
+    # inner end for
+    ################################################################################
 
     train_loss = train_loss / len(x_)
 
     # 이처럼 학습 데이터셋을 미니배치로 나누어 한바퀴(epoche) 학습하고 나면, 검증 데이터셋을
     # 활용하여 검증 작업을  수행
-    # 학습과 달리 검증 작업은 역전파back - propagation를 활용하여 학습을 수행하지 않음.
+    # 학습과 달리 검증 작업은 역전파back - propagation를 활용하여 학습을 수행하지 않음
     # 따라서 gradient를 계산할 필요가 없기 때문에, torch.no_grad 함수를 호출하여
     # with 내부에서 검증 작업을 진행함
 
@@ -290,14 +306,16 @@ for i in range(n_epochs):
     # with 내부를 살펴보겠습니다.split 함수를 써서 미니배치 크기로 나눠주는 것을 볼 수 있음
     # 앞서 이야기한 것처럼 검증 작업은 메모리 사용량이 적기 때문에, 검증 작업을 위한
     # 미니배치 크기는 학습용보다 더 크게 가져가도 됩니다만,
-    # 간편함을 위해서 그냥 기존 학습용 미니배치 크기와 같은 크기를 사용함.
-    # 그리고 학습과 달리 셔플링shuffling 작업이 빠진 것을 볼 수 있습니다.
-    # 또한 for 반복문 내부에서도 피드포워드feed-forward만 있고,
-    # 역전파back-propagation 관련 코드는 없는 것을 볼 수 있음
+    # 간편함을 위해서 그냥 기존 학습용 미니배치 크기와 같은 크기를 사용함
+    # 그리고 학습과 달리 셔플링 작업이 빠진 것을 볼 수 있음
+    # 또한 for 반복문 내부에서도 피드포워드만 있고,역전파 관련 코드는 없는 것을 볼 수 있음
 
     # You need to declare to PYTORCH to stop build the computation graph.
 
     # 계산 그래프 빌드를 중지하려면 PYTORCH에 선언해야 함
+
+    # grdient 를 계산할 필요가 없기 때문에 torch.no_grad 함수를 호출하여 with 내부에서
+    # 검증 작업을 수행
 
     with torch.no_grad():
         # You don't need to shuffle the validation set.
@@ -322,11 +340,13 @@ for i in range(n_epochs):
     valid_history += [valid_loss]
 
     if (i + 1) % print_interval == 0:
-        print('Epoch %d: train loss=%.4e  valid_loss=%.4e  lowest_loss=%.4e' % (
+        now = datetime.datetime.now()
+        nowDatetime = now.strftime('%Y-%m-%d %H:%M:%S')
+        print(nowDatetime,'Epoch %d: train loss=%.4e  valid_loss=%.4e  lowest_loss=%.4e' % (
             i + 1,
             train_loss,
             valid_loss,
-            lowest_loss,
+            lowest_loss,   # 검증 데이터셋에서 가장 낮은 손실 값
         ))
     # Epoch    400: train  loss = 3.3823e-01 valid_loss = 3.7201e-01    lowest_loss = 3.6391e-01
     # Epoch    800: train  loss = 3.2896e-01 valid_loss = 3.4263e-01    lowest_loss = 3.4245e-01
@@ -353,44 +373,54 @@ for i in range(n_epochs):
         # Take a deep copy, if the valid loss is lowest ever.
         # 유효한 손실이 가장 낮은 경우 깊은 복사를 수행
         best_model = deepcopy(model.state_dict())
-        print("1. epoch = %d: lowest epoch %d: early_stop %d: interval %d: valid_loss=%.4e lowest_loss=%.4e" % (i + 1,lowest_epoch + 1, early_stop, (i + 1) - lowest_epoch,  valid_loss, lowest_loss))
+        # print("1. epoch = %d: lowest epoch %d: early_stop %d: interval %d: valid_loss=%.4e lowest_loss=%.4e" %
+        #       (i + 1,lowest_epoch + 1, early_stop, (i + 1) - lowest_epoch,  valid_loss, lowest_loss))
     else:
         # 정해진 기간(early_stop 변수)동안 최소 검증 손실 값의 갱신이 없을 경우,
         # 학습을 종료
         # 이 조기 종료(early stopping) 파라미터  또한 하이퍼 파라미터임을 인식해야 함
-        print("2. epoch = %d: lowest epoch %d: early_stop %d: interval %d: valid_loss=%.4e lowest_loss=%.4e" % (i + 1,lowest_epoch + 1, early_stop, (i + 1) - lowest_epoch,  valid_loss, lowest_loss))
+        # print("2. epoch = %d: lowest epoch %d: early_stop %d: interval %d: valid_loss=%.4e lowest_loss=%.4e" %
+        #       (i + 1,lowest_epoch + 1, early_stop, (i + 1) - lowest_epoch,  valid_loss, lowest_loss))
         # 최소 검증 값 갱신횟수+조기중단 값이 전체 에포크 횟수보다 적을 때까지 수행
         # 즉, 최종 최소 검증 값 갱신 이후 조기중단 횟수 만큼 갱신이 일어나지 않으면 강제 종료
         if early_stop > 0 and lowest_epoch + early_stop < i + 1:
-            print("최종 최소 검증 값 갱신 이후 %d 번 에포크 동안 최소 검증값 변화가 없음." % early_stop)
-            # print("There is no improvement during last %d epochs." % early_stop)
-
-            # There is no improvement during last 1000 epochs.
+            print("최종 최소 검증 값 갱신 이후 %d 번 에포크 동안 최소 검증값 변화가 없어서 종료함" % early_stop)
+            # 최종 최소 검증 값 갱신 이후 10000 번 에포크 동안 최소 검증값 변화가 없음.
             break
 
+################################################################################
+# outter for end
+################################################################################
+
 print("The best validation loss from epoch %d: %.4e" % (lowest_epoch + 1, lowest_loss))
-# The best validation loss from epoch 2368: 3.0110e-01
-# The best validation loss from epoch 6201: 3.1013e-01
+# The best validation loss from epoch 12648: 2.3347e-01
 
 # [1]: state_dict 함수가 현재 모델 파라미터를 key-value 형태로 주소값을 반환하기에,
 # 그냥 변수에 state_dict 결과값을 저장할 경우 에포크가 끝날 때마다 best_model에 저장된 값이
 # 바뀔 수 있음
 # 따라서 deepcopy를 활용하여 현재 모델의 가중치 파라미터를 복사하여 저장
 
-# 모든 작업이 수행되고 나면, for 반복문을 빠져나와 best_model에 저장되어있던 가중치 파라미터를
-# 모델 가중치 파라미터로 복원. 그럼 우리는 최소 검증 손실 값을 얻은 모델으로 되돌릴 수 있게 됩니다.
+# 모든 작업이 수행되고 나면, for 반복문을 빠져나와 best_model에 저장되어 있던 가중치 파라미터를
+# 모델 가중치 파라미터로 복원.
+# 그럼 우리는 최소 검증 손실 값을 얻은 모델으로 되돌릴 수 있게 됨
 
 # Load best epoch's model.
 model.load_state_dict(best_model)
 
-# 코드를 수행하면 다음과 같이 출력되는 것을 볼 수 있습니다.
-# 539번째 에포크에서 최소 검증 손실 값을 얻었음을 알 수 있습니다.
+# 코드를 수행하면 다음과 같이 출력되는 것을 볼 수 있음
+# 539번째 에포크에서 최소 검증 손실 값을 얻었음을 알 수 있음
+
+now = datetime.datetime.now()
+time2 = now.strftime('%Y-%m-%d %H:%M:%S')
+print('end time =',time2)
+################################################################################
 # 만약 여러분이 보기에 손실 값이 좀 더 떨어질 여지가 있다면,
-# 조기 종료 파라미터를 늘릴 수도 있습니다.
+# 조기 종료 파라미터를 늘릴 수도 있음(중요).
+################################################################################
 
 # Loss History
-# 그럼 이제 train_history, valid_history에 쌓인 손실 값들을 그림으로 그려 확인해보도록 하겠습니다.
-# 이렇게 그림을 통해서 확인하면 화면에 프린트된 숫자들 보다 훨씬 쉽게 손실 값 추세를 확인할 수 있습니다.
+# 그럼 이제 train_history, valid_history에 쌓인 손실 값들을 그림으로 그려 확인
+# 그림을 통해서 확인하면 화면에 프린트된 숫자들 보다 훨씬 쉽게 손실 값 추세를 확인할 수 있음
 plot_from = 10
 
 plt.figure(figsize=(20, 10))
@@ -406,26 +436,38 @@ plt.show()
 ################################################################################
 # Let's see the result!
 ################################################################################
-# 먼저 가장 눈에 띄는 부분은 대부분의 구간에서 검증 손실 값이 학습 손실 값 보다 낮다는 점입니다.
-# 아무래도 검증 데이터셋은 학습 데이터셋에 비해서 일부에 불과하기 때문에 편향bias이 있을 수 있습니다. 따라서
-# 우연하게 검증 데이터셋이 좀 더 쉽게 구성이 되었다면, 학습 데이터셋에 비해 더 낮은 손실 값을 가질 수도 있습니다.
-# 만약 이 두 손실 값이 차이가 너무 크게 나지만 않는다면 크게 신경쓰지 않아도 됩니다.
+# 먼저 가장 눈에 띄는 부분은 대부분의 구간에서 검증 손실 값이 학습 손실 값 보다 낮다는 점임
+# 검증 데이터셋은 학습 데이터셋에 비해서 일부에 불과하기 때문에 편향bias이 있을 수 있음.
+# 따라서 우연하게 검증 데이터셋이 좀 더 쉽게 구성이 되었다면,
+# 학습 데이터셋에 비해 더 낮은 손실 값을 가질 수도 있음
+# 만약 이 두 손실 값이 차이가 너무 크게 나지만 않는다면 크게 신경쓰지 않아도 됨
 #
-# 그리고 검증 손실 값과 학습 손실 값의 차이가 학습 후반부로 갈수록 점점 더 줄어드는 것을 확인할 수 있습니다.
-# 모델이 학습 데이터에만 존재하는 특성을 학습하는 과정이라고도 볼 수 있습니다.
+# 그리고 검증 손실 값과 학습 손실 값의 차이가 학습 후반부로 갈수록 점점 더 줄어드는 것을 확인할 수 있음
+# 모델이 학습 데이터에만 존재하는 특성을 학습하는 과정이라고도 볼 수 있음
+
 # 하지만 어쨌든 검증 손실 값도 천천히 감소하고 있는 상황이므로,
-# 온전한 오버피팅에 접어들었다고 볼 수는 없습니다.[2] 독자 분들도 조기 종료 파라미터 등을 바꿔가며
-# 좀 더 낮은 검증 손실 값을 얻기 위한 튜닝을 해보시는 것도 좋습니다.
+# 온전한 오버피팅에 접어들었다고 볼 수는 없음.[2]
+
+# 독자 분들도 조기 종료 파라미터 등을 바꿔가며
+# 좀 더 낮은 검증 손실 값을 얻기 위한 튜닝을 해보시는 것도 좋음
 #
-# [2]: 조기 종료를 하지 않고 계속 학습시킨다면 오버피팅이 될 겁니다.
+################################################################################
+# [2]: 조기 종료를 하지 않고 계속 학습시킨다면 오버피팅이 될 것임(샤베인 방법- 김성훈 교수).
+################################################################################
 #
 # 결과 확인
-# 테스트 데이터셋에 대해서도 성능을 확인해보려 합니다. 우리의 최종 목표는 테스트 성능이 좋은 모델을 얻는 것이지만,
-# 이 과정에서 학습 데이터셋과 검증 데이터셋만 활용할 수 있었고, 중간 목표는 검증 손실 값을 낮추는 것이었습니다.
-# 이제 이렇게 얻어진 모델이 테스트 데이터셋에 대해서도 여전히 좋은 성능을 유지하는지 확인해보려 합니다.
-# 다음의 코드를 보면 검증 작업과 거의 비슷하게 진행되는 것을 볼 수 있습니다.
-# torch.no_grad 함수를 활용하여 with 내부에서 gradient 계산 없이 모든 작업이 수행됩니다.
-# 또한 미니배치 크기로 split하여 for 반복문을 통해서 피드포워드feed-forward 합니다.
+
+# 테스트 데이터셋에 대해서도 성능을 확인해 보려 함.
+# 우리의 최종 목표는 테스트 성능이 좋은 모델을 얻는 것이지만,
+# 이 과정에서 학습 데이터셋과 검증 데이터셋만 활용할 수 있었고, 중간 목표는 검증 손실 값을 낮추는 것임
+
+# 이제 이렇게 얻어진 모델이 테스트 데이터셋에 대해서도 여전히 좋은 성능을 유지하는지 확인해보려 함
+
+# 다음의 코드를 보면 검증 작업과 거의 비슷하게 진행되는 것을 볼 수 있음
+
+# torch.no_grad 함수를 활용하여 with 내부에서 gradient 계산 없이 모든 작업이 수행됨
+
+# 또한 미니배치 크기로 split하여 for 반복문을 통해서 피드포워드feed-forward 함
 
 test_loss = 0
 y_hat = []
@@ -450,17 +492,27 @@ sorted_history = sorted(zip(train_history, valid_history), key=lambda x: x[1])
 print("Train loss: %.4e" % sorted_history[0][0])
 print("Valid loss: %.4e" % sorted_history[0][1])
 print("Test loss: %.4e" % test_loss)
-# 마지막으로 sorted 함수를 활용하여 가장 낮은 검증 손실 값과 이에 대응하는 학습 손실 값을 찾아서,
-# 테스트 손실 값과 함께 출력합니다. 최종적으로 이 모델은 0.296 테스트 손실 값이 나오는 것으로 확인 되었습니다.
-# 만약 여러분에 다른 방법론이나 모델 구조 변경등을 한다면, 0.296 테스트 손실 값이 나오는 모델이 baseline 모델이 될 것입니다.
-# 그럼 새로운 모델은 이 베이스라인을 이겨야 할 것입니다.[3]
 
-# 이번에는 앞서의 실습들과 마찬가지로 샘플들에 대한 정답과 예측 값을 페어플랏pair
-# plot해보도록 하겠습니다. 앞서의 실습들과 다른 점은 테스트셋에 대해서만 그림을 그려본다는 점입니다
+# Train loss: 2.1962e-01
+# Valid loss: 2.3347e-01
+# Test loss: 2.6383e-01
+
+# sorted 함수를 활용하여 가장 낮은 검증 손실 값과 이에 대응하는 학습 손실 값을 찾아서,
+# 테스트 손실 값과 함께 출력
+# 최종적으로 이 모델은 0.296 테스트 손실 값이 나오는 것으로 확인됨.
+# 만약 여러분에 다른 방법론이나 모델 구조 변경 등을 한다면, 0.296 테스트 손실 값이 나오는
+# 모델이 baseline 모델이 될 것임.
+# 그럼 새로운 모델은 이 베이스라인을 이겨야 할 것임.[3]
+
+# 이번에는 앞서의 실습들과 마찬가지로 샘플들에 대한 정답과 예측 값을
+# 페어플랏(pair plot) 해보도록 하겠음.
+# 앞서의 실습들과 다른 점은 테스트셋에 대해서만 그림을 그려본다는 점임
+
 df = pd.DataFrame(torch.cat([y[2], y_hat], dim=1).detach().numpy(),
                   columns=["y", "y_hat"])
 
 sns.pairplot(df, height=5)
 plt.show()
 
-# 따라서 정말 정당한 비교를 위해서는 매번 랜덤하게 학습/검증/테스트셋을 나누기보단, 아예 테스트셋을 따로 빼두는 것도 좋습니다.
+# 따라서 정말 정당한 비교를 위해서는 매번 랜덤하게 학습/검증/테스트셋을 나누기보단,
+# 아예 테스트셋을 따로 빼두는 것도 좋음
