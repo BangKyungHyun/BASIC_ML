@@ -122,26 +122,26 @@ print('df.tail() = \n',df.tail())
 # nn.Sequential을 활용하여 모델을 선언하고, 아담 옵티마이저에 등록
 
 model = nn.Sequential(
-    nn.Linear(x[0].size(-1), 2000),
+    nn.Linear(x[0].size(-1), 200),
     nn.LeakyReLU(),
-    nn.Linear(2000, 1900),
+    nn.Linear(200, 190),
     nn.LeakyReLU(),
-    nn.Linear(1900, 1800),
+    nn.Linear(190, 180),
     nn.LeakyReLU(),
-    nn.Linear(1800, 1700),
+    nn.Linear(180, 170),
     nn.LeakyReLU(),
-    nn.Linear(1700, 1600),
+    nn.Linear(170, 160),
     nn.LeakyReLU(),
-    nn.Linear(1600, 1500),
+    nn.Linear(160, 150),
     nn.LeakyReLU(),
-    nn.Linear(1500, 1400),
+    nn.Linear(150, 140),
     nn.LeakyReLU(),
-    nn.Linear(1400, 1300),
+    nn.Linear(140, 130),
     nn.LeakyReLU(),
-    nn.Linear(1300, 1200),
+    nn.Linear(130, 120),
     nn.LeakyReLU(),
-    nn.Linear(1200, 1100),
-    nn.Linear(1100, y[0].size(-1)),
+    nn.Linear(120, 110),
+    nn.Linear(110, y[0].size(-1)),
 )
 
 print('model = \n', model)
