@@ -1,6 +1,8 @@
 import numpy as np
 from copy import deepcopy
 import matplotlib.pyplot as plt
+import datetime
+import time
 
 import torch
 import torch.nn as nn
@@ -158,9 +160,9 @@ y = [y_i.to(device) for y_i in y]
 
 # 다음은 학습에 필요한 하이퍼 파라미터 및 변수들을 초기화 해줍니다.
 
-n_epochs = 1000000
+n_epochs = 5000000
 batch_size = 256
-print_interval = 10000
+print_interval = 100
 
 lowest_loss = np.inf
 best_model = None
@@ -171,7 +173,7 @@ lowest_epoch = np.inf
 # 다음의 학습 코드는 앞서의 실습과 완전 똑같은 코드입니다.
 # n_epochs 만큼의 에포크를 반복하는 for 반복문 내부에는 학습과 검증을 위한 for 반복문이 각각 존재하며,
 # 학습에 앞서 학습 데이터를 임의의 순서로 섞어주는 코드가 구현되어 있습니다.
-# 학습에서는 피드포워드feed-forward, 역전파back-propagation, 경사하강gradient descent이 진행됩니다.
+# 학습에서는 feed-forward, back-propagation, gradient descent이 진행됩니다.
 # 검증에서는 피드포워드만 진행됩니다. 그리고 학습/검증의 두 for 반복문이 끝나면,
 # 최저 검증 손실 값과 현재 검증 손실 값을 비교하여 모델을 저장하는 로직이 구현되어 있습니다.
 
@@ -220,7 +222,9 @@ for i in range(n_epochs):
     valid_history += [valid_loss]
 
     if (i + 1) % print_interval == 0:
-        print('Epoch %d: train loss=%.4e  valid_loss=%.4e  lowest_loss=%.4e' % (
+        now = datetime.datetime.now()
+        nowDatetime = now.strftime('%Y-%m-%d %H:%M:%S')
+        print(nowDatetime, 'Epoch %d: train loss=%.4e  valid_loss=%.4e  lowest_loss=%.4e' % (
             i + 1,
             train_loss,
             valid_loss,
