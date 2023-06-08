@@ -116,19 +116,19 @@ for x_i, y_i in zip(x, y):
 # 따라서 모델의 크기를 충분히 깊고 넓게 가져가도록 하겠습니다.
 
 model = nn.Sequential(
-    nn.Linear(input_size, 500),
+    nn.Linear(input_size, 50),
     nn.LeakyReLU(),
-    nn.Linear(500, 400),
+    nn.Linear(50, 40),
     nn.LeakyReLU(),
-    nn.Linear(400, 300),
+    nn.Linear(40, 30),
     nn.LeakyReLU(),
-    nn.Linear(300, 200),
+    nn.Linear(30, 20),
     nn.LeakyReLU(),
-    nn.Linear(200, 100),
+    nn.Linear(20, 10),
     nn.LeakyReLU(),
-    nn.Linear(100, 50),
+    nn.Linear(10, 5),
     nn.LeakyReLU(),
-    nn.Linear(50, output_size),
+    nn.Linear(5, output_size),
     nn.LogSoftmax(dim=-1),
 )
 # 이렇게 선언한 모델의 가중치 파라미터를 아담Adam 옵티마이저에 등록하고, NLLNegative Log-likelihood
@@ -158,16 +158,16 @@ model = model.to(device)
 x = [x_i.to(device) for x_i in x]
 y = [y_i.to(device) for y_i in y]
 
-# 다음은 학습에 필요한 하이퍼 파라미터 및 변수들을 초기화 해줍니다.
+# 학습에 필요한 하이퍼 파라미터 및 변수들을 초기화
 
-n_epochs = 5000000
+n_epochs = 50000
 batch_size = 256
 print_interval = 100
 
 lowest_loss = np.inf
 best_model = None
 
-early_stop = 500000
+early_stop = 2000
 lowest_epoch = np.inf
 
 # 다음의 학습 코드는 앞서의 실습과 완전 똑같은 코드입니다.
@@ -329,7 +329,7 @@ from sklearn.metrics import confusion_matrix
 pd.DataFrame(confusion_matrix(y[-1], torch.argmax(y_hat, dim=-1)),
              index=['true_%d' % i for i in range(10)],
              columns=['pred_%d' % i for i in range(10)])
-
+a
 # 결과를 해석해보면 당연히 대부분의 문제들에 대해서는 정답을 맞추었기 때문에 행렬의 대각 성분의 값이 높은 것을 확인할 수 있습니다.
 # 그리고 대각 성분 이외에서 높은 부분들을 확인하면 현재 모델이 약한 부분을 확인할 수 있을텐데요.
 # 우리의 모델은 2를 8이라고 예측하거나, 7을 9라고 예측하거나, 9를 4라고 예측하는 경우가 많음을 확인할 수 있습니다.
