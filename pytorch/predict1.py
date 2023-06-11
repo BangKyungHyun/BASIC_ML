@@ -14,13 +14,10 @@ from utils import get_hidden_sizes
 model_fn = "./model.pth"
 
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-
-
 def load(fn, device):
     d = torch.load(fn, map_location=device)
 
     return d['model'], d['config']
-
 def plot(x, y_hat):
     for i in range(x.size(0)):
         img = (np.array(x[i].detach().cpu(), dtype='float')).reshape(28,28)
@@ -45,14 +42,17 @@ def test(model, x, y, to_be_shown=True):
         if to_be_shown:
             plot(x, y_hat)
 
-model_dict, train_config = load(model_fn, device)
-
 # Load MNIST test set.
 x, y = load_mnist(is_train=False)
+# Reshape tensor to chunk of 1-d vectors.
+x = x.view(x.size(0), -1)
+
 x, y = x.to(device), y.to(device)
 
 input_size = int(x.shape[-1])
 output_size = int(max(y)) + 1
+
+model_dict, train_config = load(model_fn, device)
 
 model = ImageClassifier(
     input_size=input_size,
