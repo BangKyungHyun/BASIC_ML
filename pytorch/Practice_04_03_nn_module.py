@@ -7,16 +7,28 @@ W = torch.FloatTensor([[1, 2],
                        [5, 6]])
 b = torch.FloatTensor([2,2])
 
+
+print('W.size = ', W.size())
+print('W      = ', W)
+print('b.size = ', b.size())
+print('b      = ', b)
+
 def linear(x, W, b):
     y = torch.matmul(x,W) + b
 
     return y
 
-x = torch.FloatTensor(4,3)
+x = torch.FloatTensor([[1, 1, 1],
+                       [2, 2, 2],
+                       [3, 3, 3],
+                       [4, 4, 4]])
 
-y = linear(x, W ,b)
-print("y = ",y)
-print("y.size() = ",y.size())
+print('x.size = ', x.size())
+print('x      = ', x)
+
+yy = linear(x, W ,b)
+print("yy = ",yy)
+print("yy.size() = ",yy.size())
 
 import torch.nn as nn
 
