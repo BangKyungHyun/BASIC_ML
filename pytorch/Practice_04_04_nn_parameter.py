@@ -35,8 +35,13 @@ class Mylinear(nn.Module):
 
         super().__init__()
 
-        self.W = torch.FloatTensor(input_dim, output_dim)
-        self.b = torch.FloatTensor(output_dim)
+        # 제대로 된 방법은 W와 b를 파이토치에서 학습 가능하도록 인식할 수 있는 파라미터로
+        # 만들어 주어야 합니다.
+        # 이것은 torch.nn.Parameter 클래스를 활용하면 쉽게 가능합니다.
+        # 다음의 코드와 같이 파이토치 텐서 선언 이후에 nn.Parameter로 감싸주면 됩니다.
+
+        self.W = nn.Parameter(torch.FloatTensor(input_dim, output_dim))
+        self.b = nn.Parameter(torch.FloatTensor(output_dim))
 
         print('__init__ self.W = ', self.W)
         print('__init__ self.b = ', self.b)
@@ -100,72 +105,3 @@ for p in linear.parameters():
     print('\n55555555555555555555555555\n')
 
     print(p)
-
-
-
-
-
-'''
-print(ft);
-
-lt = torch.LongTensor([[1, 2],
-                       [3, 4]])
-print(lt);
-
-bt = torch.ByteTensor([[1, 0],
-                       [0, 1]])
-print(bt);
-
-x = torch.FloatTensor(3, 2)
-print(x);
-
-# NumPy Compatibility
-
-import numpy as np
-
-# Define numpy array.
-x = np.array([[1, 2],
-              [3, 4]])
-print(x, type(x));
-
-x = torch.from_numpy(x)
-print(x, type(x));
-
-x = x.numpy()
-print(x, type(x));
-
-# Tensor Type-casting
-
-print(ft.long());
-
-print(lt.float());
-
-print(torch.FloatTensor([1, 0]).byte());
-
-# Get Shape
-
-x = torch.FloatTensor([[[1, 2],
-                        [3, 4]],
-                       [[5, 6],
-                        [7, 8]],
-                       [[9, 10],
-                        [11, 12]]])
-# Get tensor shape.
-print(x.size());
-print(x.shape);
-
-# Get number of dimensions in the tensor.
-
-print(x.dim());
-print(len(x.size()));
-
-# Get number of elements in certain dimension of the tensor.
-
-print(x.size(1))
-print(x.shape[1])
-
-# Get number of elements in the last dimension.
-
-print(x.size(-1))
-print(x.shape[-1])
-'''
