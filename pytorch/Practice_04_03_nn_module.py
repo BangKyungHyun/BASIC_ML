@@ -1,34 +1,12 @@
-import torch
-
-# Tensor Allocation
-
-W = torch.FloatTensor([[1, 2],
-                       [3, 4],
-                       [5, 6]])
-b = torch.FloatTensor([2,2])
 
 
-print('W.size = ', W.size())
-print('W      = ', W)
-print('b.size = ', b.size())
-print('b      = ', b)
+print("---- import torch.nn as nn ----- ")
 
-def linear(x, W, b):
-    y = torch.matmul(x,W) + b
-
-    return y
-
-x = torch.FloatTensor([[1, 1, 1],
-                       [2, 2, 2],
-                       [3, 3, 3],
-                       [4, 4, 4]])
-
-print('x.size = ', x.size())
-print('x      = ', x)
-
-yy = linear(x, W ,b)
-print("yy = ",yy)
-print("yy.size() = ",yy.size())
+# nn.Module을 상속받은 MyLinear라는 클래스 정의
+# nn.Module을 상속받은 클래스는 보통 2개의 메서드 __init__과 forward를 오버라이드
+# __init__ 함수는 계층 내부에서 필요한 변수를 미리 선언하는 부분이며,
+# 심지어는 또 다른 계층(nn.Module을 상속받은 클래스의 객체)을 소유하도록 할 수도 있음
+# forward 함수는 계층을 통과하는데 필요한 계산을 수행하도록 구현하는 부분
 
 import torch.nn as nn
 
@@ -49,11 +27,23 @@ class Mylinear(nn.Module):
         # |y| = (batch_size, input_dim) * (input_dim, output_dim)
         #     = (batch_size, output_dim)
 
+        print('self.W = ', self.W)
+        print('self.b = ', self.b)
+        # print('x      = ', x)
+        print('y      = ', y)
+
         return y
 
 linear = Mylinear(3,2)
+print('Mylinear(3,2) = ', Mylinear(3,2))
+print('linear        = ', linear)
 
 y = linear(x)
+print('x = ', x)
+
+print('W = ', W)
+print('b = ', b)
+print('y = ', y)
 
 for p in linear.parameters():
     print(p)
