@@ -3,18 +3,18 @@ import torch
 
 ft = torch.FloatTensor([[1, 2],
                         [3, 4]])
-print(ft);
+print('torch.FloatTensor = \n', ft);
 
 lt = torch.LongTensor([[1, 2],
                        [3, 4]])
-print(lt);
+print('torch.LongTensor = \n', lt);
 
 bt = torch.ByteTensor([[1, 0],
                        [0, 1]])
-print(bt);
+print('torch.ByteTensor = \n', bt);
 
 x = torch.FloatTensor(3, 2)
-print(x);
+print('torch.FloatTensor = \n',x);
 
 # NumPy Compatibility
 

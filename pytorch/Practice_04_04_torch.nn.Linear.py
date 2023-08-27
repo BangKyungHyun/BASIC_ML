@@ -5,26 +5,28 @@ import torch
 W = torch.FloatTensor([[1, 2],
                        [3, 4],
                        [5, 6]])
-b = torch.FloatTensor([2,2])
+b = torch.FloatTensor([20,20])
 
 
-'''
 def linear(x, W, b):
-    y = torch.matmul(x,W) + b
+    y = torch.matmul(x, W) + b
 
     return y
 
 x = torch.FloatTensor(4,3)
 
 y = linear(x, W ,b)
+
+print("W = ",W)
+print("b = ",b)
+print("x = ",x)
 print("y = ",y)
 print("y.size() = ",y.size())
 
 '''
 import torch.nn as nn
 
-linear = nn.linear(3,2)
-
+#linear = nn.linear(3,2)
 
 class Mylinear(nn.Module):
 
@@ -51,10 +53,7 @@ y = linear(x)
 for p in linear.parameters():
     print(p)
 
-
-
-
-
+'''
 '''
 print(ft);
 
