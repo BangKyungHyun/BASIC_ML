@@ -61,7 +61,6 @@ class Mylinear(nn.Module):
 
         print('forward self.W = ', self.W)
         print('forward self.b = ', self.b)
-        # print('x      = ', x)
         print('y      = ', y)
 
         print('forward end')
@@ -81,10 +80,6 @@ print('\n333333333333333333333333\n')
 
 print('linear(x) = ', linear(x))
 
-# 여기서 중요한 점은 forward 함수를 따로 호출하지 않고 객체명에 바로 괄호를 열러서 텐서 x를
-# 인수로 넘겨 주었다는 점이다. 이처럼 nn.Module의 상속닫은 객체는 __call__ 함수와 forward가
-# 매핑되어 있어서 forward를 직접 부를 필요가 없음
-
 y = linear(x)
 
 print('y = ', y)
@@ -94,14 +89,10 @@ print('b = ', b)
 
 print('\n444444444444444444444444\n')
 
-# 여기까지 우리는 nn.Module을 상속받아 선형 계층을 구성하여 보았습니다.
-# 하지만 이 방법도 아직은 제대로 된 방법이 아닙니다.
-# 왜냐하면 파이토치 입장에서는 비록 MyLinear라는 클래스의 계층으로 인식하고 계산도 수행하지만,
-# 내부에 학습할 수 있는 파라미터는 없는것으로 인식하기 때문입니다.
-# 예를 들어 다음의 코드를 실행하면 아무것도 출력되지 않을 것입니다.
+# 그럼 다음과 같이 파라미터를 출력하도록 했을 때, 파라미터가 정상적으로 출력되는 것을 볼 수 있습니다.
 
 print('linear.parameters() = ', linear.parameters())
 for p in linear.parameters():
     print('\n55555555555555555555555555\n')
 
-    print(p)
+    print('p =', p)

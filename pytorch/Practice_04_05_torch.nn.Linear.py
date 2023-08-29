@@ -1,14 +1,30 @@
 ################################################################################
-# STEP 1. torch.nn.Module 클래스 상속 받기
+# STEP 1. nn.Linear 활용하기
 ################################################################################
 
-# 파이토치에는 nn(neural networks) 패키지가 있고, 내부에는 미리 정의된 많은 신경망들이 들어 있음
-# 그리고 그 신경망들은 torch.nn.Module 이라는 추상클래스를 상속받아 정의되어 있음
-# 이 추상클래스를 상속받아 선형 계층을 구현할 수 있음
+# 사실은 위의 복잡한 방법들은 모두 필요 없고, torch.nn에 미리 정의된 선형 계층을 불러다 쓰면
+# 매우 간단합니다.
+# 다음의 코드는 nn.Linear 를 통해 선형 계층을 활용하는 모습입니다.
 
+import torch
 import torch.nn as nn
 
+x = torch.FloatTensor([[1, 1, 1],
+                       [2, 2, 2],
+                       [3, 3, 3],
+                       [4, 4, 4]])
+
+W = torch.FloatTensor([[1, 2],
+                       [3, 4],
+                       [5, 6]])
+
+b = torch.FloatTensor([2,2])
+
+print('\n00000000000000000000000\n')
+
 class Mylinear(nn.Module):
+
+    print('def __init__ 1111 ')
 
     def __init__(self, input_dim=3, output_dim=2):
         self.input_dim = input_dim
@@ -16,8 +32,11 @@ class Mylinear(nn.Module):
 
         super().__init__()
 
-        self.W = torch.FloatTensor(input_dim, output_dim)
-        self.b =  torch.FloatTensor(output_dim)
+        self.linear = nn.Linear(input_dim, output_dim)
+
+        print('def __init__ end')
+
+    print('forward 11111')
 
     def forward(self,x):
         # |x| = (batch_size, input_dim)
@@ -25,77 +44,36 @@ class Mylinear(nn.Module):
         # |y| = (batch_size, input_dim) * (input_dim, output_dim)
         #     = (batch_size, output_dim)
 
+        print('forward self.W = ', self.W)
+        print('forward self.b = ', self.b)
+        print('y      = ', y)
+
+        print('forward end')
         return y
 
-linear = Mylinear(3,2)
+print('\n11111111111111111111111\n')
+
+linear = nn.Linear(3,2)
+
+print('linear        = ', linear)
+
+print('\n333333333333333333333333\n')
+
+print('linear(x) = ', linear(x))
 
 y = linear(x)
 
+print('y = ', y)
+
+print('W = ', W)
+print('b = ', b)
+
+print('\n444444444444444444444444\n')
+
+print('linear.parameters() = ', linear.parameters())
 for p in linear.parameters():
     print(p)
 
+    print('\n55555555555555555555555555\n')
 
-'''
-print(ft);
-
-lt = torch.LongTensor([[1, 2],
-                       [3, 4]])
-print(lt);
-
-bt = torch.ByteTensor([[1, 0],
-                       [0, 1]])
-print(bt);
-
-x = torch.FloatTensor(3, 2)
-print(x);
-
-# NumPy Compatibility
-
-import numpy as np
-
-# Define numpy array.
-x = np.array([[1, 2],
-              [3, 4]])
-print(x, type(x));
-
-x = torch.from_numpy(x)
-print(x, type(x));
-
-x = x.numpy()
-print(x, type(x));
-
-# Tensor Type-casting
-
-print(ft.long());
-
-print(lt.float());
-
-print(torch.FloatTensor([1, 0]).byte());
-
-# Get Shape
-
-x = torch.FloatTensor([[[1, 2],
-                        [3, 4]],
-                       [[5, 6],
-                        [7, 8]],
-                       [[9, 10],
-                        [11, 12]]])
-# Get tensor shape.
-print(x.size());
-print(x.shape);
-
-# Get number of dimensions in the tensor.
-
-print(x.dim());
-print(len(x.size()));
-
-# Get number of elements in certain dimension of the tensor.
-
-print(x.size(1))
-print(x.shape[1])
-
-# Get number of elements in the last dimension.
-
-print(x.size(-1))
-print(x.shape[-1])
-'''
+    print('p =', p)
