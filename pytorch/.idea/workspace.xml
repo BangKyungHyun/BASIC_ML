@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d39b206f-61f4-4732-8dc8-d8b183b54f06" name="Changes" comment="Merge remote-tracking branch 'origin/main'">
+    <list default="true" id="d39b206f-61f4-4732-8dc8-d8b183b54f06" name="Changes" comment="수정">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Practice_05_01_mse.py" beforeDir="false" afterPath="$PROJECT_DIR$/Practice_05_01_mse.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Practice_06_01_auto_grad.py" beforeDir="false" afterPath="$PROJECT_DIR$/Practice_06_01_auto_grad.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,7 +42,7 @@
     "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "last_opened_file_path": "C:/Users/bangkh21/PycharmProjects/BASIC_ML/pytorch/Practice_05_01_mse.py",
+    "last_opened_file_path": "C:/Users/bangkh21/PycharmProjects/BASIC_ML/pytorch/Practice_06_01_auto_grad.py",
     "settings.editor.selected.configurable": "preferences.keymap"
   }
 }]]></component>
@@ -50,7 +51,7 @@
       <recent name="C:\Users\bangkh21\PycharmProjects\BASIC_ML\pytorch" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.Practice_05_01_mse">
+  <component name="RunManager" selected="Python.Practice_06_01_auto_grad">
     <configuration name="Practice_05_01_mse" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="pytorch" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -72,7 +73,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="Practice_13_02_Multi_Value_Classfication" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="Practice_06_01_auto_grad" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="pytorch" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -84,7 +85,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Practice_13_02_Multi_Value_Classfication.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Practice_06_01_auto_grad.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -158,11 +159,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.Practice_06_01_auto_grad" />
         <item itemvalue="Python.Practice_05_01_mse" />
         <item itemvalue="Python.predict" />
         <item itemvalue="Python.train" />
         <item itemvalue="Python.Practice_14_01_regularizations" />
-        <item itemvalue="Python.Practice_13_02_Multi_Value_Classfication" />
       </list>
     </recent_temporary>
   </component>
@@ -504,7 +505,21 @@
       <option name="project" value="LOCAL" />
       <updated>1693949004069</updated>
     </task>
-    <option name="localTasksCounter" value="48" />
+    <task id="LOCAL-00048" summary="Merge remote-tracking branch 'origin/main'">
+      <created>1693949801279</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1693949801279</updated>
+    </task>
+    <task id="LOCAL-00049" summary="수정">
+      <created>1693949835126</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1693949835126</updated>
+    </task>
+    <option name="localTasksCounter" value="50" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -527,9 +542,9 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="Merge remote-tracking branch 'origin/main'&#10;&#10;# Conflicts:&#10;#&#9;pytorch/.idea/workspace.xml" />
-    <MESSAGE value="수정" />
     <MESSAGE value="Merge remote-tracking branch 'origin/main'" />
-    <option name="LAST_COMMIT_MESSAGE" value="Merge remote-tracking branch 'origin/main'" />
+    <MESSAGE value="수정" />
+    <option name="LAST_COMMIT_MESSAGE" value="수정" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

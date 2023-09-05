@@ -67,6 +67,3 @@ mse_loss = nn.MSELoss()
 mse_loss(x_hat, x)
 print(" mse_loss(x_hat, x) = ", mse_loss(x_hat, x))
 # mse_loss(x_hat, x) = tensor(2.5000)
-
-
-

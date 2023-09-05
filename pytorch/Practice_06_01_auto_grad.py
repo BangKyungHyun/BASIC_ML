@@ -1,7 +1,13 @@
 import torch
+
+################################################################################
 # autograd 활성화 시키기 - requires_grad_(True)
 # Tensor를 생성하기 위해 사용하는 함수들의 파라미터로 requires_grad=True 를 넘김
+################################################################################
+
 x = torch.FloatTensor([[1,2],[3,4]]).requires_grad_(True)
+print("x =", x)
+# x = tensor([[1., 2.], [3., 4.]], requires_grad=True)
 
 x1 = x + 2
 x2 = x - 2
@@ -9,31 +15,33 @@ x3 = x1 * x2
 y = x3.sum()
 
 print("x1 =", x1)
-# x1 = tensor([[3., 4.],
-# [5., 6.]], grad_fn=<AddBackward0>)
+# x1 = tensor([[3., 4.],[ 5., 6.]], grad_fn=<AddBackward0>)
 print("x2 =", x2)
-# x2 = tensor([[-1.,  0.],
-#       [ 1.,  2.]], grad_fn=<SubBackward0>)
-
+# x2 = tensor([[-1.,0.],[ 1.,  2.]], grad_fn=<SubBackward0>)
 print("x3 =", x3)
-# x3 = tensor([[-3.,  0.],
-#        [ 5., 12.]], grad_fn=<MulBackward0>)
-
+# x3 = tensor([[-3.,0.],[ 5., 12.]], grad_fn=<MulBackward0>)
 print("y =", y)
 # y = tensor(14., grad_fn=<SumBackward0>)
 
+################################################################################
 # 역전파 시키기
-y.backward
-print('y.backward = ', y.backward)
+################################################################################
+
+y.backward()
+print('y.backward() = ', y.backward)
 # y.backward =  <bound method Tensor.backward of tensor(14., grad_fn=<SumBackward0>)>
 
-# x 텐서의 기울기가 None 임
+# x1 = x + 2
+# x2 = x - 2
+# x3 = (x + 2)(x - 2) = x2 -4
+# y = sum(x3) = x3(1,2)+x3(1,2)+x3(2,1)+x3(2,2)
+# y 도함수 : x2 - 4 = 2x
+
 print("x.grad = ",x.grad)
-# x.grad =  None
+# x.grad =  tensor([[2., 4.], [6., 8.]])
 
 print("x = ",x)
-# x =  tensor([[1., 2.],
-#        [3., 4.]], requires_grad=True)
+# x =  tensor([[1., 2.], [3., 4.]], requires_grad=True)
 
 #print("x3.numpy() = ",x3.numpy())
 
