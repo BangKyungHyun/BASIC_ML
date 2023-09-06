@@ -2,9 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d39b206f-61f4-4732-8dc8-d8b183b54f06" name="Changes" comment="수정">
+      <change afterPath="$PROJECT_DIR$/test2.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Practice_05_01_mse.py" beforeDir="false" afterPath="$PROJECT_DIR$/Practice_05_01_mse.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Practice_06_01_auto_grad.py" beforeDir="false" afterPath="$PROJECT_DIR$/Practice_06_01_auto_grad.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Practice_06_02_gradient_descent.py" beforeDir="false" afterPath="$PROJECT_DIR$/Practice_06_02_gradient_descent.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Practice_07_03_linear_regression.py" beforeDir="false" afterPath="$PROJECT_DIR$/Practice_07_03_linear_regression.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,7 +44,7 @@
     "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "last_opened_file_path": "C:/Users/bangkh21/PycharmProjects/BASIC_ML/pytorch/Practice_06_01_auto_grad.py",
+    "last_opened_file_path": "C:/Users/bangkh21/PycharmProjects/BASIC_ML/pytorch/Practice_06_02_gradient_descent.py",
     "settings.editor.selected.configurable": "preferences.keymap"
   }
 }]]></component>
@@ -51,7 +53,7 @@
       <recent name="C:\Users\bangkh21\PycharmProjects\BASIC_ML\pytorch" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.Practice_06_01_auto_grad">
+  <component name="RunManager" selected="Python.test2">
     <configuration name="Practice_05_01_mse" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="pytorch" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -94,7 +96,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="Practice_14_01_regularizations" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="Practice_06_02_gradient_descent" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="pytorch" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -106,7 +108,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Practice_14_01_regularizations.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Practice_06_02_gradient_descent.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -115,7 +117,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="predict" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="Practice_07_03_linear_regression" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="pytorch" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -127,7 +129,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/predict.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Practice_07_03_linear_regression.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -136,7 +138,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="train" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="test2" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="pytorch" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -148,8 +150,8 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/train.py" />
-      <option name="PARAMETERS" value="--model_fn tmp.pth --gpu_id -1 --batch_size 256 --n_epochs 20 --n_layers 5" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test2.py" />
+      <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -159,11 +161,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.test2" />
+        <item itemvalue="Python.Practice_07_03_linear_regression" />
+        <item itemvalue="Python.Practice_06_02_gradient_descent" />
         <item itemvalue="Python.Practice_06_01_auto_grad" />
         <item itemvalue="Python.Practice_05_01_mse" />
-        <item itemvalue="Python.predict" />
-        <item itemvalue="Python.train" />
-        <item itemvalue="Python.Practice_14_01_regularizations" />
       </list>
     </recent_temporary>
   </component>
@@ -175,13 +177,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1683664805278</updated>
-    </task>
-    <task id="LOCAL-00001" summary="Merge remote-tracking branch 'origin/main'">
-      <created>1683667426899</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1683667426899</updated>
     </task>
     <task id="LOCAL-00002" summary="Merge remote-tracking branch 'origin/main'">
       <created>1683669739966</created>
@@ -519,7 +514,14 @@
       <option name="project" value="LOCAL" />
       <updated>1693949835126</updated>
     </task>
-    <option name="localTasksCounter" value="50" />
+    <task id="LOCAL-00050" summary="수정">
+      <created>1693952163162</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1693952163163</updated>
+    </task>
+    <option name="localTasksCounter" value="51" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

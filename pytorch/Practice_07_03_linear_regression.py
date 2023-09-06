@@ -7,23 +7,33 @@ import matplotlib.pyplot as plt
 # 실습에서 사용할 데이터셋을 불러옴
 # Create Pandas Dataframe
 from sklearn.datasets import load_boston
+import datetime
 boston = load_boston()
 
 # 보스턴 주택 가격 데이터셋을 대한 설명이 자세하게 출력됨
 print(boston.DESCR)
 
+################################################################################
 # 데이터셋은 506개의 샘플을 가지고 있으며 13개의 속성들과 이에 타깃값(label)을 갖고 있음
 # 간단한 탐험적 데이터 분석을 위해 판다스 데이터 프레임으로 변환 후에 데이터 일부를 확인함
+################################################################################
+
 df = pd.DataFrame(boston.data, columns=boston.feature_names)
 df["TARGET"] = boston.target
 df.tail()
 print("df.tail()\n", df.tail())
 
+################################################################################
 # Use the `shape` property
+################################################################################
+
 print('df.shape = ', df.shape)
 # df.shape =  (506, 14)
 
-# Or use the `len()` function with the `index` property
+################################################################################
+# use the `len()` function with the `index` property
+################################################################################
+
 print('len(df.index) = ', len(df.index))
 # len(df.index) =  506
 
@@ -31,14 +41,19 @@ print('list(df.columns) = ', list(df.columns))
 # list(df.columns) =  ['CRIM', 'ZN', 'INDUS', 'CHAS', 'NOX', 'RM', 'AGE', 'DIS', 'RAD',
 # 'TAX', 'PTRATIO', 'B', 'LSTAT', 'TARGET']
 
+################################################################################
 # 각 속성의 분포와 속성 사이의 선형적 관계 유무를 파악하기 위해 페어플롯을 그림
 # sns.pairplot(df)
 # plt.show()
+################################################################################
 
+################################################################################
 # Target 속성에 대응하는 맨 마지막을 줄을 살펴보면 일부 속성들이 Target 속성과
 # 약간의 선형적 관계를 띄는 것을 볼 수 있음
 # 선형적 관계를 띄는 것으로 보이는 일부 속성을 추려 내여 다시 페어플롯을 그림
 # 그림의 맨 첫 줄이 target 속성과 대응하여 그린 것임
+################################################################################
+
 cols = ["TARGET", "INDUS", "RM", "LSTAT", "NOX", "DIS"]
 
 df[cols].describe()
@@ -52,6 +67,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 
 # Numpy 데이터를 파이토치 실수형 텐서로 변환함
+# cols = ["TARGET", "INDUS", "RM", "LSTAT", "NOX", "DIS"] 데이터에 한해 학습 진행
 data = torch.from_numpy(df[cols].values).float()
 
 print("data.shape = ", data.shape)
@@ -65,12 +81,57 @@ print("x.shape = ", x.shape, "y.shape = ", y.shape)
 # x.shape =  torch.Size([506, 5]) y.shape =  torch.Size([506, 1])
 
 # 학습에 필요한 설정값 정함
-n_epochs = 2000
+n_epochs = 2000000
 learning_rate = 1e-3
-print_interval = 100
+print_interval = 100000
 
+################################################################################
 # 모델을 생성. 텐서x의 마지막 차원의 크기를 선형 계층의 입력 크기로 주고,
 # 텐서 y의 마지막 차원의 크기를 선형 계층의 출력 크기로 함
+################################################################################
+
+################################################################################
+# nn.Linear
+################################################################################
+# nn.Linear는 파이토치에서 사용되는 선형 변환(linear transformation)을 수행하는 클래스로,
+# Fully Connected Layer 또는 Dense Layer라고도 불립니다.
+#
+# nn.Linear 클래스의 생성자(__init__)에는 다음과 같은 인수가 있습니다:
+#
+# in_features (int): 입력 텐서의 크기. 입력 텐서의 차원(dimension) 또는 특성(feature)의 수
+# out_features (int): 출력 텐서의 크기. 출력 텐서의 차원(dimension) 또는 특성(feature)의 수
+# bias (bool, optional): 편향(bias)을 사용할지 여부를 지정합니다. 기본값은 True입니다.
+
+# nn.Linear 클래스는 두 개의 행렬 가중치(weight)와 편향(bias)을 학습하며,
+# 입력 텐서를 선형 변환하여 출력 텐서를 생성합니다.
+# 선형 변환은 입력 텐서와 가중치 행렬의 행렬 곱을 계산하고, 편향을 더하는 연산으로 이루어집니다.
+#
+# nn.Linear 클래스의 예제 코드는 다음과 같습니다:
+#
+# import torch
+# import torch.nn as nn
+#
+# # 입력 텐서의 크기가 10이고 출력 텐서의 크기가 20인 선형 변환을 수행하는 nn.Linear 모듈 생성
+# linear = nn.Linear(10, 20)
+#
+# # 입력 텐서 생성 (크기가 10인 벡터)
+# input_tensor = torch.randn(1, 10)
+#
+# # 선형 변환 수행 (입력 텐서를 출력 텐서로 변환)
+# output_tensor = linear(input_tensor)
+#
+# print("Input Tensor Size: ", input_tensor.size())
+# print("Output Tensor Size: ", output_tensor.size())
+#
+# Input Tensor Size:  torch.Size([1, 10])
+# Output Tensor Size:  torch.Size([1, 20])
+# 위의 예제에서는 입력 텐서의 크기가 10이고 출력 텐서의 크기가 20인 nn.Linear 모듈을 생성하고,
+# 입력 텐서를 선형 변환하여 출력 텐서를 생성하는 예제입니다.
+# 출력 텐서의 크기는 nn.Linear의 out_features 인수에 지정한 값인 20과 동일합니다.
+
+print("x.size(-1) = ", x.size(-1), "y.size(-1) = ", y.size(-1))
+# x.size(-1) =  5 y.size(-1) =  1
+
 model = nn.Linear(x.size(-1), y.size(-1))
 
 print('model =', model)
@@ -110,7 +171,10 @@ print('model =', model)
 
 optimizer = optim.SGD(model.parameters(), lr=learning_rate)
 
-# 정해진 에폭만큼 for 반복문을 통해 최적화를 수행
+################################################################################
+# 정해진 epoch만큼 for 반복문을 통해 최적화를 수행
+################################################################################
+
 for i in range(n_epochs):
 
     y_hat = model(x)
@@ -125,15 +189,23 @@ for i in range(n_epochs):
     optimizer.step()
 
     if (i + 1) % print_interval == 0:
-        print('Epoch %d: loss=%.6e' % (i + 1, loss))
+        now = datetime.datetime.now()
+        nowDatetime = now.strftime('%Y-%m-%d %H:%M:%S')
+        print(nowDatetime,'Epoch %d: loss=%.6e' % (i + 1, loss))
 
-# 결과 확인
-# 모델을 통과한 y_hat를 가져와서 실제 y와 비교하기 위한 페어 플롯을 그림 
+
+################################################################################
+# 결과 확인- 모델을 통과한 y_hat를 가져와서 실제 y와 비교하기 위한 페어 플롯을 그림
+################################################################################
+
 df = pd.DataFrame(torch.cat([y, y_hat], dim=1).detach_().numpy(),
                   columns=["y", "y_hat"])
 
+################################################################################
 # 왼쪽 위에 그려진 y의 분포와 오른쪽 아래에 그려진 y_hat의 분포가 약간은 다르게 나타난 것을
 # 볼수 있음. 하지만 오른쪽 위에 그려진 y와 왼쪽 아래의 y_hat과의 비교에서는 대부분의 점들이
 # 빨간색 점선 부근에 나타나 있는 것을 확인할 수 있음
+################################################################################
+
 sns.pairplot(df, height=5)
 plt.show()

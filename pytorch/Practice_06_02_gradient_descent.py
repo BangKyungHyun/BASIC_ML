@@ -9,8 +9,10 @@ target = torch.FloatTensor([[.1,.2,.3],
 # 랜덤값을 갖는 텐서 하나 생성
 x = torch.rand_like(target)
 
+################################################################################
 # [중요] 텐서의 requires_grad 속성이 True가 되도록 설정해 주어야 함
 # autograd 활성화 시키기
+################################################################################
 x.requires_grad = True
 
 # 랜덤 생성한 텐서의 값을 출력
@@ -25,10 +27,13 @@ print("loss =", loss)
 # loss = tensor(0.1928, grad_fn=<MseLossBackward0>)
 
 threshold = 1e-11   # 임계치
-learning_rate = 1.
+learning_rate = 1
 iter_cnt = 0
+
+################################################################################
 # while 반복문을 사용하여 두 텐서 값의 차이가 threshold의 값보다 작아질 때 까지
 # 미분 및 경사하강법을 반복 수행
+################################################################################
 
 while loss > threshold:
 
@@ -38,12 +43,12 @@ while loss > threshold:
     # backward를 호출하기 위한 텐서의 크기는 스칼라이어야 함
     # 만약 스칼라가 아닌 경우에 backward를 호출하면 파이토치는 오류를 발생시킴
 
-    # 기울기 계산
-    loss.backward()
+    loss.backward()                 # 기울기 계산
     x = x - learning_rate * x.grad  # 경사 기울기 값이 x.grad에 자동 저장
 
     # detach(분리하다) - 기존 Tensor에서 gradient 전파가 안되는 텐서 생성
-    x.detach_() # .
+    x.detach_()
+
     # autograd 활성화 시키기
     x.requires_grad_(True)
 
