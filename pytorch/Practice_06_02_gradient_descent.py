@@ -54,7 +54,7 @@ while loss > threshold:
 
     loss = F.mse_loss(x, target)
 
-    print('%d-th Loss : %.4e' % (iter_cnt, loss))
+    print('%d-th Loss : %.4e ' % (iter_cnt, loss))
     print("x = ",x )
 
 # 1-th Loss : 5.6074e-02
