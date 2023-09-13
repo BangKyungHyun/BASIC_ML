@@ -82,7 +82,7 @@ print("x.shape = ", x.shape, "y.shape = ", y.shape)
 # x.shape =  torch.Size([506, 5]) y.shape =  torch.Size([506, 1])
 
 # 학습에 필요한 설정값 정함
-n_epochs = 200000
+n_epochs = 400000
 learning_rate = 1e-5
 print_interval = 10000
 

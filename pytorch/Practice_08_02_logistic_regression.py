@@ -1,7 +1,3 @@
-###############################################################################################
-    # 1. 데이터 준비
-###############################################################################################
-
 import torch
 import torch.nn as nn
 import pandas as pd
@@ -9,17 +5,24 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import datetime
 
+################################################################################
+# 1. 데이터 준비
+################################################################################
+
 # Load Dataset from sklearn
 # 위스콘신 유방암 데이터셋은 30개의 속성을 가지며 이를 통해 유방암 여부 예측
 from sklearn.datasets import load_breast_cancer
 cancer = load_breast_cancer()
 
-print('cancer.DESCR =', cancer.DESCR)
+# print('cancer.DESCR =', cancer.DESCR)
 
+################################################################################
 # 판다스로 데이터를 변환
+################################################################################
 df = pd.DataFrame(cancer.data, columns=cancer.feature_names)
 df['class'] = cancer.target
 print('df.tail() = \n' ,df.tail())
+
 #       mean radius  mean texture  ...  worst fractal dimension  class
 # 564        21.56         22.39  ...                  0.07115      0
 # 565        20.13         28.25  ...                  0.06637      0
@@ -29,6 +32,7 @@ print('df.tail() = \n' ,df.tail())
 
 print('list(df.columns) = ', list(df.columns))
 
+# 총 31 개 속성 - 평균 10개, 표준편차 10개, 최악값 10개, label(class) 1개
 # list(df.columns) =
 # ['mean radius', 'mean texture', 'mean perimeter', 'mean area', 'mean smoothness',
 # 'mean compactness', 'mean concavity', 'mean concave points', 'mean symmetry', 'mean fractal dimension',
@@ -37,7 +41,9 @@ print('list(df.columns) = ', list(df.columns))
 # 'concavity error', 'concave points error', 'symmetry error', 'fractal dimension error',
 
 # 'worst radius', 'worst texture', 'worst perimeter', 'worst area', 'worst smoothness', 'worst compactness',
-# 'worst concavity','worst concave points', 'worst symmetry', 'worst fractal dimension', 'class']
+# 'worst concavity','worst concave points', 'worst symmetry', 'worst fractal dimension',
+#
+# 'class']
 
 # radius : 반지름
 
@@ -67,7 +73,7 @@ sns.pairplot(df[['class'] + list(df.columns[10:20])])
 sns.pairplot(df[['class'] + list(df.columns[20:30])])
 # plt.show()
 
-# select features
+# 특성 속성 11개 선택
 cols = ["mean radius", "mean texture",
         "mean smoothness", "mean compactness", "mean concave points",
         "worst radius", "worst texture",
@@ -95,37 +101,38 @@ y = data[:, -1:]
 print('x.shape, y.shape =',x.shape, y.shape)
 # x.shape, y.shape = torch.Size([569, 10]) torch.Size([569, 1])
 
-###############################################################################################
+################################################################################
 # 2. 학습 수행
-###############################################################################################
+################################################################################
 
-n_epochs = 2000000
+n_epochs = 28600000
 learning_rate = 1e-2
 print_interval = 200000
-###############################################################################################
+
+################################################################################
 # PyTorch로 신경망 모델을 설계할 때, 크게 다음과 같은 세 가지 스텝을 따르면 된다.
 #
 # 1. Design your model using class with Variables
 # 2. Construct loss and optim
 # 3. Train cycle (forward, backward, update)
-###############################################################################################
-###############################################################################################
+################################################################################
 # 1. Design your model using class with Variables
-# ---------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # 클래스와 변수를 정의하는 방법을 다루려고 한다.
 # PyTorch로 신경망을 설계할 때 크게 두 가지 방법이 있다.
 #
-# 1. 사용자 정의 nn 모듈
+# 1. 사용자 정의 nn 모듈 (추천)
 # 2. nn.Module을 상속한 클래스 이용
 #
-# 어느 방식으로 신경망을 설계해도 상관 없지만, 복잡한 신경망을 직접 설계할 때는 내 마음대로 정의하는 방식의
-# nn모듈을 더 많이 사용한다고 한다. (참고: tutorials.pytorch.kr/beginner/pytorch_with_examples.html)
+# 어느 방식으로 신경망을 설계해도 상관 없지만, 복잡한 신경망을 직접 설계할 때는 내 마음대로
+# 정의하는 방식의 nn모듈을 더 많이 사용한다고 한다.
+# (참고: tutorials.pytorch.kr/beginner/pytorch_with_examples.html)
 # 여기서 모듈이란 한 개 이상의 레이어가 모여서 구성된 것을 말한다. 모듈+모듈 = 새모듈 < 이런 공식도 성립함.
 # 신경망(모델)은 한 개 이상의 모듈로 이루어진 내가 최종적으로 원하는 것을 뜻함!
-###############################################################################################
-###############################################################################################
+################################################################################
+################################################################################
 # 1. PyTorch 모델의 기본 구조
-###############################################################################################
+################################################################################
 # PyTorch로 설계하는 신경망은 기본적으로 다음과 같은 구조를 갖음
 # PyTorch 내장 모델 뿐만 아니라 사용자 정의 모델도 반드시 이 구조를 따라야 함
 #
@@ -152,7 +159,7 @@ print_interval = 200000
 #         """
 #         return x
 # model = Model_Name()  # 여기에 변수를 넣어 주면 됨.
-# -----------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # PyTorch 모델로 쓰기 위해선 다음 두 가지 조건을 따라야 함. 내장된 모델(nn.Linear등)도 이를 만족함.
 #
 # 1.torch.nn.Module을 상속해야 함.
@@ -164,22 +171,25 @@ print_interval = 200000
 #   3) forward()에서는 모델에서 실행되어야 하는 계산을 정의한다.
 #      backward 계산은 backward()를 이용하면 PyTorch가 알아서 해주니까 forward()만 정의해 주면 된다.
 #      input을 넣어서 어떤 계산을 진행하하여 output이 나올지를 정의해 준다고 이해하면 됨.
-###############################################################################################
-###############################################################################################
+################################################################################
+################################################################################
 # nn.Module
-###############################################################################################
+################################################################################
 # PyTorch의 nn 라이브러리는 Neural Network의 모든 것을 포괄하는 모든 신경망 모델의 Base Class
 # 다른 말로, 모든 신경망 모델은 nn.Module의 subclass라고 할 수 있다.
 # nn.Module을 상속한 subclass가 신경망 모델로 사용되기 위해선 앞서 소개한 두 메소드를 override 해야 한다.
 # 1) __init__(self): initialize; 내가 사용하고 싶은, 내 신경망 모델에 사용될 구성품들을 정의 및 초기화 하는
 #    메소드이다.
 # 2) forward(self, x): specify the connections;  이닛에서 정의된 구성품들을 연결하는 메소드이다.
-###############################################################################################
-###############################################################################################
+################################################################################
 # nn.Module을 상속받은 자식 클래스를 정의할 때에는 보통 두개의 함수(메서드)를 오버라이드함.
 # 또한 __init__ 함수를 통해 모델을 구성하는데 필요한 내부모듈(선형계층)을 미리 선언함.
 # forward함수는 미리 선언된 내부 모듈을 활용하여 계산을 수행함
-###############################################################################################
+################################################################################
+# 이제 모델을 준비할 차례입니다. 앞서 선형 회귀에서는 선형 계층 하나만 필요했던 것과 달리,
+# 이번에는 시그모이드 함수도 모델이 포함되어야 합니다.
+# 따라서 nn.Module을 상속받아 클래스를 정의하고, 내부에 필요한 계층들을 소유하도록 합니다.
+################################################################################
 
 class MyModel(nn.Module):
 
@@ -190,7 +200,7 @@ class MyModel(nn.Module):
         super().__init__()
 
         self.linear = nn.Linear(input_dim, output_dim)
-        self.act = nn.Sigmoid()
+        self.act = nn.Sigmoid()    # sigmoid 함수 추가
 
     def forward(self, x):
         # |x| = (batch_size, input_dim)
@@ -216,47 +226,36 @@ print(nowDatetime)
 for i in range(n_epochs):
 
     y_hat = model(x)
+
     loss = crit(y_hat, y)
-
+    # optimizer.zero_grad() 는 반복 시에 전에 계산했던 기울기를 0 으로 초기화하는 함수이다.
+    # 즉 최적화된 모든 torch의 기울기를 0으로 바꾼다.
+    # 기울기를 초기화해야 새로운 가중치와 편차에 대해서 새로운 기울기를 구할 수 있기 때문이다.
     optimizer.zero_grad()
+    # w와 b에 대한 기울기 계산
     loss.backward()
-
+    # model.paramters()에서 리턴되는 변수들의 기울기에 학습률을 곱해서 빼준 뒤에 업데이트한다.
     optimizer.step()
 
     if (i + 1) % print_interval == 0:
         now = datetime.datetime.now()
         nowDatetime = now.strftime('%Y-%m-%d %H:%M:%S')
         print(nowDatetime,'Epoch %d: loss=%.4e' % (i + 1, loss))
+# 2023-09-13 06:44:22 Epoch 27600000: loss=7.4783e-02
+# 2023-09-13 06:45:12 Epoch 27800000: loss=7.4780e-02
+# 2023-09-13 06:46:01 Epoch 28000000: loss=7.4777e-02
+# 2023-09-13 06:46:50 Epoch 28200000: loss=7.4774e-02
+# 2023-09-13 06:47:39 Epoch 28400000: loss=7.4774e-02
+# 2023-09-13 06:48:28 Epoch 28600000: loss=7.4774e-02
 
-'''
-Epoch 10000: loss=2.7718e-01
-Epoch 20000: loss=2.2865e-01
-Epoch 30000: loss=1.9965e-01
-Epoch 40000: loss=1.8072e-01
-Epoch 50000: loss=1.6749e-01
-Epoch 60000: loss=1.5775e-01
-Epoch 70000: loss=1.5028e-01
-Epoch 80000: loss=1.4436e-01
-Epoch 90000: loss=1.3956e-01
-Epoch 100000: loss=1.3558e-01
-Epoch 110000: loss=1.3222e-01
-Epoch 120000: loss=1.2935e-01
-Epoch 130000: loss=1.2686e-01
-Epoch 140000: loss=1.2469e-01
-Epoch 150000: loss=1.2276e-01
-Epoch 160000: loss=1.2105e-01
-Epoch 170000: loss=1.1952e-01
-Epoch 180000: loss=1.1813e-01
-Epoch 190000: loss=1.1688e-01
-Epoch 200000: loss=1.1573e-01
-'''
+
 # Let's see the result!
 # y와 y_hat을 비교하여 정확도 계산
 correct_cnt = (y == (y_hat > .5)).sum()
 total_cnt = float(y.size(0))
 
 print('Accuracy: %.4f' % (correct_cnt / total_cnt))
-# Accuracy: 0.9666
+# Accuracy: 0.9789
 
 df = pd.DataFrame(torch.cat([y, y_hat], dim=1).detach().numpy(),
                   columns=["y", "y_hat"])

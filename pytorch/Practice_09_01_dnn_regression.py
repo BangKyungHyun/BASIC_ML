@@ -4,21 +4,22 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import datetime
-
 # StandardScaler는 모든 피처들을 평균이 0, 분산이 1인 정규분포를 갖도록 만듬
 from sklearn.preprocessing import StandardScaler
-
 # scikit-learn dataset에서 boston dataset을 load
-# scikit-learn의 datasets에서 sample data import
+# scikit-learn dataset에서 sample data import
 from sklearn.datasets import load_boston
 
+################################################################################
 # boston dataset load
+################################################################################
 boston = load_boston()
-
+################################################################################
 # 데이터 프레임으로 변환
+################################################################################
 df = pd.DataFrame(boston.data, columns=boston.feature_names)
 
-# 출력값은 TARGET속성으로 저장되도록 함
+# 출력값은 TARGET 속성으로 저장되도록 함
 df["TARGET"] = boston.target
 print('df.tail() =\n',df.tail())
 # df.tail() =
@@ -31,12 +32,6 @@ print('df.tail() =\n',df.tail())
 
 # [5 rows x 14 columns]
 
-# 보스톤 주택 가격 데이터넷은 13개의 속성을 가지며 506개의 샘플로 구성되어 있음.
-# 일부 속성만을 활용하여 선형 회귀를 학습했던 것과 달리 이번에는 전체 속성들을 활용하여 
-# 심층신경망 학습을 진행함
-# 조금 더 쉽고 수월한 최적화 및 성능향샹을 위해 표준 스케줄링을 통해 입력값을 정규화 함
-# 보스턴 주택 가격 데이터셋의 각 열이 정규분포를 따른다고 가정하고 표준 스케줄링을 적용함
-# 다음 테이블은 표준 스케일링을 적용한 결과를 보여 줌
 
 # missing value 검사
 print('df.isnull().sum() = \n', df.isnull().sum())
@@ -57,6 +52,15 @@ print('df.isnull().sum() = \n', df.isnull().sum())
 # LSTAT      0
 # TARGET     0
 # dtype: int64
+
+################################################################################
+# 보스톤 주택 가격 데이터넷은 13개의 속성을 가지며 506개의 샘플로 구성되어 있음.
+# 일부 속성만을 활용하여 선형 회귀를 학습했던 것과 달리 이번에는 전체 속성들을 활용하여
+# 심층신경망 학습을 진행함
+# 조금 더 쉽고 수월한 최적화 및 성능향샹을 위해 표준 스케줄링을 통해 입력값을 정규화 함
+# 보스턴 주택 가격 데이터셋의 각 열이 정규분포를 따른다고 가정하고 표준 스케줄링을 적용함
+# 다음 테이블은 표준 스케일링을 적용한 결과를 보여 줌
+################################################################################
 
 scalar = StandardScaler()
 scalar.fit(df.values[:, :-1])
@@ -79,26 +83,29 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 
+################################################################################
 # 학습에 필요한 패키지를 불려오고 판다스에 저장된 넘파이 값을 파이토치 텐서로 변환하여
 # 입력 텐서 x와 출력 텐서 y를 만듬
+################################################################################
 data = torch.from_numpy(df.values).float()
 print('data.shape = ',data.shape)
 # data.shape =  torch.Size([506, 14])
 
-x = data[:, -1:]
-y = data[:, :-1]
+x = data[:, :-1]
+y = data[:, -1:]
 print('x.shape, y.shape =' , x.shape, y.shape)
-# x.shape, y.shape =  torch.Size([506, 1]) torch.Size([506, 13])
+# x.shape, y.shape = torch.Size([506, 13]) torch.Size([506, 1])
 
-n_epochs = 100000
+n_epochs = 10000000
 learning_rate = 1e-4
-print_interval = 5000
+print_interval = 50000
 
 # Build Model using nn.Module
 relu = nn.ReLU()
 leaky_relu = nn.LeakyReLU(0.1)     # 새는, 구멍 난
-
+##############################################################################
 # 심층 신경망 정의
+##############################################################################
 # nn.Module을 상속받아 Mymodel 이라는 나만이 모델 클래스를 정의함
 # 이러한 심층신경망은 4개의 선형 계층과 1개의 비선형을 함수를 갖도록 함
 # __init__함수를 살펴보면 선형계층은 각각 linear1,linear2,linear3,linear4라는 이름을
@@ -109,7 +116,7 @@ leaky_relu = nn.LeakyReLU(0.1)     # 새는, 구멍 난
 # 비선형 활성 함수는 학습되는 파라미터를 갖지 않았기 때문에 모든 계층에서
 # 동일하게 동작하므로 한 개만 선언하여 재활용함
 #
-# 각 선형 계층의 입출력 크기는 최초 입력 자원(input_im)과 최종 출력 차원(output_dim)을
+# 각 선형 계층의 입출력 크기는 최초 입력 자원(input_dim)과 최종 출력 차원(output_dim)을
 # 제외하고는 임의로 정함
 #
 # forward 함수에서는 앞서 선언된 내부 모듈들을 활용하여 피드포워드 연산을 수행할 수 있도록 함
@@ -134,7 +141,7 @@ class MyModel(nn.Module):
         self.linear1 = nn.Linear(input_dim,3)
         self.linear2 = nn.Linear(3, 3)
         self.linear3 = nn.Linear(3, 3)
-        self.linear3 = nn.Linear(3, output_dim)
+        self.linear4 = nn.Linear(3, output_dim)
         self.act = nn.ReLU()
 
     def forward(self, x):
@@ -150,12 +157,13 @@ model = MyModel(x.size(-1), y.size(-1))
 print('model 1 =  ', model)
 
 # model 1 =   MyModel(
-#   (linear1): Linear(in_features=1, out_features=3, bias=True)
+#   (linear1): Linear(in_features=13, out_features=3, bias=True)
 #   (linear2): Linear(in_features=3, out_features=3, bias=True)
-#   (linear3): Linear(in_features=3, out_features=13, bias=True)
+#   (linear3): Linear(in_features=3, out_features=3, bias=True)
+#   (linear4): Linear(in_features=3, out_features=1, bias=True)
 #   (act): ReLU()
 # )
-
+##############################################################################
 # Build Model with LeakyReLU using nn.Sequential
 # 앞서와 같은 방법으로 직접 나만의 모델 클래스를 정의하는 방법도 아주 좋은 방법입니다.
 # 하지만 지금은 모델 구조가 매우 단순한 편입니다. 입력 텐서를 받아 단순하게 순차적으로
@@ -166,6 +174,7 @@ print('model 1 =  ', model)
 # 내부 모듈들을 nn.Sequential을 생성할 때, 순차적으로 넣어주는 것을 볼 수 있습니다.
 # 당연한 것이지만 앞 쪽에 넣은 모듈들의 출력이 바로 뒷 모듈의 입력에 될 수 있도록,
 # 내부 모듈들의 입출력 크기를 잘 적어주어야 할 것입니다.
+##############################################################################
 
 model = nn.Sequential(
     nn.Linear(x.size(-1), 3),
@@ -182,7 +191,7 @@ model = nn.Sequential(
 print('model  2 = ', model)
 
 # model  2 =  Sequential(
-#   (0): Linear(in_features=1, out_features=3, bias=True)
+#   (0): Linear(in_features=13, out_features=3, bias=True)
 #   (1): LeakyReLU(negative_slope=0.01)
 #   (2): Linear(in_features=3, out_features=3, bias=True)
 #   (3): LeakyReLU(negative_slope=0.01)
@@ -190,7 +199,7 @@ print('model  2 = ', model)
 #   (5): LeakyReLU(negative_slope=0.01)
 #   (6): Linear(in_features=3, out_features=3, bias=True)
 #   (7): LeakyReLU(negative_slope=0.01)
-#   (8): Linear(in_features=3, out_features=13, bias=True)
+#   (8): Linear(in_features=3, out_features=1, bias=True)
 # )
 
 optimizer = optim.SGD(model.parameters(),lr=learning_rate)
