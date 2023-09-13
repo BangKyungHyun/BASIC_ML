@@ -96,9 +96,9 @@ y = data[:, -1:]
 print('x.shape, y.shape =' , x.shape, y.shape)
 # x.shape, y.shape = torch.Size([506, 13]) torch.Size([506, 1])
 
-n_epochs = 10000000
+n_epochs = 1000000
 learning_rate = 1e-4
-print_interval = 50000
+print_interval = 10000
 
 # Build Model using nn.Module
 relu = nn.ReLU()
@@ -165,6 +165,7 @@ print('model 1 =  ', model)
 # )
 ##############################################################################
 # Build Model with LeakyReLU using nn.Sequential
+##############################################################################
 # 앞서와 같은 방법으로 직접 나만의 모델 클래스를 정의하는 방법도 아주 좋은 방법입니다.
 # 하지만 지금은 모델 구조가 매우 단순한 편입니다. 입력 텐서를 받아 단순하게 순차적으로
 # 앞으로 하나씩 계산해 나가는 것에 불과하기 때문입니다. 이 경우에는 나만의 모델 클래스를
@@ -242,8 +243,8 @@ for i in range(n_epochs):
 ##############################################################################
 # Let's see the result!  (샘플대로 했으나 오류 발생)
 ##############################################################################
-# df = pd.DataFrame(torch.cat([y, y_hat], dim=1).detach().numpy(),
-#                   columns=["y", "y_hat"])
-#
-# sns.pairplot(df, height=5)
-# plt.show()
+df = pd.DataFrame(torch.cat([y, y_hat], dim=1).detach().numpy(),
+                  columns=["y", "y_hat"])
+
+sns.pairplot(df, height=5)
+plt.show()

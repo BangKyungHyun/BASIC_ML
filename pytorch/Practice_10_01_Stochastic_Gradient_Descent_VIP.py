@@ -46,9 +46,9 @@ print('x.shape, y.shape = ',x.shape, y.shape)
 
 # 학습에 필요한 하이퍼파라미터 설정
 # 모덱은 전체 데이터셋의 모든 샘플을 천번 학습, 배치사이즈는 256, 학습률은 0.01로 지정
-n_epochs = 1000
+n_epochs = 1000000
 batch_size = 256
-print_interval = 50
+print_interval = 10000
 learning_rate = 1e-2
 
 # print('\nLearning hyper parameter => Epoch = %d,: print_interval = %d \n' % (n_epochs, print_interval))
