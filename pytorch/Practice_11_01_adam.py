@@ -1,3 +1,4 @@
+################################################################################
 # 하이퍼 파라미터
 # 하이퍼 파라미터란 모델의 성능에 영향을 주지만 데이터를 통해 자동으로 학습할 수 없는 파라미터를 가리킨다.
 # 학습률, 신경망의 깊이/너비, 활성함수의 종류 등
@@ -6,12 +7,12 @@
 # 학습률의 설정에 따라 모델의 학습 경향이 매우 달라질 수 있다.
 # 학습 초반에는 큰 학습률이 선호되고, 학습 후반에는 작은 학습률이 선호된다.
 # 이를 응용하여 각 가중치 파라미터별 학습 진행 정도에 따라 학습률을 다르게 자동 적용할 수 있다.
-
+################################################################################
 # Adam 최적화 방법
 # 가장 널리 쓰이는 알고리즘
 # 모멘텀과 적응형 학습률이 복합 적용된 방식
 # 학습률 하이퍼 파라미터가 존재하지만, 입문 단계에서는 딱히 튜닝할 필요가 없다.
-
+################################################################################
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -43,9 +44,9 @@ x = data[:, :-1]
 y = data[:, -1:]
 print('x.shape, y.shape =',x.shape, y.shape)
 
-n_epochs = 4000
+n_epochs = 1000
 batch_size = 256
-print_interval = 200
+print_interval = 100
 
 print('\nLearning hyper parameter => Epoch = ', format(n_epochs,','),'print_interval = ',format(print_interval,','))
 
@@ -129,7 +130,6 @@ for i in range(n_epochs):
     for x_i, y_i in zip(x_, y_):
         # |x_i| = |x_[i]|
         # |y_i| = |y_[i]|
-
         y_hat_i = model(x_i)
         loss = F.mse_loss(y_hat_i, y_i)
 
@@ -138,7 +138,7 @@ for i in range(n_epochs):
 
         optimizer.step()
 
-        total_loss += float(loss) # This is very important to prevent memory leak
+        total_loss += float(loss)
         y_hat += [y_hat_i]
 
     total_loss = total_loss / len(x_)
@@ -180,6 +180,8 @@ y = torch.cat(y_, dim=0)
 # |y_hat| = (total_size, output_dim)
 # |y| = (total_size, output_dim)
 
-df = pd.DataFrame(torch.cat([y,y_hat], dim=1).detach().numpy(),columns=["y","y_hat"])
+df = pd.DataFrame(torch.cat([y, y_hat], dim=1).detach().numpy(),
+                  columns=["y", "y_hat"])
+
 sns.pairplot(df, height=5)
 plt.show()

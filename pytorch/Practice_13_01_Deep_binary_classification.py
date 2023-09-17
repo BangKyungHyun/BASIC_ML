@@ -1,6 +1,7 @@
-# 로지스틱 회귀logistic regression에서 실습했던 유방암 예측 데이터셋을 활용하여 딥러닝을 통한 이진 분류를 실습하도록 함
-# 다음과 같이 필요한 라이브러리들을 불러옴
-
+################################################################################
+# 로지스틱 회귀logistic regression에서 실습했던 유방암 예측 데이터셋을 활용하여
+# 딥러닝을 통한 이진 분류를 실습하도록 함
+################################################################################
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -82,17 +83,17 @@ x = [torch.from_numpy(scaler.transform(x[0].numpy())).float(),
 # 그리고 아담 옵티마이저에 선언한 모델 가중치 파라미터를 등록해 줌
 
 model = nn.Sequential(
-    nn.Linear(x[0].size(-1), 250),
+    nn.Linear(x[0].size(-1), 25),
     nn.LeakyReLU(),
-    nn.Linear(250, 200),
+    nn.Linear(25, 20),
     nn.LeakyReLU(),
-    nn.Linear(200, 150),
+    nn.Linear(20, 15),
     nn.LeakyReLU(),
-    nn.Linear(150, 100),
+    nn.Linear(15, 10),
     nn.LeakyReLU(),
-    nn.Linear(100, 50),
+    nn.Linear(10, 5),
     nn.LeakyReLU(),
-    nn.Linear(50, y[0].size(-1)),
+    nn.Linear(5, y[0].size(-1)),
     nn.Sigmoid(),
 )
 
@@ -270,4 +271,3 @@ print('roc_auc_score = ',roc_auc_score(df.values[:, 0], df.values[:, 1]))
 
 # 정답 값과 예측 실수 값을 함께 넣어주면 자동으로 계산함,
 # 앞서 그림에서 보았듯이 두 클래스의 분포가 확연하게 나뉠 수 있는 상황이기 때문에 매우 높은 값을 보여줌
-

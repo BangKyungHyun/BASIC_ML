@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 import datetime
 import time
 
-
 from sklearn.preprocessing import StandardScaler
 from sklearn.datasets import fetch_california_housing
 
@@ -122,26 +121,15 @@ print('df.tail() = \n',df.tail())
 # nn.Sequential을 활용하여 모델을 선언하고, 아담 옵티마이저에 등록
 
 model = nn.Sequential(
-    nn.Linear(x[0].size(-1), 200),
+    nn.Linear(x[0].size(-1), 6),
     nn.LeakyReLU(),
-    nn.Linear(200, 190),
+    nn.Linear(6, 5),
     nn.LeakyReLU(),
-    nn.Linear(190, 180),
+    nn.Linear(5, 4),
     nn.LeakyReLU(),
-    nn.Linear(180, 170),
+    nn.Linear(4, 3),
     nn.LeakyReLU(),
-    nn.Linear(170, 160),
-    nn.LeakyReLU(),
-    nn.Linear(160, 150),
-    nn.LeakyReLU(),
-    nn.Linear(150, 140),
-    nn.LeakyReLU(),
-    nn.Linear(140, 130),
-    nn.LeakyReLU(),
-    nn.Linear(130, 120),
-    nn.LeakyReLU(),
-    nn.Linear(120, 110),
-    nn.Linear(110, y[0].size(-1)),
+    nn.Linear(3, y[0].size(-1)),
 )
 
 print('model = \n', model)
@@ -155,10 +143,10 @@ optimizer = optim.Adam(model.parameters())
 
 n_epochs = 400000
 batch_size = 256
-print_interval = 1000
+print_interval = 10
 
 print('\nLearning hyper parameter => Epoch = ', format(n_epochs,','),'print_interval = ',format(print_interval,','))
-
+################################################################################
 # 우리가 원하는 모델은 가장 낮은 검증 손실 값(validation loss)을 갖는 모델임
 #
 # 매 epoch마다 학습이 끝날 때, 검증 데이터셋을 똑같이 feed-forwarding하여
@@ -184,16 +172,19 @@ print('\nLearning hyper parameter => Epoch = ', format(n_epochs,','),'print_inte
 
 #  깊은 복사(deep copy)를 통해 값 자체를 복사하여 저장하기 위해
 #  copy 패키지의 deepcopy 함수를 불러옴
+################################################################################
 
 from copy import deepcopy
 lowest_loss = np.inf
 best_model = None
 
+################################################################################
 # 학습 조기 종료(early stopping)을 위한 셋팅 값과,가장 낮은 검증손실 값을 찾아내는 에포크를
 # 저장하기 위한 변수 lowest_epoch도 선언함
+################################################################################
 
-early_stop = 10000
-lowest_epoch = np.inf
+early_stop = 100
+lowest_epoch = 0
 
 print('\nearly_stop hyper parameter => early_stop = ', format(early_stop,','))
 
@@ -211,7 +202,7 @@ train_history, valid_history = [], []
 
 now = datetime.datetime.now()
 time1 = now.strftime('%Y-%m-%d %H:%M:%S')
-print('start time =',time1)
+print('Start Time =',time1)
 
 for i in range(n_epochs):
 
@@ -344,11 +335,12 @@ for i in range(n_epochs):
     if (i + 1) % print_interval == 0:
         now = datetime.datetime.now()
         nowDatetime = now.strftime('%Y-%m-%d %H:%M:%S')
-        print(nowDatetime,'Epoch %d: train loss=%.4e  valid_loss=%.4e  lowest_loss=%.4e' % (
+        print(nowDatetime,'Epoch %d: train loss=%.4e  valid_loss=%.4e  lowest_loss=%.4e lowest_epoch=%d' % (
             i + 1,
             train_loss,
             valid_loss,
             lowest_loss,   # 검증 데이터셋에서 가장 낮은 손실 값
+            lowest_epoch + 1
         ))
     # Epoch    400: train  loss = 3.3823e-01 valid_loss = 3.7201e-01    lowest_loss = 3.6391e-01
     # Epoch    800: train  loss = 3.2896e-01 valid_loss = 3.4263e-01    lowest_loss = 3.4245e-01
@@ -385,10 +377,15 @@ for i in range(n_epochs):
         #       (i + 1,lowest_epoch + 1, early_stop, (i + 1) - lowest_epoch,  valid_loss, lowest_loss))
         # 최소 검증 값 갱신횟수+조기중단 값이 전체 에포크 횟수보다 적을 때까지 수행
         # 즉, 최종 최소 검증 값 갱신 이후 조기중단 횟수 만큼 갱신이 일어나지 않으면 강제 종료
-        if early_stop > 0 and lowest_epoch + early_stop < i + 1:
-            print("최종 최소 검증 값 갱신 이후 %d 번 에포크 동안 최소 검증값 변화가 없어서 종료함" % early_stop)
+#        if early_stop > 0 and lowest_epoch + early_stop < i + 1:
+        if lowest_epoch + early_stop < i + 1:
+             print("최종 최소 검증 값 갱신 이후 %d 번 에포크 동안 최소 검증값 변화가 없어서 종료함" % early_stop)
+             print("최종 최소 검증 에포크 값 + 조기 종료 값 = ", str(lowest_epoch + early_stop))
+             print("최종 최소 검증 에포크 값 %d " % lowest_epoch)
+             print("현재 에포크 값  ", str(i + 1))
+
             # 최종 최소 검증 값 갱신 이후 10000 번 에포크 동안 최소 검증값 변화가 없음.
-            break
+             break
 
 ################################################################################
 # outter for end
@@ -414,7 +411,7 @@ model.load_state_dict(best_model)
 
 now = datetime.datetime.now()
 time2 = now.strftime('%Y-%m-%d %H:%M:%S')
-print('end time =',time2)
+print('End Time =',time2)
 ################################################################################
 # 만약 여러분이 보기에 손실 값이 좀 더 떨어질 여지가 있다면,
 # 조기 종료 파라미터를 늘릴 수도 있음(중요).
@@ -513,7 +510,7 @@ print("Test loss: %.4e" % test_loss)
 df = pd.DataFrame(torch.cat([y[2], y_hat], dim=1).detach().numpy(),
                   columns=["y", "y_hat"])
 
-sns.pairplot(df, height=5)
+sns.histplot(df, x='y_hat', hue='y', bins=50, stat='probability')
 plt.show()
 
 # 따라서 정말 정당한 비교를 위해서는 매번 랜덤하게 학습/검증/테스트셋을 나누기보단,

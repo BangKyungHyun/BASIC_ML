@@ -1,6 +1,8 @@
+################################################################################
 # SGD는 비복원 추출을 통해 일부 샘플을 뽑아 미니배치를 구성하고
 # 피드포워딩 및 파라미터(가중치) 업데이트를 수행하는 방법
 # 기존 전체 데이터셋을 활용하는 방식에 비해 파라미터(가중치) 업데이트를 효율적으로 수행할 수 있음
+################################################################################
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -18,8 +20,9 @@ print('df.tail() = \n',df.tail())
 
 sns.pairplot(df.sample(1000))
 # plt.show()
-
+################################################################################
 # 정규화
+################################################################################
 scalar = StandardScaler()
 scalar.fit(df.values[:, :0-1])
 df.values[:, :-1] = scalar.transform(df.values[:, :-1])
@@ -46,21 +49,21 @@ print('x.shape, y.shape = ',x.shape, y.shape)
 
 # 학습에 필요한 하이퍼파라미터 설정
 # 모덱은 전체 데이터셋의 모든 샘플을 천번 학습, 배치사이즈는 256, 학습률은 0.01로 지정
-n_epochs = 1000000
+n_epochs = 10000
 batch_size = 256
-print_interval = 10000
-learning_rate = 1e-2
+print_interval = 100
+learning_rate = 1e-5
 
 # print('\nLearning hyper parameter => Epoch = %d,: print_interval = %d \n' % (n_epochs, print_interval))
 print('\nLearning hyper parameter => Epoch = ', format(n_epochs,','),'print_interval = ',format(print_interval,','))
-
+################################################################################
 # nn.Sequential 클래스를 활용하여 심층신경망을 구성.nn.Sequential을
 # 선언할 때, 선형 계층 nn.Linear와 활성함수 nn.LeakyReLU를 선언
 # 주의할 점
 # 1) 선형계층과 마지막 선형 계층은 실제 데이터셋 텐서 x의 크기(8)와 y의 크기(1)를
 #    입출력 크기로 갖도록 정함
 # 2) 내부의 선형 계층들은 서로 입출력 크기가 호환 되도록 되어 있다는 점에도 주목
-
+################################################################################
 # Build models
 model = nn.Sequential(
     nn.Linear(x.size(-1), 10),
@@ -92,7 +95,7 @@ print('model =', model)
 
 # 옵티마이저 정의
 optimizer = optim.SGD(model.parameters(), lr=learning_rate)
-
+################################################################################
 # |x| = = (total_size, input_dim)
 # |y| = = (total_size, output_dim)
 
@@ -126,7 +129,7 @@ optimizer = optim.SGD(model.parameters(), lr=learning_rate)
 
 # 그리고 마지막 에포크가 끝나면 이 y_hat 리스트를 파이토치 cat 함수를 활용하여
 # 이어 붙여 하나의 텐서로 만든 후, 실제 정답과 비교
-
+################################################################################
 now = datetime.datetime.now()
 time1 = now.strftime('%Y-%m-%d %H:%M:%S')
 print('start time =',time1)
@@ -225,4 +228,3 @@ df = pd.DataFrame(torch.cat([y, y_hat], dim=1).detach().numpy(),columns=["y", "y
 # 대각선 주변으로 점들이 분포하고 있는 것을 볼 수 있음
 sns.pairplot(df, height=5)
 plt.show()
-
