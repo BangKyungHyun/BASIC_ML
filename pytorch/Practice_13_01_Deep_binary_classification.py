@@ -104,7 +104,7 @@ optimizer = optim.Adam(model.parameters())
 n_epochs = 10000
 batch_size = 32
 print_interval = 10
-early_stop = 100
+early_stop = 1000
 
 lowest_loss = np.inf
 best_model = None

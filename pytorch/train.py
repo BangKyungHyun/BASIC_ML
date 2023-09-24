@@ -13,7 +13,9 @@ from utils import load_mnist
 from utils import split_data
 from utils import get_hidden_sizes
 
+###############################################################################
 # 파일명	    설명
+###############################################################################
 # model.py	    : 모델 클래스가 정의된 코드
 # trainer.py	: 데이터를 받아와 모델 객체를 학습하기 위한 trainer가 정의된 코드
 #               : data loader로부터 준비된 데이터를 넘겨받아 모델에 넣어 학습과 검증을 진행하는 역할을 수행
@@ -26,10 +28,10 @@ from utils import get_hidden_sizes
 #               : 저장된 피클 파일을 읽어와서 모델 객체를 생성하고, 학습된 가중치 파라미터를 그대로 복원함
 #               : 사용자로부터 추론을 위한 샘플이 주어지면 모델에 통과시켜 추론 결과를 반환함. 
 #                : 이때, predict.py에 선언된 함수들을 감싸서 RESTful API 서버로 구현할 수도 있을 것임
-
+###############################################################################
 # 먼저 define_argparser라는 함수를 통해 사용자가 입력한 파라미터들을 config라는 객체에 저장합니다.
 # 다음 코드는 define_argparser 함수를 정의한 코드입니다.
-
+###############################################################################
 # argparse 라이브러리를 통해 다양한 입력 파라미터들을 손쉽게 정의하고 처리할 수 있습니다.
 # train.py와 함께 주어질 수 있는 입력들은 다음과 같습니다.
 
@@ -49,6 +51,8 @@ from utils import get_hidden_sizes
 # 만약 다른 알고리즘의 도입으로 이외에도 추가적인 하이퍼파라미터의 설정이 필요하다면
 # add_argument 함수를 통해 프로그램이 입력을 받도록 설정할 수 있습니다.
 # 이렇게 입력받은 파라미터들은 다음과 같이 접근할 수 있습니다.
+###############################################################################
+
 def define_argparser():
     p = argparse.ArgumentParser()
 
@@ -70,23 +74,37 @@ def define_argparser():
 
     return config
 
+###############################################################################
 # 앞서 모델 클래스를 정의할 때, hidden_sizes라는 리스트를 통해 쌓을 블럭들의
 # 크기들을 지정할 수 있었습니다.
 # 사용자가 블럭 크기들을 일일히 지정하는것은 어쩌면 번거로운 일이 될 수 있기 때문에,
 # 사용자가 모델의 계층 갯수만 정해주면 자동으로 등차수열을 적용하여
 # hidden_sizes를 구하고자 합니다.
 # 다음의 get_hidden_sizes 함수는 해당 작업을 수행합니다.
+###############################################################################
+
 def get_hidden_sizes(input_size, output_size, n_layers):
     step_size = int((input_size - output_size) / n_layers)
 
+    print('input size = ', input_size)
+    print('output size = ', output_size)
+    print('n_layers = ', n_layers)
+    print('step size int((input_size - output_size) / n_layers) = ', step_size)
+
     hidden_sizes = []
     current_size = input_size
+    print('current_size = ', current_size)
+
     for i in range(n_layers - 1):
         hidden_sizes += [current_size - step_size]
         current_size = hidden_sizes[-1]
+        print('i = ', i)
+        print('hidden_sizes = ', hidden_sizes)
+        print('current_size = ', current_size)
 
     return hidden_sizes
 
+###############################################################################
 # 이제 학습에 필요한 대부분의 부분들이 구현되었습니다.
 # 이것들을 모아서 학습을 진행하도록 코드를 구현하면 됩니다.
 # 다음의 코드는 앞서 구현한 코드들을 모아서 실제 학습을 진행하는 과정을 수행하도록 구현한 코드입니다.
@@ -100,7 +118,9 @@ def get_hidden_sizes(input_size, output_size, n_layers):
 # Adam 옵티마이저와 NLL 손실 함수도 함께 준비합니다.
 # 그리고 트레이너를 초기화한 후, train함수를 호출하여 불러온 데이터를
 # 넣어주어 학습을 시작합니다.
-# 학습이 종료된 이후에는 torch.save 함수를 활용하여 모델 가중치를 config.model_fn 경로에 저장합니다
+# 학습이 종료된 이후에는 torch.save 함수를 활용하여 모델 가중치를 config.model_fn 경로에 저장합니다.
+###############################################################################
+
 def main(config):
     # Set device based on user defined configuration.
     device = torch.device('cpu') if config.gpu_id < 0 else torch.device('cuda:%d' % config.gpu_id)
@@ -113,6 +133,9 @@ def main(config):
 
     input_size = int(x[0].shape[-1])
     output_size = int(max(y[0])) + 1
+
+    print("input_size = ", input_size)
+    print("output_size = ", output_size)
 
     model = ImageClassifier(
         input_size=input_size,
@@ -145,8 +168,10 @@ def main(config):
         'config': config,
     }, config.model_fn)
 
+###############################################################################
 # 사용자는 train.py를 통해 다양한 파라미터를 시도하고 모델을 학습할 수 있습니다.
 # CLI 환경에서 바로 train.py를 호출 할 것이며, 그럼 train.py의 다음 코드가 실행될 것입니다.
+###############################################################################
 
 if __name__ == '__main__':
     config = define_argparser()
