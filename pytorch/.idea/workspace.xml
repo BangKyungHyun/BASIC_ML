@@ -2,14 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d39b206f-61f4-4732-8dc8-d8b183b54f06" name="Changes" comment="수정">
-      <change afterPath="$PROJECT_DIR$/VanillaRNN.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Practice_13_01_Deep_binary_classification.py" beforeDir="false" afterPath="$PROJECT_DIR$/Practice_13_01_Deep_binary_classification.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Practice_13_02_Multi_Value_Classfication.py" beforeDir="false" afterPath="$PROJECT_DIR$/Practice_13_02_Multi_Value_Classfication.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Practice_14_01_regularizations.py" beforeDir="false" afterPath="$PROJECT_DIR$/Practice_14_01_regularizations.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model.py" beforeDir="false" afterPath="$PROJECT_DIR$/model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tmp.pth" beforeDir="false" afterPath="$PROJECT_DIR$/tmp.pth" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VanillaRNN.py" beforeDir="false" afterPath="$PROJECT_DIR$/VanillaRNN.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

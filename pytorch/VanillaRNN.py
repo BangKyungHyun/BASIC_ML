@@ -181,11 +181,73 @@ def backward(ys, hs, xs):
 
     for i in range(seq_len)[::-1]:
 
-        output = np.zeros((vocab_size, 1))
-        output[targets[i]] = 1
+        # print('backward => i = ', i)
+        output = np.zeros((vocab_size, 1)) # vocab_size = 42
+        # output[targets[i]] = 1
+        # print('backward => output[targets[i]] = ', output[targets[i]])
+
+
+        # reshape(-1,정수) : 위치에 -1인 경우
+        # x.reshape(-1,1)
+        # >>> array([[ 0],
+        #        	   [ 1],
+        #        	   [ 2],
+        #            [ 3],
+        #            [ 4],
+        #            [ 5],
+        #            [ 6],
+        #            [ 7],
+        #            [ 8],
+        #            [ 9],
+        #            [10],
+        #            [11]])
+        # x.reshape(-1,2)
+        # >>> array([[ 0,  1],
+        #            [ 2,  3],
+        #            [ 4,  5],
+        #            [ 6,  7],
+        #            [ 8,  9],
+        #            [10, 11]])
+        # x.reshape(-1,3)
+        # >>> array([[ 0,  1,  2],
+        #            [ 3,  4,  5],
+        #            [ 6,  7,  8],
+        #            [ 9, 10, 11]])
+        # 즉, 행(행)의 위치에 -1을 대신할 열의 값을 가집니다.
+
+        # print('backward => output.reshape(-1, 1) = ', output.reshape(-1, 1))
+        # print('backward => ys[i] 1 = ', ys[i])
+
         ys[i] = ys[i] - output.reshape(-1, 1)
-        # 매번 i스텝에서 dL/dVi를 구하기
+
+        # print('backward => ys[i] 2 = ', ys[i])
+        #
+        # print('backward => (hs[i]) = ', (hs[i]))
+
+        # 배열 전치하는 법 (T 메소드)
+        #
+        # A=np.array([[1,2,3],[4,5,6]])
+        #
+        # 2행 3열인 배열입니다.
+        #
+        # >>> A
+        #
+        # array([[1, 2, 3],
+        #        [4, 5, 6]])
+        #
+        # 위 배열의 전치배열을 만들 때는 T 메소드를 사용합니다.
+        #
+        # >>> A.T
+        #
+        # array([[1, 4],
+        #        [2, 5],
+        #        [3, 6]])
+
+        # 매번 i스텝에서 dL/dVi를 구하기  @는 나머지 계산
+        # print('backward => (hs[i]).T = ', (hs[i]).T)
+        # print('backward => ys[i] = ', ys[i])
         dV_step_i = ys[i] @ (hs[i]).T  # (y_hat - y) @ hs.T - for each step
+        # print('backward => (dV_step_i = ', dV_step_i)
 
         dV = dV + dV_step_i  # dL/dVi를 다 더하기
 
@@ -226,20 +288,39 @@ def predict(word, length):
 
     for t in range(length):
 
+        print('predict => t ', t)
+
         h = np.tanh(np.dot(U, x) + np.dot(W, h))
+        print('predict => h = ', h)
+
         y = np.dot(V, h)
+        print('predict => y = ', y)
+
+
         p = np.exp(y) / np.sum(np.exp(y))    # 소프트맥스
+
+        print('predict => p = ', p)
+
         ix = np.argmax(p)                    # 가장 높은 확률의 index를 리턴
+
+        print('predict => ix = ', ix)
+
         x = np.zeros((vocab_size, 1))        # 다음번 input x를 준비
+
+        print('predict => x = ', x)
+
         x[ix] = 1
         ixes.append(ix)
 
     pred_words = ' '.join(ix_to_word[i] for i in ixes)
 
+    print('predict => pred_words = ', pred_words)
+
     return pred_words
 
+
 # 기본적인 parameters
-epochs = 2000
+epochs = 1000
 h_size = 100
 seq_len = 4
 learning_rate = 1e-2
@@ -267,11 +348,11 @@ for epoch in range(epochs):
         inputs = [word_to_ix[tok] for tok in tokens[p:p + seq_len]]
         # print('tokens[p:p + seq_len] = ',tokens[p:p + seq_len])
         # print('[word_to_ix[tok] = ',[word_to_ix['나라의']])
-        # print('inputs = ', inputs)
+        print('inputs = ', inputs)
 
         targets = [word_to_ix[tok] for tok in tokens[p + 1:p + seq_len + 1]]
         # print('tokens[p + 1:p + seq_len + 1] = ',tokens[p + 1:p + seq_len + 1])
-        # print('targets = ', targets)
+        print('targets = ', targets)
 
         loss, ys, hs, xs = feedforward(inputs, targets, hprev)
 
