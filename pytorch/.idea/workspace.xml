@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d39b206f-61f4-4732-8dc8-d8b183b54f06" name="Changes" comment="수정">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/VanillaRNN.py" beforeDir="false" afterPath="$PROJECT_DIR$/VanillaRNN.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

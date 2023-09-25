@@ -281,36 +281,42 @@ def backward(ys, hs, xs):
 
 def predict(word, length):
 
-    x = np.zeros((vocab_size, 1))
+    print('predict => word = ', word)
+    print('predict => length = ', length)
+    x = np.zeros((vocab_size, 1)) # vocab_size = 42
     x[word_to_ix[word]] = 1
+    print('predict => word_to_ix[word] = ', word_to_ix[word])
+
     ixes = []
-    h = np.zeros((h_size,1))
+    h = np.zeros((h_size,1)) # h_size = 100
 
     for t in range(length):
 
         print('predict => t ', t)
-
+        # 입력 단어 x에 대한 상태값
         h = np.tanh(np.dot(U, x) + np.dot(W, h))
-        print('predict => h = ', h)
+        # print('predict => x = ', x)
 
-        y = np.dot(V, h)
-        print('predict => y = ', y)
-
-
+        y = np.dot(V, h)                     # 출력값 y hat
         p = np.exp(y) / np.sum(np.exp(y))    # 소프트맥스
 
-        print('predict => p = ', p)
-
-        ix = np.argmax(p)                    # 가장 높은 확률의 index를 리턴
+        # 출력 단어의 인덱스 : 가장 높은 확률의 index를 리턴
+        ix = np.argmax(p)
 
         print('predict => ix = ', ix)
 
         x = np.zeros((vocab_size, 1))        # 다음번 input x를 준비
+        # print('predict => x = ', x)
 
-        print('predict => x = ', x)
-
+        # 출력 단어(인덱스)가 다음 단계 반복문의 입력 단어(인덱스)가 됨
+        # 나라의 말씀이 중국과 달라
+        # 1번째 입력 단어 : 말씀이,  1번째 출력 단어 : 중국과
+        # 2번째 입력 단어 : 중국과,  2번째 출력 단어 : 달라
         x[ix] = 1
+
+        # 42번 출력값에 저장
         ixes.append(ix)
+        print('predict => ixes = ', ixes)
 
     pred_words = ' '.join(ix_to_word[i] for i in ixes)
 
@@ -318,16 +324,13 @@ def predict(word, length):
 
     return pred_words
 
-
 # 기본적인 parameters
-epochs = 1000
+epochs = 10000
 h_size = 100
 seq_len = 4
 learning_rate = 1e-2
 
 tokens, vocab_size, word_to_ix, ix_to_word = data_preprocessing(data)
-
-print('ix_to_word = ', ix_to_word)
 
 U, W, V = init_weights(h_size, vocab_size)
 
@@ -348,11 +351,11 @@ for epoch in range(epochs):
         inputs = [word_to_ix[tok] for tok in tokens[p:p + seq_len]]
         # print('tokens[p:p + seq_len] = ',tokens[p:p + seq_len])
         # print('[word_to_ix[tok] = ',[word_to_ix['나라의']])
-        print('inputs = ', inputs)
+        # print('inputs = ', inputs)
 
         targets = [word_to_ix[tok] for tok in tokens[p + 1:p + seq_len + 1]]
         # print('tokens[p + 1:p + seq_len + 1] = ',tokens[p + 1:p + seq_len + 1])
-        print('targets = ', targets)
+        # print('targets = ', targets)
 
         loss, ys, hs, xs = feedforward(inputs, targets, hprev)
 
