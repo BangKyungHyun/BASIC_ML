@@ -183,7 +183,7 @@ def backward(ys, hs, xs):
 
         # print('backward => i = ', i)
         output = np.zeros((vocab_size, 1)) # vocab_size = 42
-        # output[targets[i]] = 1
+        output[targets[i]] = 1
         # print('backward => output[targets[i]] = ', output[targets[i]])
 
 
