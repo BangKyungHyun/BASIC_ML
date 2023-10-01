@@ -10,10 +10,11 @@ import datetime
 n_time = 20  # 시점의 수
 n_mid = 128  # 은닉층
 
-eta = 0.01  # 학습률
+# eta = 0.01  # 학습률
+eta = 0.1  # 학습률
 clip_const = 0.02  # 노름의 최댓값을 구하는 상수
 beta = 2  # 확률분포 폭(다음 시점에 올 문자를 예측할 때 사용)
-epoch = 100
+epoch = 10
 batch_size = 128
 
 def sigmoid(x):
@@ -30,6 +31,7 @@ def clip_grad(grads, max_norm):
 
 # -- 훈련용 텍스트 --
 with open("human_problem.txt", mode="r", encoding="utf-8-sig") as f:
+# with open("human_problem_short.txt", mode="r", encoding="utf-8-sig") as f:
     text = f.read()
 print("문자 수:", len(text))  # len()으로 문자열의 문자 수도 출력 가능
 
@@ -45,28 +47,65 @@ for i, char in enumerate(chars_list):
     char_to_index[char] = i
     index_to_char[i] = char
 
+print(char_to_index)
+# {'\n': 0, ' ': 1, '!': 2, ',': 3, '-': 4, '.': 5, '?': 6, '―': 7, '‘': 8, '’': 9, '…': 10, '가': 11, '각': 12, '간': 13, '갈': 14, '감': 15, '갑': 16, '값': 17, '갔': 18, '강': 19, '갖': 20, '같': 21, '갚': 22, '갛': 23, '개': 24, '갸': 25, '걀': 26,
 # -- 시계열로 나열된 문자와 다음 차례 문자 --
+print(index_to_char)
+# {0: '\n', 1: ' ', 2: '!', 3: ',', 4: '-', 5: '.', 6: '?', 7: '―', 8: '‘', 9: '’', 10: '…', 11: '가', 12: '각', 13: '간', 14: '갈', 15: '감', 16: '갑', 17: '값', 18: '갔', 19: '강', 20: '갖', 21: '같', 22: '갚', 23: '갛', 24: '개', 25: '갸', 26: '걀',
+
 seq_chars = []
 next_chars = []
+# len(text) = 60322
+# n_time = 20  # 시점의 수
 for i in range(0, len(text) - n_time):
     seq_chars.append(text[i:i + n_time])
     next_chars.append(text[i + n_time])
 
+# print(seq_chars)
+# print(next_chars)
+# ['이 산등에 올라서면 용연 동네는 저렇', ' 산등에 올라서면 용연 동네는 저렇게', '산등에 올라서면 용연 동네는 저렇게 ', '등에 올라서면 용연 동네는 저렇게 뻔', '에 올라서면 용연 동네는 저렇게 뻔히', ' 올라서면 용연 동네는 저렇게 뻔히 ', '올라서면 용연 동네는 저렇게 뻔히 들',
+# ['게', ' ', '뻔', '히', ' ', '들', '여', '다', '볼', ' ']
+
 # -- 입력과 정답을 원핫 인코딩으로 표시 --
+print('len(seq_chars)  = ',len(seq_chars))
+# len(seq_chars)  =  60302
+print("n_chars =>문자 수 (중복없음) :", n_chars)
+# n_chars =>문자 수 (중복없음) : 980
+
 input_data = np.zeros((len(seq_chars), n_time, n_chars), dtype=np.bool_)
 correct_data = np.zeros((len(seq_chars), n_chars), dtype=np.bool_)
+
 print('input_data length = ',len(input_data))
 print('correct_data length = ',len(correct_data))
+# input_data length =  60302
+# correct_data length =  60302
 
 for i, chars in enumerate(seq_chars):
+
+    print (' i= ', i)
+    print (' chars= ', chars)
+    # i=  0
+    # chars=  이 산등에 올라서면 용연 동네는 저렇
+    # i=  1
+    # chars=   산등에 올라서면 용연 동네는 저렇게
+    # i=  2
+    # chars=  산등에 올라서면 용연 동네는 저렇게
+
     # 정답을 원핫 인코딩으로 표시
     correct_data[i, char_to_index[next_chars[i]]] = 1
+    print (' char_to_index[next_chars[i]]= ', char_to_index[next_chars[i]])
+
+    # char_to_index[next_chars[i]]=  7
+    # char_to_index[next_chars[i]]=  1
+    # char_to_index[next_chars[i]]=  33
+
     for j, char in enumerate(chars):
         # 입력을 원핫 인코딩으로 표시
         input_data[i, j, char_to_index[char]] = 1
 
 # -- LSTM층 --
 class LSTMLayer:
+
     def __init__(self, n_upper, n):
         # 각 파라미터의 초깃값
         self.w = np.random.randn(4, n_upper, n) / np.sqrt(n_upper)
@@ -75,6 +114,7 @@ class LSTMLayer:
 
     # y_prev, c_prev: 이전 시점의 출력과 기억 셀
     def forward(self, x, y_prev, c_prev):
+
         u = np.matmul(x, self.w) + np.matmul(y_prev, self.v) + self.b.reshape(4,1,-1)
 
         a0 = sigmoid(u[0])  # 망각 게이트
@@ -135,6 +175,7 @@ class LSTMLayer:
 
 # -- 전결합 출력층 --
 class OutputLayer:
+
     def __init__(self, n_upper, n):
         # 자비에르 초기화 기반의 초깃값
         self.w = np.random.randn(n_upper, n) / np.sqrt(n_upper)
@@ -161,7 +202,6 @@ class OutputLayer:
 # -- 각 층의 초기화 --
 lstm_layer = LSTMLayer(n_chars, n_mid)
 output_layer = OutputLayer(n_mid, n_chars)
-
 
 # -- 훈련 --
 def train(x_mb, t_mb):
@@ -213,7 +253,6 @@ def train(x_mb, t_mb):
     lstm_layer.update(eta)
     output_layer.update(eta)
 
-
 # -- 예측 --
 def predict(x_mb):
     # 순전파 LSTM층
@@ -232,7 +271,6 @@ def predict(x_mb):
     output_layer.forward(y)
     return output_layer.y
 
-
 # -- 오차 계산 --
 def get_error(x, t):
     limit = 1000
@@ -244,7 +282,6 @@ def get_error(x, t):
     y = predict(x)
     # 교차 엔트로피 오차
     return -np.sum(t * np.log(y + 1e-7)) / batch_size
-
 
 def create_text():
     prev_text = text[0:n_time]  # 입력
@@ -270,19 +307,52 @@ def create_text():
     print(created_text)
     print()  # 개행
 
-
 error_record = []
 
+# input_data length =  60302
 # batch_size = 128
 n_batch = len(input_data) // batch_size  # 1 에포크당 배치 개수
+print('n_batch =', n_batch)
+# n_batch = 471
 
 for i in range(epoch):
     # -- 학습 --
+    # np.arange(시작점, 끝점, step size)
+    # np.arange(10)
+    # # array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+    #
+    # np.arange(1, 15, 2)
+    # # array([ 1,  3,  5,  7,  9, 11, 13])
+    #
+    # np.arange(9, -2, -1.5)
+    # # array([ 9. ,  7.5,  6. ,  4.5,  3. ,  1.5,  0. , -1.5])
     index_random = np.arange(len(input_data))
+    print('np.arange(len(input_data)) =', np.arange(len(input_data)))
+    print('index_random =', index_random)
+    # np.arange(len(input_data)) = [0     1     2... 60299 60300 60301]
     np.random.shuffle(index_random)  # 인덱스 임의 섞기
+    print('np.random.shuffle(index_random) =', np.random.shuffle(index_random))
+    print('index_random =', index_random)
+    # np.random.shuffle(index_random) = None
+    # index_random = [30948 45238 24615... 48699 57547 12631]
+
     for j in range(n_batch):
         # 미니 배치 구성
         mb_index = index_random[j * batch_size: (j + 1) * batch_size]
+        # 0 * 128: 1*128
+        print('mb_index =', mb_index)
+        # mb_index = [24177 21664 36328 14991 38631 52332 24017  5022 22642 29345 32914  2649  총 128개
+        #             1521 38486 57774 25629 40707 34061 46882 10720 50632  4357  3411  6335
+        #             44708 24509 23412 48344 46545 10264  4334   300 44890 20735 16711 25218
+        #             17563 17895 38398 54558 10544 59578  8503 36163 37909 10336 12159 19009
+        #             22944  9193 26841  7572 26996 46512 57804 23738  8585  6188 45570 52655
+        #             35835 22266 35862  7117  2929 29435 25083 10629 59814 24961 19262 43831
+        #             30514  4970  8778 35244  8888  7140  8089 18763 49410 15521 6081 10527
+        #             306 21621 36675 52100 58525   398 52361 40192 13953  9763   24278  5862
+        #             16834 36062 27731 44589  2254  7254 29646 43865 12008 37981 50490 56354
+        #             15608  5227 14198 34206 49587 21426 36079 59150 11544 34458 47376 20443
+        #             10578 56242 24585 21182  8669  8951 33873  1536]
+
         x_mb = input_data[mb_index, :]
         t_mb = correct_data[mb_index, :]
         train(x_mb, t_mb)
