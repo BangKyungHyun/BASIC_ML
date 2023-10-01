@@ -339,6 +339,7 @@ correct_cnt = (y[-1].squeeze() == torch.argmax(y_hat, dim=-1)).sum()
 total_cnt = float(y[-1].size(0))
 
 print('Test Accuracy: %.4f' % (correct_cnt / total_cnt))
+
 # Test Accuracy: 0.9818
 
 # 이전 챕터의 실습 결과에 비해 훨씬 더 좋은 결과가 나오는 것을 볼 수 있음

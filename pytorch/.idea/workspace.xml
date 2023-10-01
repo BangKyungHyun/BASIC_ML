@@ -2,7 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d39b206f-61f4-4732-8dc8-d8b183b54f06" name="Changes" comment="수정">
+      <change afterPath="$PROJECT_DIR$/LSTM_Example.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data-02-stock_daily.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Practice_14_01_regularizations.py" beforeDir="false" afterPath="$PROJECT_DIR$/Practice_14_01_regularizations.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/VanillaRNN.py" beforeDir="false" afterPath="$PROJECT_DIR$/VanillaRNN.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -35,23 +38,23 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/bangkh21/PycharmProjects/BASIC_ML/pytorch/Practice_13_02_Multi_Value_Classfication.py&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "last_opened_file_path": "C:/Users/bangkh21/PycharmProjects/BASIC_ML/pytorch/CNN",
+    "settings.editor.selected.configurable": "preferences.keymap"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\bangkh21\PycharmProjects\BASIC_ML\pytorch" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.VanillaRNN">
-    <configuration name="Practice_13_01_Deep_binary_classification" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Python.Practice_14_01_regularizations">
+    <configuration name="LSTM_Example" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="pytorch" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -63,7 +66,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Practice_13_01_Deep_binary_classification.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/LSTM_Example.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -158,11 +161,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.Practice_14_01_regularizations" />
+        <item itemvalue="Python.LSTM_Example" />
         <item itemvalue="Python.VanillaRNN" />
         <item itemvalue="Python.train" />
-        <item itemvalue="Python.Practice_14_01_regularizations" />
         <item itemvalue="Python.Practice_13_02_Multi_Value_Classfication" />
-        <item itemvalue="Python.Practice_13_01_Deep_binary_classification" />
       </list>
     </recent_temporary>
   </component>
@@ -174,13 +177,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1683664805278</updated>
-    </task>
-    <task id="LOCAL-00008" summary="수정">
-      <created>1683753590082</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1683753590082</updated>
     </task>
     <task id="LOCAL-00009" summary="Merge remote-tracking branch 'origin/main'">
       <created>1683756687678</created>
@@ -518,7 +514,14 @@
       <option name="project" value="LOCAL" />
       <updated>1695679808305</updated>
     </task>
-    <option name="localTasksCounter" value="57" />
+    <task id="LOCAL-00057" summary="수정">
+      <created>1695758221699</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1695758221700</updated>
+    </task>
+    <option name="localTasksCounter" value="58" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

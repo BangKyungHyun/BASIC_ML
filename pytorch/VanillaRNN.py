@@ -1,3 +1,6 @@
+
+# 장기 의존성 문제란 입력과 출력 사이의 거리가 멀어질수록 연관 관계가 적어지는 문제
+# 은닉층의 정보가 끝까지 전달되지 못하는 현상
 # NumPy는 행렬이나 일반적으로 대규모 다차원 배열을 쉽게 처리할 수 있도록 지원하는 파이썬 라이브러리
 import numpy as np
 import re
@@ -325,10 +328,10 @@ def predict(word, length):
     return pred_words
 
 # 기본적인 parameters
-epochs = 10000
+epochs = 100000
 h_size = 100
 seq_len = 4
-learning_rate = 1e-2
+learning_rate = 1e-3
 
 tokens, vocab_size, word_to_ix, ix_to_word = data_preprocessing(data)
 
