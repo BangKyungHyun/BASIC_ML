@@ -2,11 +2,23 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d39b206f-61f4-4732-8dc8-d8b183b54f06" name="Changes" comment="수정">
-      <change afterPath="$PROJECT_DIR$/LSTM_Example.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RNN/mnist_classifier/_init_.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RNN/mnist_classifier/models/_init_.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RNN/mnist_classifier/models/cnn.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RNN/mnist_classifier/models/fc.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RNN/mnist_classifier/models/rnn.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RNN/mnist_classifier/trainer.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RNN/mnist_classifier/utils.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RNN/model.pth" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RNN/predict.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RNN/train.py" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/data-02-stock_daily.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/human_problem_short.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/temp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/temp1.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Practice_14_01_regularizations.py" beforeDir="false" afterPath="$PROJECT_DIR$/Practice_14_01_regularizations.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/VanillaRNN.py" beforeDir="false" afterPath="$PROJECT_DIR$/VanillaRNN.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LSTM_Example.py" beforeDir="false" afterPath="$PROJECT_DIR$/LSTM_Example.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LSTM_TEST.py" beforeDir="false" afterPath="$PROJECT_DIR$/LSTM_TEST.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,7 +56,7 @@
     "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "last_opened_file_path": "C:/Users/bangkh21/PycharmProjects/BASIC_ML/pytorch/CNN",
+    "last_opened_file_path": "C:/Users/bangkh21/PycharmProjects/BASIC_ML/pytorch/RNN",
     "settings.editor.selected.configurable": "preferences.keymap"
   }
 }]]></component>

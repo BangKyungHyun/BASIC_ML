@@ -13,7 +13,7 @@ n_mid = 128  # 은닉층
 eta = 0.01  # 학습률
 clip_const = 0.02  # 노름의 최댓값을 구하는 상수
 beta = 2  # 확률분포 폭(다음 시점에 올 문자를 예측할 때 사용)
-epoch = 100
+epoch = 200
 batch_size = 128
 
 def sigmoid(x):
