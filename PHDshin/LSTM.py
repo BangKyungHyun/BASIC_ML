@@ -131,19 +131,35 @@ class LSTM:
             #print('forward(self, inputs): => x[t] = \n', x[t])
 
             self.X[t] = np.concatenate((self.HS[t - 1], x[t]))
-            print('forward(self, inputs): => self.HS[t - 1].shape = \n',self.HS[t - 1].shape)
-            # forward(self, inputs): = > self.HS[t - 1].shape =  (25, 1)
 
             self.F[t] = sigmoid(np.dot(self.Wf, self.X[t]) + self.bf) # 망각 게이트
             self.I[t] = sigmoid(np.dot(self.Wi, self.X[t]) + self.bi) # 입력 게이트
             self.C[t] = tanh(np.dot(self.Wc, self.X[t]) + self.bc)    # 후보자 게이트
             self.O[t] = sigmoid(np.dot(self.Wo, self.X[t]) + self.bo) # 출력 게이트
 
-            self.CS[t] = self.F[t] * self.CS[t - 1] + self.I[t] * self.C[t] # 상태 게이트
+            self.CS[t] = self.F[t] * self.CS[t - 1] + self.I[t] * self.C[t] # 셀 상태
+            # 이전 셀 상태 * 망각게이트 + 후보자게이트*입력게이트
             self.HS[t] = self.O[t] * tanh(self.CS[t])
-
+            # 은닉층 = 출력 게이트 * 셀 상태
             outputs += [np.dot(self.Wy, self.HS[t]) + self.by]
-
+            # 출력 값 = 출력 가중치
+            print('forward(self, inputs): => x[t].shape = \n',x[t].shape)
+            print('forward(self, inputs): => self.HS[t - 1].shape = \n',self.HS[t - 1].shape)
+            print('forward(self, inputs): => self.F[t].shape = ', self.F[t].shape)
+            print('forward(self, inputs): => self.I[t].shape = ', self.I[t].shape)
+            print('forward(self, inputs): => self.C[t].shape = ', self.C[t].shape)
+            print('forward(self, inputs): => self.O[t].shape = ', self.O[t].shape)
+            print('forward(self, inputs): => self.CS[t].shape = ', self.CS[t].shape)
+            print('forward(self, inputs): => self.HS[t].shape = ', self.HS[t].shape)
+            print('forward(self, inputs): => outputs = \n', outputs)
+            # forward(self, inputs): = > x[t].shape = (42, 1)
+            # forward(self, inputs): = > self.HS[t - 1].shape =  (25, 1)
+            # forward(self, inputs): => self.F[t].shape =  (25, 1)
+            # forward(self, inputs): => self.I[t].shape =  (25, 1)
+            # forward(self, inputs): => self.C[t].shape =  (25, 1)
+            # forward(self, inputs): => self.O[t].shape =  (25, 1)
+            # forward(self, inputs): => self.CS[t].shape =  (25, 1)
+            # forward(self, inputs): => self.HS[t].shape =  (25, 1)
         return outputs
 
     # 역전파
