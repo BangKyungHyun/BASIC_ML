@@ -2,23 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d39b206f-61f4-4732-8dc8-d8b183b54f06" name="Changes" comment="수정">
-      <change afterPath="$PROJECT_DIR$/RNN/mnist_classifier/_init_.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/RNN/mnist_classifier/models/_init_.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/RNN/mnist_classifier/models/cnn.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/RNN/mnist_classifier/models/fc.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/RNN/mnist_classifier/models/rnn.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/RNN/mnist_classifier/trainer.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/RNN/mnist_classifier/utils.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/RNN/model.pth" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/RNN/predict.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/RNN/train.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data-02-stock_daily.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/human_problem_short.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/temp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/temp1.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RNN/mnist_classifier/models/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RNN/mnist_classifier/models/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RNN/mnist_classifier/models/.idea/models.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RNN/mnist_classifier/models/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RNN/mnist_classifier/models/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LSTM_Example.py" beforeDir="false" afterPath="$PROJECT_DIR$/LSTM_Example.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LSTM_TEST.py" beforeDir="false" afterPath="$PROJECT_DIR$/LSTM_TEST.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RNN/model.pth" beforeDir="false" afterPath="$PROJECT_DIR$/RNN/model.pth" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,16 +40,16 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "last_opened_file_path": "C:/Users/bangkh21/PycharmProjects/BASIC_ML/pytorch/RNN",
-    "settings.editor.selected.configurable": "preferences.keymap"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/bangkh21/PycharmProjects/BASIC_ML/PHDshin&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\bangkh21\PycharmProjects\BASIC_ML\pytorch" />
