@@ -48,7 +48,20 @@ def data_preprocessing(data):
     #     print('word_to_ix1 = ', i, word)
 
     Word_to_ix = {Word: i for i, Word in enumerate(vocab)}
+    print('word_to_ix = ', Word_to_ix)
+    # word_to_ix =  {'말이': 0, '통하지': 1, '쉬이': 2, '하고자': 3, '따름이니라': 4, '씀에': 5, '제': 6, '중국과': 7, '문자와': 8, '백성이': 9,
+    # '능히': 10, '서로': 11, '날로': 12, '많으니라': 13, '사람마다': 14, '새로': 15, '할': 16, '나라의': 17, '못할': 18, '만드노니': 19,
+    # '여겨': 20, '마침내': 21, '어리석은': 22, '사람이': 23, '내가': 24, '까닭으로': 25, '이르고자': 26, '아니하기에': 27, '뜻을': 28, '가엾이': 29,
+    # '달라': 30, '하여': 31, '스물여덟': 32, '익혀': 33, '펴지': 34, '위해': 35, '글자를': 36, '편안케': 37, '이를': 38, '바가': 39, '이런': 40,
+    # '있어도': 41}
+
     ix_to_Word = {i: Word for i, Word in enumerate(vocab)}
+    print('ix_to_word = ', ix_to_Word)
+    # ix_to_word =  {0: '말이', 1: '통하지', 2: '쉬이', 3: '하고자', 4: '따름이니라', 5: '씀에', 6: '제', 7: '중국과', 8: '문자와', 9: '백성이',
+    # 10: '능히', 11: '서로', 12: '날로', 13: '많으니라', 14: '사람마다', 15: '새로', 16: '할', 17: '나라의', 18: '못할', 19: '만드노니',
+    # 20: '여겨', 21: '마침내', 22: '어리석은', 23: '사람이', 24: '내가', 25: '까닭으로', 26: '이르고자', 27: '아니하기에', 28: '뜻을',
+    # 29: '가엾이', 30: '달라', 31: '하여', 32: '스물여덟', 33: '익혀', 34: '펴지', 35: '위해', 36: '글자를', 37: '편안케', 38: '이를', 39: '바가',
+    # 40: '이런', 41: '있어도'}
 
     return tokens, vocab_size, Word_to_ix, ix_to_Word
 
@@ -73,10 +86,10 @@ def softmax(input):
 
 ################################################################################
 # input_size=vocab_size + hidden_size, hidden_size=hidden_size, output_size=vocab_size
+# 67 = 42+25                                       25                     42
 ################################################################################
 class LSTM:
-    def __init__(self, input_size, hidden_size, output_size, num_epochs,
-                 learning_rate):
+    def __init__(self, input_size, hidden_size, output_size, num_epochs, learning_rate):
         # Hyperparameters
         self.learning_rate = learning_rate
         self.hidden_size = hidden_size
@@ -85,10 +98,9 @@ class LSTM:
         # Forget Gate
         self.Wf = np.random.randn(hidden_size, input_size) * 0.1
         self.bf = np.zeros((hidden_size, 1))
-        print('class LSTM ==> self.Wf.shape = ', self.Wf.shape)
+        # print('class LSTM ==> self.Wf.shape = ', self.Wf.shape)
         # class LSTM == > self.Wf.shape = (25, 67)
-
-        print('class LSTM ==> self.bf.shape = ', self.bf.shape)
+        # print('class LSTM ==> self.bf.shape = ', self.bf.shape)
         # class LSTM == > self.bf.shape = (25, 1)
 
         # Input Gate
@@ -106,6 +118,10 @@ class LSTM:
         # Final Gate
         self.Wy = np.random.randn(output_size, hidden_size)
         self.by = np.zeros((output_size, 1))
+        # print('class LSTM ==> self.Wy.shape = ', self.Wy.shape)
+        # print('class LSTM ==> self.by.shape = ', self.by.shape)
+        # class LSTM == > self.Wy.shape =  (42, 25)
+        # class LSTM == > self.by.shape =  (42, 1)
 
     # 네트워크 메모리 리셋
     def reset(self):
@@ -121,38 +137,56 @@ class LSTM:
         self.outputs = {}
 
     # Forward 순전파
+    # 입력에 대한 추정 출력값을 계산(1에서 42번 문자까지 반복)
+    # 입력 1  : 나라의, 출력 1  : 말이
+    # 입력 42 : 할     출력 42 : 따름이니라
     def forward(self, inputs):
         # self.reset()
-        x = {}
+        x = {}   # 각각의 Word에 대한 one hot coding 용 변수
         outputs = []
         for t in range(len(inputs)):  # 길이 42
             x[t] = np.zeros((vocab_size, 1))
             x[t][inputs[t]] = 1  # 각각의 Word에 대한 one hot coding
-            #print('forward(self, inputs): => x[t] = \n', x[t])
+            # print('forward(self, inputs): => x[t].shape = \n',x[t].shape)
+            # forward(self, inputs): = > x[t].shape = (42, 1)
 
-            self.X[t] = np.concatenate((self.HS[t - 1], x[t]))
+            # print('forward(self, inputs): => x[t] = \n', x[t])
+            # x[t] =
+            # [[0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.]
+            #  [1.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.]
+            #  [0.] [0.] [0.] [0.]]
 
+            self.X[t] = np.concatenate((self.HS[t - 1], x[t]))        # 입력 값 = 이전 상태+입력 단어(67개 생성)
+            # print('forward(self, inputs): => self.HS[t - 1] = \n',self.HS[t - 1])  # 은닉층 갯수 만큼 생성 25개
+            # forward(self, inputs): => self.HS[t - 1] =
+            #  [[0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.]]
+            # print('forward(self, inputs): => x[t] = \n',x[t]) =   42개 생성
+            # print('forward(self, inputs): => np.concatenate((self.HS[t - 1], x[t])) = \n',np.concatenate((self.HS[t - 1], x[t])))
+            # forward(self, inputs): = > np.concatenate((self.HS[t - 1], x[t])) = 67개 생성
             self.F[t] = sigmoid(np.dot(self.Wf, self.X[t]) + self.bf) # 망각 게이트
             self.I[t] = sigmoid(np.dot(self.Wi, self.X[t]) + self.bi) # 입력 게이트
             self.C[t] = tanh(np.dot(self.Wc, self.X[t]) + self.bc)    # 후보자 게이트
             self.O[t] = sigmoid(np.dot(self.Wo, self.X[t]) + self.bo) # 출력 게이트
 
             self.CS[t] = self.F[t] * self.CS[t - 1] + self.I[t] * self.C[t] # 셀 상태
-            # 이전 셀 상태 * 망각게이트 + 후보자게이트*입력게이트
+            # 이전 셀 상태 * 망각게이트 + 후보자게이트 * 입력게이트
             self.HS[t] = self.O[t] * tanh(self.CS[t])
             # 은닉층 = 출력 게이트 * 셀 상태
-            outputs += [np.dot(self.Wy, self.HS[t]) + self.by]
+            outputs += [np.dot(self.Wy, self.HS[t]) + self.by]  # outputs는 강의에서 Zt 값
+            # print('forward(self, inputs): => outputs = ', len(outputs))
+            # forward(self, inputs): => outputs =  1
+            # forward(self, inputs): => outputs =  2
+            #    1~4까지 반복
+            # forward(self, inputs): => outputs =  42
+
             # 출력 값 = 출력 가중치
-            print('forward(self, inputs): => x[t].shape = \n',x[t].shape)
-            print('forward(self, inputs): => self.HS[t - 1].shape = \n',self.HS[t - 1].shape)
-            print('forward(self, inputs): => self.F[t].shape = ', self.F[t].shape)
-            print('forward(self, inputs): => self.I[t].shape = ', self.I[t].shape)
-            print('forward(self, inputs): => self.C[t].shape = ', self.C[t].shape)
-            print('forward(self, inputs): => self.O[t].shape = ', self.O[t].shape)
-            print('forward(self, inputs): => self.CS[t].shape = ', self.CS[t].shape)
-            print('forward(self, inputs): => self.HS[t].shape = ', self.HS[t].shape)
-            print('forward(self, inputs): => outputs = \n', outputs)
-            # forward(self, inputs): = > x[t].shape = (42, 1)
+            # print('forward(self, inputs): => self.HS[t - 1].shape = \n',self.HS[t - 1].shape)
+            # print('forward(self, inputs): => self.F[t].shape = ', self.F[t].shape)
+            # print('forward(self, inputs): => self.I[t].shape = ', self.I[t].shape)
+            # print('forward(self, inputs): => self.C[t].shape = ', self.C[t].shape)
+            # print('forward(self, inputs): => self.O[t].shape = ', self.O[t].shape)
+            # print('forward(self, inputs): => self.CS[t].shape = ', self.CS[t].shape)
+            # print('forward(self, inputs): => self.HS[t].shape = ', self.HS[t].shape)
             # forward(self, inputs): = > self.HS[t - 1].shape =  (25, 1)
             # forward(self, inputs): => self.F[t].shape =  (25, 1)
             # forward(self, inputs): => self.I[t].shape =  (25, 1)
@@ -160,6 +194,9 @@ class LSTM:
             # forward(self, inputs): => self.O[t].shape =  (25, 1)
             # forward(self, inputs): => self.CS[t].shape =  (25, 1)
             # forward(self, inputs): => self.HS[t].shape =  (25, 1)
+            # print('--------------------------------------------------------')
+            # print('forward(self, inputs): => x = \n', x)
+            # print('forward(self, inputs): => self.CS = \n',self.CS)
         return outputs
 
     # 역전파
@@ -187,8 +224,7 @@ class LSTM:
             dLdbo += dLdo
 
             # Cell State Error
-            dLdCS = tanh_derivative(tanh(self.CS[t])) * self.O[
-                t] * dLdHS + dc_next
+            dLdCS = tanh_derivative(tanh(self.CS[t])) * self.O[t] * dLdHS + dc_next
 
             # Forget Gate Weights and Biases Errors
             dLdf = dLdCS * self.CS[t - 1] * sigmoid_derivative(self.F[t])
@@ -233,38 +269,60 @@ class LSTM:
         self.by += dLdby * self.learning_rate * (-1)
 
     # Train
-    def train(self, inputs, labels):
-        for _ in tqdm(range(self.num_epochs)):
+    def train(self, inputs, labels):  # train_x 42개 입력 나라의  train_y 42개 출력 말씀이
+
+        for _ in tqdm(range(self.num_epochs),mininterval=0.1):  #1000번
+            # print('def train => _) = ', _)
+
             self.reset()
+            # 입력 42 단어(마지막 1단어 제외)를 인덱스 값으로 변환
             input_idx = [Word_to_ix[input] for input in inputs]
             # print('def train => input_idx = \n', input_idx)
             # def train => input_idx =
-            # [12, 6, 32, 20, 4, 17, 38, 41, 40, 19, 30, 2, 8, 14, 34, 27, 22, 23,
-            #  21, 16, 26, 3, 39, 31, 35, 25, 28, 13, 29, 10, 36, 7, 0, 1, 24, 5,
-            #  33, 9, 11, 18, 37, 14]
+            # [17, 0, 7, 30, 8, 11, 1, 27, 40, 25, 22, 9, 26, 16, 39, 41, 21, 6, 28, 10, 34, 18, 23, 13, 24, 38, 35, 29, 20, 15, 32, 36, 19, 14, 31, 2, 33, 12, 5, 3
+            # train_X =  ['나라의', '말이', '중국과', '달라', '문자와', '서로', '통하지', '아니하기에', '이런', '까닭으로', '어리석은', '백성이', '이르고자', '할', '바가', '있어도', '마침내', '제', '뜻을', '능히', '펴지', '못할', '사람이', '많으니라', '내가', '이를', '위해', '가엾이', '여겨', '새로', '스물여덟', '글자를', '만드노니', '사람마다', '하여', '쉬이', '익혀', '날로', '씀에', '편안케', '하고자', '할']
+
             # print('def train => len(input_idx) = \n', len(input_idx))
             # def train => len(input_idx) = 42
 
             predictions = self.forward(input_idx)
+            # print('def train => seq, len(predictions) = ', _, len(predictions))
 
             errors = []
             for t in range(len(predictions)):
-                errors += [softmax(predictions[t])]
+                errors += [softmax(predictions[t])]   # output에 softmax 처리하면 y hat이 됨
+                #print('def train => len(errors) = ', len(errors))
                 errors[-1][Word_to_ix[labels[t]]] -= 1
+                # print('------------')
+                # print('def train => errors[-1],Word_to_ix[labels[t]] = ', errors[-1], Word_to_ix[labels[t]])
 
-            self.backward(errors, self.X)
+            # print('def train => len(errors) = ', len(errors))
+            # def train => len(errors) = 42
+
+            # print('def train => errors = ', errors)
+            self.backward(errors, self.X)  # 예측값과 실제값
 
     def test(self, inputs, labels):
         accuracy = 0
+        # 입력값에 대해 학습된 가중치를 바탕으로 출력값(확률)을 산출 -> 가중치가 결정되어 역전파는 필요 없음
         probabilities = self.forward([Word_to_ix[input] for input in inputs])
+        # print('def test => len(probabilities) = ', len(probabilities))
+        # print('def test => probabilities[0] = \n', probabilities[0])
+        # print('def test => softmax(probabilities[0].reshape(-1)) = \n', softmax(probabilities[0].reshape(-1)))
+        # print('def test => np.argmax(softmax(probabilities[0].reshape(-1))) = ', np.argmax(softmax(probabilities[0].reshape(-1))))
+        # print('def test => ix_to_Word[np.argmax(softmax(probabilities[0].reshape(-1)))] = ', ix_to_Word[np.argmax(softmax(probabilities[0].reshape(-1)))])
+
+        # def test => len(probabilities) = 42
 
         gt = ''
         output = '나라의 '
 
-        for q in range(len(labels)):
-            prediction = ix_to_Word[
-                np.argmax(softmax(probabilities[q].reshape(-1)))]
-            gt += inputs[q] + ' '
+        for q in range(len(labels)):   # labels : 실제 결과 값
+            prediction = ix_to_Word[np.argmax(softmax(probabilities[q].reshape(-1)))]
+            # print('def test => prediction = ', prediction)
+            # print('def test => labels[q] = ', labels[q])
+
+            gt += inputs[q] + ' '    # input 값은 단순히 concatenate 작업 만 수행
             output += prediction + ' '
 
             if prediction == labels[q]:
@@ -272,7 +330,9 @@ class LSTM:
 
         print('실제값: ', gt)
         print('예측값: ', output)
+        print('정확도: ', accuracy)
 
+################################################################################
 hidden_size = 25
 
 
@@ -284,7 +344,7 @@ print('train_y = ',train_y)
 # train_X =  ['나라의', '말이', '중국과', '달라', '문자와', '서로', '통하지', '아니하기에', '이런', '까닭으로', '어리석은', '백성이', '이르고자', '할', '바가', '있어도', '마침내', '제', '뜻을', '능히', '펴지', '못할', '사람이', '많으니라', '내가', '이를', '위해', '가엾이', '여겨', '새로', '스물여덟', '글자를', '만드노니', '사람마다', '하여', '쉬이', '익혀', '날로', '씀에', '편안케', '하고자', '할']
 # train_y =  ['말이', '중국과', '달라', '문자와', '서로', '통하지', '아니하기에', '이런', '까닭으로', '어리석은', '백성이', '이르고자', '할', '바가', '있어도', '마침내', '제', '뜻을', '능히', '펴지', '못할', '사람이', '많으니라', '내가', '이를', '위해', '가엾이', '여겨', '새로', '스물여덟', '글자를', '만드노니', '사람마다', '하여', '쉬이', '익혀', '날로', '씀에', '편안케', '하고자', '할', '따름이니라']
 
-lstm = LSTM(input_size=vocab_size + hidden_size, hidden_size=hidden_size, output_size=vocab_size, num_epochs=1000,
+lstm = LSTM(input_size=vocab_size + hidden_size, hidden_size=hidden_size, output_size=vocab_size, num_epochs=100,
             learning_rate=0.05)
 
 ##### Training #####
