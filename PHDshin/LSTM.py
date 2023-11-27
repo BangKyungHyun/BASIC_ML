@@ -156,11 +156,10 @@ class LSTM:
             #  [1.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.]
             #  [0.] [0.] [0.] [0.]]
 
-            self.X[t] = np.concatenate((self.HS[t - 1], x[t]))        # 입력 값 = 이전 상태+입력 단어(67개 생성)
+            self.X[t] = np.concatenate((self.HS[t - 1], x[t]))        # 입력 값(일종의 단기 기억) = 이전 상태+입력 단어(67개 생성)
             # print('forward(self, inputs): => self.HS[t - 1] = \n',self.HS[t - 1])  # 은닉층 갯수 만큼 생성 25개
             # forward(self, inputs): => self.HS[t - 1] =
             #  [[0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.] [0.]]
-            # print('forward(self, inputs): => x[t] = \n',x[t]) =   42개 생성
             # print('forward(self, inputs): => np.concatenate((self.HS[t - 1], x[t])) = \n',np.concatenate((self.HS[t - 1], x[t])))
             # forward(self, inputs): = > np.concatenate((self.HS[t - 1], x[t])) = 67개 생성
             self.F[t] = sigmoid(np.dot(self.Wf, self.X[t]) + self.bf) # 망각 게이트
@@ -168,11 +167,14 @@ class LSTM:
             self.C[t] = tanh(np.dot(self.Wc, self.X[t]) + self.bc)    # 후보자 게이트
             self.O[t] = sigmoid(np.dot(self.Wo, self.X[t]) + self.bo) # 출력 게이트
 
-            self.CS[t] = self.F[t] * self.CS[t - 1] + self.I[t] * self.C[t] # 셀 상태
-            # 이전 셀 상태 * 망각게이트 + 후보자게이트 * 입력게이트
+            # 현재 셀 상태 = 이전 셀 상태 * 망각게이트 + 후보자게이트 * 입력게이트
+            self.CS[t] = self.CS[t - 1] * self.F[t] + self.I[t] * self.C[t]
+
+            # 은닉상태 = 출력 게이트 * 셀 상태
             self.HS[t] = self.O[t] * tanh(self.CS[t])
-            # 은닉층 = 출력 게이트 * 셀 상태
-            outputs += [np.dot(self.Wy, self.HS[t]) + self.by]  # outputs는 강의에서 Zt 값
+
+            # 순전파의 outputs인 logit를 계산하는 부분 - 강의에서 Zt 값
+            outputs += [np.dot(self.Wy, self.HS[t]) + self.by]
             # print('forward(self, inputs): => outputs = ', len(outputs))
             # forward(self, inputs): => outputs =  1
             # forward(self, inputs): => outputs =  2
@@ -290,16 +292,23 @@ class LSTM:
 
             errors = []
             for t in range(len(predictions)):
-                errors += [softmax(predictions[t])]   # output에 softmax 처리하면 y hat이 됨
-                #print('def train => len(errors) = ', len(errors))
+                # output에 softmax 처리하면 y hat이 됨
+                errors += [softmax(predictions[t])]
+                # print('def train => len(errors) = ', len(errors))
+                # print('def train => errors[-1][Word_to_ix[labels[t]]] = ',
+                #       errors[-1][Word_to_ix[labels[t]]])
                 errors[-1][Word_to_ix[labels[t]]] -= 1
                 # print('------------')
-                # print('def train => errors[-1],Word_to_ix[labels[t]] = ', errors[-1], Word_to_ix[labels[t]])
+                # print('def train => errors[-1] = ', errors[-1])
+                # print('def train => errors[-1][Word_to_ix[labels[t]]] = ',
+                #       errors[-1][Word_to_ix[labels[t]]])
+                # print('def train => Word_to_ix[labels[t]] = ', Word_to_ix[labels[t]])
 
             # print('def train => len(errors) = ', len(errors))
             # def train => len(errors) = 42
+            # if _ % 10000 == 0:
+            #     print('def train => errors[41] = ', _, errors[41].reshape(-1))
 
-            # print('def train => errors = ', errors)
             self.backward(errors, self.X)  # 예측값과 실제값
 
     def test(self, inputs, labels):
@@ -333,8 +342,8 @@ class LSTM:
         print('정확도: ', accuracy)
 
 ################################################################################
-hidden_size = 25
 
+hidden_size = 25
 
 # data preparation
 tokens, vocab_size, Word_to_ix, ix_to_Word = data_preprocessing(data)
@@ -344,7 +353,7 @@ print('train_y = ',train_y)
 # train_X =  ['나라의', '말이', '중국과', '달라', '문자와', '서로', '통하지', '아니하기에', '이런', '까닭으로', '어리석은', '백성이', '이르고자', '할', '바가', '있어도', '마침내', '제', '뜻을', '능히', '펴지', '못할', '사람이', '많으니라', '내가', '이를', '위해', '가엾이', '여겨', '새로', '스물여덟', '글자를', '만드노니', '사람마다', '하여', '쉬이', '익혀', '날로', '씀에', '편안케', '하고자', '할']
 # train_y =  ['말이', '중국과', '달라', '문자와', '서로', '통하지', '아니하기에', '이런', '까닭으로', '어리석은', '백성이', '이르고자', '할', '바가', '있어도', '마침내', '제', '뜻을', '능히', '펴지', '못할', '사람이', '많으니라', '내가', '이를', '위해', '가엾이', '여겨', '새로', '스물여덟', '글자를', '만드노니', '사람마다', '하여', '쉬이', '익혀', '날로', '씀에', '편안케', '하고자', '할', '따름이니라']
 
-lstm = LSTM(input_size=vocab_size + hidden_size, hidden_size=hidden_size, output_size=vocab_size, num_epochs=100,
+lstm = LSTM(input_size=vocab_size + hidden_size, hidden_size=hidden_size, output_size=vocab_size, num_epochs=10,
             learning_rate=0.05)
 
 ##### Training #####
