@@ -144,3 +144,20 @@ describe( x + x)
 # 값 :
 # tensor([[ 1.0920,  1.2274,  0.8934],
 #         [-3.3744,  1.1224,  1.9812]])
+
+# 차원별 텐서 연산
+
+x = torch.arange(6)
+describe(x)
+# 타입 : torch.LongTensor
+# 크기 : torch.Size([6])
+# 값 :
+# tensor([0, 1, 2, 3, 4, 5])
+x = x.view(2,3)
+describe(x)
+# 타입 : torch.LongTensor
+# 크기 : torch.Size([2, 3])
+# 값 :
+# tensor([[0, 1, 2],
+#         [3, 4, 5]])
+
