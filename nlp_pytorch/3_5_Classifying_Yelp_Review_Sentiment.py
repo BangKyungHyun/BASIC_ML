@@ -389,30 +389,60 @@ def handle_dirs(dirpath):
     if not os.path.exists(dirpath):
         os.makedirs(dirpath)
 
+###############################################################################
+#   MAIN START
+###############################################################################
 
 args = Namespace(
     # 날짜와 경로 정보
+
+    # 학습 데이터셋에서 25번 이상 출현한 단어만 학습, 나머지는 UNK으로 처리
     frequency_cutoff=25,
+
+    # vectorizer_file과 model_state_file을 저장할 디렉터리
+    save_dir='model_storage/ch3/yelp/',
+
+    # 모델 상태를 저장할 파일 이름
     model_state_file='model.pth',
+
+    # vectorizer를 저장할 파일 이름
+    vectorizer_file='vectorizer.json',
+
+    # 전처리를 마친 리뷰 csv 파일의 위치
     # review_csv='data/yelp/reviews_with_splits_lite.csv',
     review_csv='reviews_with_splits_lite.csv',
     # review_csv='data/yelp/reviews_with_splits_full.csv',
-    save_dir='model_storage/ch3/yelp/',
-    vectorizer_file='vectorizer.json',
+
     # 모델 하이퍼파라미터 없음
     # 훈련 하이퍼파라미터
+
+    # 배치 사이즈
     batch_size=128,
+
+    # 오버피팅 방지를 위한 조기 종료 기준
     early_stopping_criteria=5,
+
+    # 학습율
     learning_rate=0.001,
+
+    # 학습을 반복할 횟수
     num_epochs=100,
+
+    # 시드
     seed=1337,
     # 실행 옵션
+    # 키보드 인터럽트 처리?
     catch_keyboard_interrupt=True,
+    # GPU 사용?
     cuda=True,
+    # filepaths 앞에 save_dir을 붙여?
     expand_filepaths_to_save_dir=True,
+
+    # 체크포인트에서 훈련을 다시 시작하는 경우?
     reload_from_files=False,
 )
 
+# 파일 경로와 gpu 설정을 마친다.
 if args.expand_filepaths_to_save_dir:
     args.vectorizer_file = os.path.join(args.save_dir,
                                         args.vectorizer_file)
@@ -439,6 +469,8 @@ set_seed_everywhere(args.seed, args.cuda)
 handle_dirs(args.save_dir)
 
 # 헬퍼 함수
+# 훈련 과정 중 훈련 상태를 저장할 변수들의 묶음을 만든다.
+
 def make_train_state(args):
     return {'stop_early': False,
             'early_stopping_step': 0,
@@ -453,6 +485,7 @@ def make_train_state(args):
             'test_acc': -1,
             'model_filename': args.model_state_file}
 
+# 훈련 상태를 업데이트한다. 성능이 향상되면 현재 모델을 저장하여 최상의 모델을 사용할 수 있도록 한다.
 def update_train_state(args, model, train_state):
     """ 훈련 상태를 업데이트합니다.
 
@@ -469,15 +502,18 @@ def update_train_state(args, model, train_state):
 
     # 적어도 한 번 모델을 저장합니다
     if train_state['epoch_index'] == 0:
+        print("\n train_state['epoch_index'] = ", train_state['epoch_index'])
         torch.save(model.state_dict(), train_state['model_filename'])
         train_state['stop_early'] = False
 
     # 성능이 향상되면 모델을 저장합니다
     elif train_state['epoch_index'] >= 1:
+
+        # items[-2:]  # 마지막에서 두번째 아이템부터 리스트의 끝까지 슬라이싱
         loss_tm1, loss_t = train_state['val_loss'][-2:]
 
-        # 손실이 나빠지면
-        if loss_t >= train_state['early_stopping_best_val']:
+        # 손실이 증가하면
+        if loss_t >= train_state['early_stopping_best_val']:  # 1e8
             # 조기 종료 단계 업데이트
             train_state['early_stopping_step'] += 1
         # 손실이 감소하면
@@ -492,13 +528,16 @@ def update_train_state(args, model, train_state):
         # 조기 종료 여부 확인
         train_state['stop_early'] = \
             train_state['early_stopping_step'] >= args.early_stopping_criteria
-
+                                                  # 5번
     return train_state
 
+# 정확도를 계산한다.
 def compute_accuracy(y_pred, y_target):
+
     y_target = y_target.cpu()
     y_pred_indices = (torch.sigmoid(y_pred)>0.5).cpu().long()#.max(dim=1)[1]
     n_correct = torch.eq(y_pred_indices, y_target).sum().item()
+
     return n_correct / len(y_pred_indices) * 100
 
 # 초기화
@@ -511,6 +550,10 @@ def compute_accuracy(y_pred, y_target):
 # %cd data
 # !./get-all-data.sh
 # %cd ..
+
+# 데이터셋과 Vectorizer를 준비한다. 전에 만들어 둔 Vectorizer가 있다면 체크포인트에서 훈련을 다시 시작할 수도 있다.
+# 우리가 만든 간단한 분류 모델인 ReviewClassifier 객체를 생성하고, loss function과 optimizer를 설정한다.
+# scheduler로 학습 과정에서 learning rate를 조정할 수 있도록 한다.
 
 if args.reload_from_files:
     # 체크포인트에서 훈련을 다시 시작
@@ -550,13 +593,13 @@ train_bar = tqdm(desc='split=train',
 dataset.set_split('val')
 # val_bar = tqdm.notebook.tqdm(desc='split=val',
 val_bar = tqdm(desc='split=val',
-
                              total=dataset.get_num_batches(args.batch_size),
                              position=1,
                              leave=True)
 
 try:
     for epoch_index in range(args.num_epochs):
+
         train_state['epoch_index'] = epoch_index
 
         # 훈련 세트에 대한 순회
