@@ -1,0 +1,18 @@
+import numpy as np
+#
+# examp = np.arange(0, 500,3)
+#
+# examp.resize(3, 5,5)
+#
+# print(examp)
+#
+
+
+for count in range(20):
+    count += 1
+    print('count = ', count)
+    print('count % 10 = ', (count % 10))
+    print('not count % 10 = ', not (count % 10))
+
+    # if not (count % 10):
+    #     print('not count % 10 aaaaa = ', not (count % 10))
