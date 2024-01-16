@@ -121,6 +121,7 @@ model.to(device)
 
 criterion = nn.CrossEntropyLoss(); # 분류 문제에서 사용할 손실 함수
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate);
+print('# 심층 신경망 모델 #')
 print(model)
 
 ################################################################################
@@ -158,7 +159,7 @@ for epoch in range(num_epochs):
         #     print(' count = ', count)
 
         if count % 50 == 0:
-            print(' 1) count 2) epoch, = ', count,  epoch)
+            # print(' 1) count 2) epoch, = ', count,  epoch)
 
             total = 0
             correct = 0
@@ -178,9 +179,9 @@ for epoch in range(num_epochs):
             accuracy_list.append(accuracy)
 
         if count % 500 == 0:  # true
-            print(' 1) count 2)  epoch, = ', count, epoch)
+            # print(' 1) count 2)  epoch, = ', count, epoch)
 
-            print("Iteration: {}, Loss: {}, Accuracy: {}%".format(count,
+            print("DNN Iteration: {}, Loss: {}, Accuracy: {}%".format(count,
                                                                   loss.data,
                                                                   accuracy))
 
@@ -207,7 +208,8 @@ class FashionCNN(nn.Module):
             # F : 커널 크기
             # P : 패딩 크기
             # S : 스트라이드 - 스트라이드가 명시되지 않지 않다면 기본값은 (1,1)
-            # (784-3+(2*1)
+            # (784-3+(2*1) /1 + 1 = 784 
+            # 계산 결과를 적용하면 출력의 형태는 [32,784,784] 
             #-------------------------------------------------------------------
             # BatchNorm2d는 학습과정에서 각 배치 단위별로 데이터가 다양한 분포를 가지더라도
             # 평균과 분산을 이용하여 정규화하는 것을 의미
@@ -216,9 +218,15 @@ class FashionCNN(nn.Module):
             # MaxPool2d 는 이미지를 축소시키는 용도로서 합성곱층의 출력 데이터를 입력으로 받아서
             # 출력데이터 크기를 줄이거나 특정 데이터를 강조하는 용도로 사용
             nn.MaxPool2d(kernel_size=2, stride=2)
+            #-------------------------------------------------------------------
+            # MaxPool2d 계층에서의 출력 크기 구하는 방식
+            # 출력 크기 : IF / F
+            # IF : 입력 데이터의 크기(input_filter_size, 또한 바로 앞의 Conv2d의 출력크기)
+            
         )
         self.layer2 = nn.Sequential(
             nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3),
+            # 784-3+(2*1)/1+1 = 784 ==> [64, 784,784]
             nn.BatchNorm2d(64),
             nn.ReLU(),
             nn.MaxPool2d(2)
@@ -235,6 +243,11 @@ class FashionCNN(nn.Module):
     def forward(self, x):
         out = self.layer1(x)
         out = self.layer2(out)
+        # 합성곱층에서 완전연결층으로 변경되기 때문에 데이터의 형태를 1차원으로 바꾸어야 함
+        # 이 때 out.size(0)은 결국 100을 의미함. 따라서 (100,?) 크기이 텐서로 변경하겠다는
+        # 의미임 
+        # out.view(out.size(0),-1) 에서 '-1'은 행의 수는 정확히 알고 있지만 열(컬럼)
+        # 숫자를 정확하게 알지 못할 때 사용
         out = out.view(out.size(0), -1)
         out = self.fc1(out)
         out = self.drop(out)
@@ -242,12 +255,16 @@ class FashionCNN(nn.Module):
         out = self.fc3(out)
         return out
 
+################################################################################
+# 합성곱 네트워크를 위한 파라미터 정의
+################################################################################
 learning_rate = 0.001;
 model = FashionCNN();
 model.to(device)
 
 criterion = nn.CrossEntropyLoss();
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate);
+print('# 합성곱 네트워크 ')
 print(model)
 
 num_epochs = 5
@@ -292,414 +309,8 @@ for epoch in range(num_epochs):
             accuracy_list.append(accuracy)
 
         if not (count % 500):
-            print("Iteration: {}, Loss: {}, Accuracy: {}%".format(count,
+            print("CNN Iteration: {}, Loss: {}, Accuracy: {}%".format(count,
                                                                   loss.data,
                                                                   accuracy))
 
 
-#5.3.1 특성 추출 기법
-
-import os
-import time
-import copy
-import glob
-import cv2
-import shutil
-
-import torch
-import torchvision
-import torchvision.transforms as transforms
-import torchvision.models as models
-import torch.nn as nn
-import torch.optim as optim
-
-import matplotlib.pyplot as plt
-
-data_path = 'data/catanddog/train'
-
-transform = transforms.Compose(
-    [
-        transforms.Resize([256, 256]),
-        transforms.RandomResizedCrop(224),
-        transforms.RandomHorizontalFlip(),
-        transforms.ToTensor(),
-    ])
-train_dataset = torchvision.datasets.ImageFolder(
-    data_path,
-    transform=transform
-)
-train_loader = torch.utils.data.DataLoader(
-    train_dataset,
-    batch_size=32,
-    num_workers=8,
-    shuffle=True
-)
-
-print(len(train_dataset))
-
-
-samples, labels = iter(train_loader).next()
-classes = {0:'cat', 1:'dog'}
-fig = plt.figure(figsize=(16,24))
-for i in range(24):
-    a = fig.add_subplot(4,6,i+1)
-    a.set_title(classes[labels[i].item()])
-    a.axis('off')
-    a.imshow(np.transpose(samples[i].numpy(), (1,2,0)))
-plt.subplots_adjust(bottom=0.2, top=0.6, hspace=0)
-
-resnet18 = models.resnet18(pretrained=True)
-
-
-def set_parameter_requires_grad(model, feature_extracting=True):
-    if feature_extracting:
-        for param in model.parameters():
-            param.requires_grad = False
-
-
-set_parameter_requires_grad(resnet18)
-
-resnet18.fc = nn.Linear(512, 2)
-
-for name, param in resnet18.named_parameters():
-    if param.requires_grad:
-        print(name, param.data)
-
-model = models.resnet18(pretrained = True)
-
-for param in model.parameters():
-    param.requires_grad = False
-
-model.fc = torch.nn.Linear(512, 2)
-for param in model.fc.parameters():
-    param.requires_grad = True
-
-optimizer = torch.optim.Adam(model.fc.parameters())
-cost = torch.nn.CrossEntropyLoss()
-print(model)
-
-
-def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=13,
-                is_train=True):
-    since = time.time()
-    acc_history = []
-    loss_history = []
-    best_acc = 0.0
-
-    for epoch in range(num_epochs):
-        print('Epoch {}/{}'.format(epoch, num_epochs - 1))
-        print('-' * 10)
-
-        running_loss = 0.0
-        running_corrects = 0
-
-        for inputs, labels in dataloaders:
-            inputs = inputs.to(device)
-            labels = labels.to(device)
-
-            model.to(device)
-            optimizer.zero_grad()
-            outputs = model(inputs)
-            loss = criterion(outputs, labels)
-            _, preds = torch.max(outputs, 1)
-            loss.backward()
-            optimizer.step()
-
-            running_loss += loss.item() * inputs.size(0)
-            running_corrects += torch.sum(preds == labels.data)
-
-        epoch_loss = running_loss / len(dataloaders.dataset)
-        epoch_acc = running_corrects.double() / len(dataloaders.dataset)
-
-        print('Loss: {:.4f} Acc: {:.4f}'.format(epoch_loss, epoch_acc))
-
-        if epoch_acc > best_acc:
-            best_acc = epoch_acc
-
-        acc_history.append(epoch_acc.item())
-        loss_history.append(epoch_loss)
-        torch.save(model.state_dict(), os.path.join('../chap05/data/catanddog/',
-                                                    '{0:0=2d}.pth'.format(
-                                                        epoch)))
-        print()
-
-    time_elapsed = time.time() - since
-    print('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60,
-                                                        time_elapsed % 60))
-    print('Best Acc: {:4f}'.format(best_acc))
-    return acc_history, loss_history
-
-
-params_to_update = []
-for name, param in resnet18.named_parameters():
-    if param.requires_grad == True:
-        params_to_update.append(param)
-        print("\t", name)
-
-optimizer = optim.Adam(params_to_update)
-
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-criterion = nn.CrossEntropyLoss()
-train_acc_hist, train_loss_hist = train_model(resnet18, train_loader, criterion, optimizer, device)
-
-test_path = 'data/catanddog/test'
-
-transform = transforms.Compose(
-                [
-                    transforms.Resize(224),
-                    transforms.CenterCrop(224),
-                    transforms.ToTensor(),
-                ])
-test_dataset = torchvision.datasets.ImageFolder(
-    root=test_path,
-    transform=transform
-)
-test_loader = torch.utils.data.DataLoader(
-    test_dataset,
-    batch_size=32,
-    num_workers=1,
-    shuffle=True
-)
-
-print(len(test_dataset))
-
-
-def eval_model(model, dataloaders, device):
-    since = time.time()
-    acc_history = []
-    best_acc = 0.0
-
-    saved_models = glob.glob('data/catanddog/' + '*.pth')
-    saved_models.sort()
-    print('saved_model', saved_models)
-
-    for model_path in saved_models:
-        print('Loading model', model_path)
-
-        model.load_state_dict(torch.load(model_path))
-        model.eval()
-        model.to(device)
-        running_corrects = 0
-
-        for inputs, labels in dataloaders:
-            inputs = inputs.to(device)
-            labels = labels.to(device)
-
-            with torch.no_grad():
-                outputs = model(inputs)
-
-            _, preds = torch.max(outputs.data, 1)
-            preds[preds >= 0.5] = 1
-            preds[preds < 0.5] = 0
-            running_corrects += preds.eq(labels.cpu()).int().sum()
-
-        epoch_acc = running_corrects.double() / len(dataloaders.dataset)
-        print('Acc: {:.4f}'.format(epoch_acc))
-
-        if epoch_acc > best_acc:
-            best_acc = epoch_acc
-
-        acc_history.append(epoch_acc.item())
-        print()
-
-    time_elapsed = time.time() - since
-    print('Validation complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60,
-                                                          time_elapsed % 60))
-    print('Best Acc: {:4f}'.format(best_acc))
-
-    return acc_history
-
-val_acc_hist = eval_model(resnet18, test_loader, device)
-
-
-plt.plot(train_acc_hist)
-plt.plot(val_acc_hist)
-plt.show()
-
-plt.plot(train_loss_hist)
-plt.show()
-
-def im_convert(tensor):
-    image=tensor.clone().detach().numpy()
-    image=image.transpose(1,2,0)
-    image=image*(np.array((0.5,0.5,0.5))+np.array((0.5,0.5,0.5)))
-    image=image.clip(0,1)
-    return image
-
-classes = {0:'cat', 1:'dog'}
-
-dataiter=iter(test_loader)
-images,labels=dataiter.next()
-output=model(images)
-_,preds=torch.max(output,1)
-
-fig=plt.figure(figsize=(25,4))
-for idx in np.arange(20):
-    ax=fig.add_subplot(2,10,idx+1,xticks=[],yticks=[])
-    plt.imshow(im_convert(images[idx]))
-    a.set_title(classes[labels[i].item()])
-    ax.set_title("{}({})".format(str(classes[preds[idx].item()]),str(classes[labels[idx].item()])),color=("green" if preds[idx]==labels[idx] else "red"))
-plt.show()
-plt.subplots_adjust(bottom=0.2, top=0.6, hspace=0)
-
-# 5.4.1 특성 맵 시각화
-
-import matplotlib.pyplot as plt
-from PIL import Image
-import cv2
-import torch
-import torch.nn.functional as F
-import torch.nn as nn
-from torchvision.transforms import ToTensor
-import torchvision
-import torchvision.transforms as transforms
-import torchvision.models as models
-
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-class XAI(torch.nn.Module):
-    def __init__(self, num_classes=2):
-        super(XAI, self).__init__()
-        self.features = nn.Sequential(
-            nn.Conv2d(3, 64, kernel_size=3, bias=False),
-            nn.BatchNorm2d(64),
-            nn.ReLU(inplace=True),
-            nn.Dropout(0.3),
-            nn.Conv2d(64, 64, kernel_size=3, padding = 1, bias=False),
-            nn.BatchNorm2d(64),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-
-            nn.Conv2d(64, 128, kernel_size=3, padding = 1, bias=False),
-            nn.BatchNorm2d(128),
-            nn.ReLU(inplace=True),
-            nn.Dropout(0.4),
-            nn.Conv2d(128, 128, kernel_size=3, padding = 1, bias=False),
-            nn.BatchNorm2d(128),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-
-            nn.Conv2d(128, 256, kernel_size=3, padding = 1, bias=False),
-            nn.BatchNorm2d(256),
-            nn.ReLU(inplace=True),
-            nn.Dropout(0.4),
-            nn.Conv2d(256, 256, kernel_size=3, padding = 1, bias=False),
-            nn.BatchNorm2d(256),
-            nn.ReLU(inplace=True),
-            nn.Dropout(0.4),
-            nn.Conv2d(256, 256, kernel_size=3, padding = 1, bias=False),
-            nn.BatchNorm2d(256),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-
-            nn.Conv2d(256, 512, kernel_size=3, padding = 1, bias=False),
-            nn.BatchNorm2d(512),
-            nn.ReLU(inplace=True),
-            nn.Dropout(0.4),
-            nn.Conv2d(512, 512, kernel_size=3, padding = 1, bias=False),
-            nn.BatchNorm2d(512),
-            nn.ReLU(inplace=True),
-            nn.Dropout(0.4),
-            nn.Conv2d(512, 512, kernel_size=3, padding = 1, bias=False),
-            nn.BatchNorm2d(512),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-
-            nn.Conv2d(512, 512, kernel_size=3, padding = 1, bias=False),
-            nn.BatchNorm2d(512),
-            nn.ReLU(inplace=True),
-            nn.Dropout(0.4),
-            nn.Conv2d(512, 512, kernel_size=3, padding = 1, bias=False),
-            nn.BatchNorm2d(512),
-            nn.ReLU(inplace=True),
-            nn.Dropout(0.4),
-            nn.Conv2d(512, 512, kernel_size=3, padding = 1, bias=False),
-            nn.BatchNorm2d(512),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-        )
-        self.classifier = nn.Sequential(
-            nn.Linear(512, 512, bias=False),
-            nn.Dropout(0.5),
-            nn.BatchNorm1d(512),
-            nn.ReLU(inplace=True),
-            nn.Dropout(0.5),
-            nn.Linear(512, num_classes)
-        )
-
-    def forward(self, x):
-        x = self.features(x)
-        x = x.view(-1, 512)
-        x = self.classifier(x)
-        return F.log_softmax(x)
-
-model=XAI()
-model.to(device)
-model.eval()
-
-
-class LayerActivations:
-    features = []
-
-    def __init__(self, model, layer_num):
-        self.hook = model[layer_num].register_forward_hook(self.hook_fn)
-
-    def hook_fn(self, module, input, output):
-        self.features = output.detach().numpy()
-
-    def remove(self):
-        self.hook.remove()
-
-img=cv2.imread("data/cat.jpg")
-plt.imshow(img)
-img = cv2.resize(img, (100, 100), interpolation=cv2.INTER_LINEAR)
-img = ToTensor()(img).unsqueeze(0)
-print(img.shape)
-
-result = LayerActivations(model.features, 0)
-
-model(img)
-activations = result.features
-
-fig, axes = plt.subplots(4,4)
-fig = plt.figure(figsize=(12, 8))
-fig.subplots_adjust(left=0, right=1, bottom=0, top=1, hspace=0.05, wspace=0.05)
-for row in range(4):
-    for column in range(4):
-        axis = axes[row][column]
-        axis.get_xaxis().set_ticks([])
-        axis.get_yaxis().set_ticks([])
-        axis.imshow(activations[0][row*10+column])
-plt.show()
-
-result = LayerActivations(model.features, 20)
-
-model(img)
-activations = result.features
-
-fig, axes = plt.subplots(4,4)
-fig = plt.figure(figsize=(12, 8))
-fig.subplots_adjust(left=0, right=1, bottom=0, top=1, hspace=0.05, wspace=0.05)
-for row in range(4):
-    for column in range(4):
-        axis = axes[row][column]
-        axis.get_xaxis().set_ticks([])
-        axis.get_yaxis().set_ticks([])
-        axis.imshow(activations[0][row*10+column])
-plt.show()
-
-result = LayerActivations(model.features, 40)
-
-model(img)
-activations = result.features
-
-fig, axes = plt.subplots(4,4)
-fig = plt.figure(figsize=(12, 8))
-fig.subplots_adjust(left=0, right=1, bottom=0, top=1, hspace=0.05, wspace=0.05)
-for row in range(4):
-    for column in range(4):
-        axis = axes[row][column]
-        axis.get_xaxis().set_ticks([])
-        axis.get_yaxis().set_ticks([])
-        axis.imshow(activations[0][row*10+column])
-plt.show()
