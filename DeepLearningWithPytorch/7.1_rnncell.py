@@ -17,7 +17,12 @@ start=time.time()
 
 # torchtext.legacy.data는 제공하는 Field는 데이터 전처리를 위해 사용됨
 # lower : 대표자를 모두 소문자로 변경, 기본값은 false
-#
+# fixed_length : 고정된 길이의 데이터를 얻을 수 있음. 여기에서는 데이터의 길이를 200으로
+#                고정했으며 200보다 짤으면 패딩작업을 통해 200으로 맞춤
+# batch_first: 신경망에 입력되는 텐서의 첫번째 차원 값이 배치크기로 되도록 함
+#              기본값은 false임. 모델의 네트워크로 입력되는 데이터는 [시퀀스 길이, 배치 크기,
+#              은닉층의 뉴런 개수]([seq_len, batch_size, hidden_size])의 형태임
+
 TEXT = torchtext.legacy.data.Field(lower=True, fix_length=200, batch_first=False)
 LABEL = torchtext.legacy.data.Field(sequential=False)
 
@@ -26,31 +31,47 @@ train_data, test_data = datasets.IMDB.splits(TEXT, LABEL)
 
 print(vars(train_data.examples[0]))
 
+################################################################################
+# 데이터 전 처리 적용
+################################################################################
+
 import string
 
 for example in train_data.examples:
-    text = [x.lower() for x in vars(example)['text']]
-    text = [x.replace("<br", "") for x in text]
+    text = [x.lower() for x in vars(example)['text']]  # 소문자로 변경
+    text = [x.replace("<br", "") for x in text]        # "<br"을 공백으로 변경(개행)
+    # 구둣점 제거
     text = [''.join(c for c in s if c not in string.punctuation) for s in text]
-    text = [s for s in text if s]
+    text = [s for s in text if s]   # 공백 제거
     vars(example)['text'] = text
 
-for example in test_data.examples:
-    text = [x.lower() for x in vars(example)['text']]
-    text = [x.replace("<br", "") for x in text]
-    text = [''.join(c for c in s if c not in string.punctuation) for s in text]
-    text = [s for s in text if s]
-    vars(example)['text'] = text
+################################################################################
+# 훈련과 검증 데이터셋 분리
+################################################################################
 
 import random
+
+# split()을 이용하여 훈련 데이터셋을 훈련과 검증 용도로 분리
+# random_state : 데이터 분할 시 데이터가 임의로 섞인 상태에서 분할. 이때 시드값을 사용하면
+#                동일한 코드를 여러번 수행하더라도 동일한 값의 데이터를 반환
+# split_rate : 데이터 분할 정도를 의미. 8:2로 분리함
 train_data, valid_data = train_data.split(random_state = random.seed(0), split_ratio=0.8)
 
+################################################################################
+# 데이터셋 갯수 확인
+################################################################################
 print(f'Number of training examples: {len(train_data)}')
 print(f'Number of validation examples: {len(valid_data)}')
 print(f'Number of testing examples: {len(test_data)}')
 
+################################################################################
+# 단어 집합 만들기
+################################################################################
 TEXT.build_vocab(train_data, max_size=10000, min_freq=10, vectors=None)
 LABEL.build_vocab(train_data)
+
+
+
 
 print(f"Unique tokens in TEXT vocabulary: {len(TEXT.vocab)}")
 print(f"Unique tokens in LABEL vocabulary: {len(LABEL.vocab)}")

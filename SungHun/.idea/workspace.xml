@@ -2,12 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9819d92d-6edd-4a41-860d-e31eccac6311" name="Changes" comment="수정">
-      <change afterPath="$PROJECT_DIR$/../DeepLearningWithPytorch/5.2_transfer_learning.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../DeepLearningWithPytorch/5.3_feature_map.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../DeepLearningWithPytorch/6.1_LeNet-5.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../DeepLearningWithPytorch/7.1_rnncell.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../DeepLearningWithPytorch/5.1_cnn_fashion_mnist.py" beforeDir="false" afterPath="$PROJECT_DIR$/../DeepLearningWithPytorch/5.1_cnn_fashion_mnist.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../DeepLearningWithPytorch/test1.py" beforeDir="false" afterPath="$PROJECT_DIR$/../DeepLearningWithPytorch/test1.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../DeepLearningWithPytorch/7.1_rnncell.py" beforeDir="false" afterPath="$PROJECT_DIR$/../DeepLearningWithPytorch/7.1_rnncell.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -175,7 +170,14 @@
       <option name="project" value="LOCAL" />
       <updated>1705130174064</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="수정">
+      <created>1705434763841</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1705434763841</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
