@@ -16,8 +16,12 @@
 #
 #     # if not (count % 10):
 #     #     print('not count % 10 aaaaa = ', not (count % 10))
+#
+#
+# import matplotlib.pyplot as plt
+# import mxnet as mx
+# from mxnet.gluon.data.vision import tranforms
 
+import torch
 
-import matplotlib.pyplot as plt
-import mxnet as mx
-from mxnet.gluon.data.vision import tranforms
+print(torch.__version__)

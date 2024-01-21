@@ -3,6 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="9819d92d-6edd-4a41-860d-e31eccac6311" name="Changes" comment="수정">
       <change beforePath="$PROJECT_DIR$/../DeepLearningWithPytorch/7.1_rnncell.py" beforeDir="false" afterPath="$PROJECT_DIR$/../DeepLearningWithPytorch/7.1_rnncell.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../DeepLearningWithPytorch/test1.py" beforeDir="false" afterPath="$PROJECT_DIR$/../DeepLearningWithPytorch/test1.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -60,19 +61,19 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="5.3_feature_map" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="5.2_transfer_learning" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="SungHun" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="C:\Users\bangkh21\anaconda3\python.exe" />
+      <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../DeepLearningWithPytorch" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/../DeepLearningWithPytorch/5.3_feature_map.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/../DeepLearningWithPytorch/5.2_transfer_learning.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -147,10 +148,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.7.1_rnncell" />
-        <item itemvalue="Python.6.1_LeNet-5" />
-        <item itemvalue="Python.5.3_feature_map" />
         <item itemvalue="Python.5.1_cnn_fashion_mnist" />
+        <item itemvalue="Python.5.2_transfer_learning" />
         <item itemvalue="Python.test1" />
+        <item itemvalue="Python.6.1_LeNet-5" />
       </list>
     </recent_temporary>
   </component>
@@ -177,7 +178,14 @@
       <option name="project" value="LOCAL" />
       <updated>1705434763841</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="수정">
+      <created>1705525909627</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1705525909627</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
