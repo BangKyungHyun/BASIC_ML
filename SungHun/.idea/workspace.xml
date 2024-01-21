@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="9819d92d-6edd-4a41-860d-e31eccac6311" name="Changes" comment="수정">
       <change beforePath="$PROJECT_DIR$/../DeepLearningWithPytorch/7.1_rnncell.py" beforeDir="false" afterPath="$PROJECT_DIR$/../DeepLearningWithPytorch/7.1_rnncell.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../DeepLearningWithPytorch/test1.py" beforeDir="false" afterPath="$PROJECT_DIR$/../DeepLearningWithPytorch/test1.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -36,7 +35,7 @@
   &quot;keyToString&quot;: {
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/bangkh21/PycharmProjects/BASIC_ML/DeepLearningWithPytorch/main.py&quot;
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/bangkh21/PycharmProjects/BASIC_ML/SungHun/lab-10-2-mnist_nn.py&quot;
   }
 }</component>
   <component name="RunManager" selected="Python.7.1_rnncell">
@@ -185,7 +184,14 @@
       <option name="project" value="LOCAL" />
       <updated>1705525909627</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="수정">
+      <created>1705838720694</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1705838720694</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

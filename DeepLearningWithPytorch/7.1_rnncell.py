@@ -8,6 +8,7 @@ import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
 import time
+import datetime
 
 ################################################################################
 # 데이터 전 처리
@@ -29,6 +30,7 @@ LABEL = torchtext.legacy.data.Field(sequential=False)
 from torchtext.legacy import datasets
 train_data, test_data = datasets.IMDB.splits(TEXT, LABEL)
 
+# 훈련 데이터셋의 첫번째 examples[0] 출력
 print(vars(train_data.examples[0]))
 
 # {'text': ['bromwell', 'high', 'is', 'a', 'cartoon', 'comedy.', 'it', 'ran', 'at', 'the', 'same', 'time', 'as', 'some', 'other', 'programs', 'about', 'school', 'life,',
@@ -40,7 +42,6 @@ print(vars(train_data.examples[0]))
 # 'welcome', 'to', 'bromwell', 'high.', 'i', 'expect', 'that', 'many', 'adults', 'of', 'my', 'age', 'think', 'that', 'bromwell', 'high', 'is', 'far', 'fetched.', 'what', 'a', 'pity',
 # 'that', 'it', "isn't!"], 'label': 'pos'}
 
-
 ################################################################################
 # 데이터 전 처리 적용
 ################################################################################
@@ -48,11 +49,14 @@ print(vars(train_data.examples[0]))
 import string
 
 for example in train_data.examples:
-    text = [x.lower() for x in vars(example)['text']]  # 소문자로 변경
-    text = [x.replace("<br", "") for x in text]        # "<br"을 공백으로 변경(개행)
+    # 소문자로 변경
+    text = [x.lower() for x in vars(example)['text']]
+    # "<br"을 공백으로 변경(개행)
+    text = [x.replace("<br", "") for x in text]
     # 구둣점 제거
     text = [''.join(c for c in s if c not in string.punctuation) for s in text]
-    text = [s for s in text if s]   # 공백 제거
+    # 공백 제거
+    text = [s for s in text if s]
     vars(example)['text'] = text
 
 ################################################################################
@@ -70,6 +74,7 @@ train_data, valid_data = train_data.split(random_state = random.seed(0), split_r
 ################################################################################
 # 데이터셋 갯수 확인
 ################################################################################
+
 print(f'Number of training examples: {len(train_data)}')
 print(f'Number of validation examples: {len(valid_data)}')
 print(f'Number of testing examples: {len(test_data)}')
@@ -77,9 +82,13 @@ print(f'Number of testing examples: {len(test_data)}')
 # Number of training examples: 20000
 # Number of validation examples: 5000
 # Number of testing examples: 25000
+
 ################################################################################
 # 단어 집합 만들기
 ################################################################################
+
+# 단어 집합이란 IMDB 데이터셋에 포함된 단어들을 이용하여 하나의 딕셔너리와 같은 집합을 만듬
+# 단어 집합을 만들때는 단어들의 중복은 제거된 상태에서 제거
 
 # 단어 집합 생성은 TEXT.build_vocab()을 이용
 # train_data : 훈련 데이터셋
@@ -87,8 +96,12 @@ print(f'Number of testing examples: {len(test_data)}')
 # min_freq : 훈련 데이터셋에서 특정 단어의 최소 등장 횟수를 의미
 #            min_freq=10으로 설정했기 때문에 훈련 데이터셋에서 특정 단어가 최소 10번 이상
 #            등장한 것만 집합에 추가한다는 의미
-# vectors :  임베딩 벡터를 지정할 수 있음. 파이토치에도 nn.embedding()을 통해 단어를
-#            랜덤한 숫자 갓으로 변환한 후 가중치를 학습하는 방법 제공
+# vectors :  임베딩 벡터를 지정할 수 있음
+#            임베딩 벅터는 워드 임베딩의 결과로 나온 벡터
+#            사전 학습된 임베딩으로는 word2vec, glove등이 있음
+#            파이토치에도 nn.embedding()을 통해 단어를
+#            랜덤한 숫자 값으로 변환한 후 가중치를 학습하는 방법 제공
+
 TEXT.build_vocab(train_data, max_size=10000, min_freq=10, vectors=None)
 LABEL.build_vocab(train_data)
 
@@ -102,18 +115,25 @@ print(f"Unique tokens in LABEL vocabulary: {len(LABEL.vocab)}")
 # 테스트 데이터셋의 단어 집합 확인
 ################################################################################
 
+# LABEL.vocab.stoi을 통해 현재 단어 집합의 단어와 그것에 부여된 고유정수(인덱스)를 확인
+# <unk>는 사전에 없는 단어를 의미
+
 print(LABEL.vocab.stoi)
 
 # defaultdict(<bound method Vocab._default_unk_index of <torchtext.vocab.Vocab object at 0x000002E1341FAE20>>, {'<unk>': 0, 'pos': 1, 'neg': 2})
+
 ################################################################################
 # 데이터셋 메모리로 가져오기
 ################################################################################
+
 # 전처리가 완료되었기 때문에 BucketIterator()를 이용하여 데이터셋을 메모리로 가져옴
+
 BATCH_SIZE = 64
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
-# 각 단어를 100차원으로 조정(임베딩 계층을 통과한 후 각 벡터의 크기)
+# 각 단어를 100 차원으로 조정(임베딩 계층을 통과한 후 각 벡터의 크기)
 embeding_dim = 100
+
 # 은닉층의 유닛 갯수를 지정
 hidden_size = 300
 
@@ -124,6 +144,7 @@ hidden_size = 300
 # 1번째 파라미터 : 배치 크기 단위로 데이터를 가져올 데이터셋
 # 2번째 파라미터 : 한번에 가져올 데이터 크기(배치 크기)
 # 3번째 파라미터 : 어떤 장치(CPU OR GPU)를 사용할 지 결정
+
 train_iterator, valid_iterator, test_iterator = torchtext.legacy.data.BucketIterator.splits(
     (train_data, valid_data, test_data),
     batch_size = BATCH_SIZE,
@@ -195,6 +216,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
 ################################################################################
 
 def training(epoch, model, trainloader, validloader):
+
     correct = 0
     total = 0
     running_loss = 0
@@ -242,7 +264,13 @@ def training(epoch, model, trainloader, validloader):
     epoch_valid_acc = valid_correct / valid_total
 
     # 훈련이 진행될 때 에포크마마 정확도와 오차를 출력
-    print('epoch: ', epoch,
+
+
+    now = datetime.datetime.now()
+    nowDatetime = now.strftime('%Y-%m-%d %H:%M:%S')
+
+    print(nowDatetime,
+          'epoch: ', epoch,
           'loss： ', round(epoch_loss, 3),
           'accuracy:', round(epoch_acc, 3),
           'valid_loss： ', round(epoch_valid_loss, 3),
@@ -253,13 +281,14 @@ def training(epoch, model, trainloader, validloader):
 ################################################################################
 # 모델 학습
 ################################################################################
-epochs = 5
+epochs = 20
 train_loss = []
 train_acc = []
 valid_loss = []
 valid_acc = []
 
 for epoch in range(epochs):
+
     epoch_loss, epoch_acc, epoch_valid_loss, epoch_valid_acc = training(epoch,
                                                                  model,train_iterator, valid_iterator)
     # 훈련 데이터셋을 모덜에 적용했을 때의 오차
@@ -308,7 +337,7 @@ def evaluate(epoch, model, testloader):
 # 모델 예측 결과 확인
 ################################################################################
 
-epochs = 5
+epochs = 20
 test_loss = []
 test_acc = []
 
