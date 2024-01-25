@@ -25,3 +25,7 @@
 import torch
 
 print(torch.__version__)
+
+print(torchaudio.__version__)
+
+print(torvision.__version__)
