@@ -119,7 +119,6 @@ print(f"Unique tokens in LABEL vocabulary: {len(LABEL.vocab)}")
 # <unk>는 사전에 없는 단어를 의미
 
 print(LABEL.vocab.stoi)
-
 # defaultdict(<bound method Vocab._default_unk_index of <torchtext.vocab.Vocab object at 0x000002E1341FAE20>>, {'<unk>': 0, 'pos': 1, 'neg': 2})
 
 ################################################################################
@@ -153,10 +152,12 @@ train_iterator, valid_iterator, test_iterator = torchtext.legacy.data.BucketIter
 ################################################################################
 # 워드 임베딩 및 RNN 셀 정의
 ################################################################################
+
 # 앞에서 단어 집합을 만드는 과정에서 vectors=none으로 설정했기 때문에 임베딩 부분에 대해
 # 정의하지 않음. 이번 예제에서는 nn.Embedding()을 이용하여 임베딩 처리를 진행함
 
 class RNNCell_Encoder(nn.Module):
+
     def __init__(self, input_dim, hidden_size):
         super(RNNCell_Encoder, self).__init__()
         # RNN 셀 구현을 위한 구문
@@ -180,12 +181,17 @@ class RNNCell_Encoder(nn.Module):
         return ht
 
 class Net(nn.Module):
+
     def __init__(self):
         super(Net, self).__init__()
+        print('len(TEXT.vocab.stoi) = ', len(TEXT.vocab.stoi))
+
+        # len(TEXT.vocab.stoi) = 10002
         # 임베딩 처리를 위한 구문
         # len(TEXT.vocab.stoi) : 임베딩을 할 단어 수(단어 집합의 크기)
-        # embeding_dim : 임베딩할 벡터의 차원
+        # embeding_dim : 임베딩할 벡터의 차원 ==> 100
         self.em = nn.Embedding(len(TEXT.vocab.stoi), embeding_dim)
+
         self.rnn = RNNCell_Encoder(embeding_dim, hidden_size)
         self.fc1 = nn.Linear(hidden_size, 256)
         self.fc2 = nn.Linear(256, 3)
@@ -263,8 +269,7 @@ def training(epoch, model, trainloader, validloader):
     epoch_valid_loss = valid_running_loss / len(validloader.dataset)
     epoch_valid_acc = valid_correct / valid_total
 
-    # 훈련이 진행될 때 에포크마마 정확도와 오차를 출력
-
+    # 훈련이 진행될 때 에포크마다 정확도와 오차를 출력
 
     now = datetime.datetime.now()
     nowDatetime = now.strftime('%Y-%m-%d %H:%M:%S')
@@ -281,7 +286,8 @@ def training(epoch, model, trainloader, validloader):
 ################################################################################
 # 모델 학습
 ################################################################################
-epochs = 20
+
+epochs = 40
 train_loss = []
 train_acc = []
 valid_loss = []
@@ -327,7 +333,10 @@ def evaluate(epoch, model, testloader):
     epoch_test_loss = test_running_loss / len(testloader.dataset)
     epoch_test_acc = test_correct / test_total
 
-    print('epoch: ', epoch,
+    now = datetime.datetime.now()
+    nowDatetime = now.strftime('%Y-%m-%d %H:%M:%S')
+    print(nowDatetime,
+          'epoch: ', epoch,
           'test_loss： ', round(epoch_test_loss, 3),
           'test_accuracy:', round(epoch_test_acc, 3)
           )
@@ -337,7 +346,7 @@ def evaluate(epoch, model, testloader):
 # 모델 예측 결과 확인
 ################################################################################
 
-epochs = 20
+epochs = 40
 test_loss = []
 test_acc = []
 
