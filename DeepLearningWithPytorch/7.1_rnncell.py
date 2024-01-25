@@ -228,6 +228,7 @@ def training(epoch, model, trainloader, validloader):
     running_loss = 0
 
     model.train()
+
     for b in trainloader:
         # trainloader에서 text와 label를 꺼내 옴
         x, y = b.text, b.label
