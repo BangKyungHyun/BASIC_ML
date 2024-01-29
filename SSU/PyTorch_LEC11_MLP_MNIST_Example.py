@@ -174,7 +174,7 @@ val_accuracy_list = []
 
 start_time = datetime.now()
 
-EPOCHS = 20
+EPOCHS = 50
 
 for epoch in range(EPOCHS):
 
