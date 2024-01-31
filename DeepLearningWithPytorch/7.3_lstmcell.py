@@ -42,7 +42,11 @@ mnist_transform = transforms.Compose([
 from torchvision.datasets import MNIST
 
 download_root = '../chap07/MNIST_DATASET'
-
+# download_root : MNIST를 내려 받을 위치 지정
+# transform=mnist_transform : 앞 단계 데이터 전처리 적용
+# train : True로 설정할 경우 훈련용 데이터, False는 테스트용 데이터를 가져옴
+# download : True로 설정할 경우 내려 받으려는 위치에 MNIST 파일이 없으면 내려받지만
+#            파일이 있다면 내려 받지 않음
 train_dataset = MNIST(download_root, transform=mnist_transform, train=True, download=True)
 valid_dataset = MNIST(download_root, transform=mnist_transform, train=False, download=True)
 test_dataset = MNIST(download_root, transform=mnist_transform, train=False, download=True)
@@ -50,6 +54,7 @@ test_dataset = MNIST(download_root, transform=mnist_transform, train=False, down
 ################################################################################
 # 데이터셋을 메모리로 가져오기
 ################################################################################
+
 batch_size = 64
 train_loader = DataLoader(dataset=train_dataset,
                          batch_size=batch_size,
@@ -60,53 +65,71 @@ valid_loader = DataLoader(dataset=test_dataset,
 test_loader = DataLoader(dataset=test_dataset,
                          batch_size=batch_size,
                          shuffle=True)
+print('len(train_dataset) = ',len(train_dataset))
+print('len(valid_dataset) = ',len(valid_dataset))
+print('len(test_dataset) = ',len(test_dataset))
 
-
+# len(train_dataset) =  60000
+# len(valid_dataset) =  10000
+# len(test_dataset) =  10000
 ################################################################################
 # 변수 값 지정
 ################################################################################
 
 batch_size = 100
 n_iters = 6000
+# num_epochs = 6000 / (60000 / 100) = 6000/600  = 10
 num_epochs = n_iters / (len(train_dataset) / batch_size)
+
 num_epochs = int(num_epochs)
+
+print('num_epochs = ',num_epochs)
 
 ################################################################################
 # LSTM 셀 네트워크 구축
 ################################################################################
 
 class LSTMCell(nn.Module):
+
     def __init__(self, input_size, hidden_size, bias=True):
         super(LSTMCell, self).__init__()
         self.input_size = input_size
         self.hidden_size = hidden_size
         self.bias = bias
+        # 은닉층이 4개로 쪼개지는 상황이기 때문에 4를 곱함
         self.x2h = nn.Linear(input_size, 4 * hidden_size, bias=bias)
         self.h2h = nn.Linear(hidden_size, 4 * hidden_size, bias=bias)
         self.reset_parameters()
 
+    # 모델의 파라미터 초기화
     def reset_parameters(self):
         std = 1.0 / math.sqrt(self.hidden_size)
         for w in self.parameters():
-            w.data.uniform_(-std, std)
+            w.data.uniform_(-std, std) # -std, std 사이의 임의의 실수인 난수 발생
 
     def forward(self, x, hidden):
         hx, cx = hidden
         x = x.view(-1, x.size(1))
 
         gates = self.x2h(x) + self.h2h(hx)
+        # troch.squeeze는 텐서를 차원을 줄일 때 사용
         gates = gates.squeeze()
+
+        # torch.chunk는 텐서를 쪼갤 때 사용하는 함수
+        # 첫번째 파라미터 : 턴세를 몇 개로 쪼갤지 설정
+        # 두번째 파라미터 : 어떤 차원을 기준을 쪼갤지를 설정. dim=이므로 열 단위로 텐서를 분할
         ingate, forgetgate, cellgate, outgate = gates.chunk(4, 1)
 
-        ingate = F.sigmoid(ingate)
-        forgetgate = F.sigmoid(forgetgate)
-        cellgate = F.tanh(cellgate)
-        outgate = F.sigmoid(outgate)
+        ingate = F.sigmoid(ingate)         # 입력 게이트에서 시그모이드 활성화 함수 적용
+        forgetgate = F.sigmoid(forgetgate) # 망각 게이트에서 시그모이드 활성화 함수 적용
+        cellgate = F.tanh(cellgate)        # 셀 게이트에서 탄젠트 활성화 함수 적용
+        outgate = F.sigmoid(outgate)       # 출력 게이트에서 시그모이드 활성화 함수 적용
 
+        # 하나의 LSTM 셀을 통과하면 셀(Ct) 상태와 은닉 상태(Ht)가 출력으로 주어짐
+        # 이 때 셀 상태는 입력,망각, 셀 게이트에 의해 계산되며, 은닉상태는 출력 게이트에 의해 계산
         cy = torch.mul(cx, forgetgate) + torch.mul(ingate, cellgate)
         hy = torch.mul(outgate, F.tanh(cy))
         return (hy, cy)
-
 
 class LSTMModel(nn.Module):
     def __init__(self, input_dim, hidden_dim, layer_dim, output_dim, bias=True):
