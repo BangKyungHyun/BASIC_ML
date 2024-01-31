@@ -46,6 +46,7 @@ test_dataset_loader = DataLoader(dataset=test_dataset, batch_size=BATCH_SIZE, sh
 ################################################################################
 # 모델 정의
 ################################################################################
+
 class MyDeepLearningModel(nn.Module):
     # 아키텍쳐를 구성하는 다양한 계층 정의
     def __init__(self):
@@ -65,7 +66,6 @@ class MyDeepLearningModel(nn.Module):
         logits = self.fc2(data)    # 출력층
         return logits
 
-
 ################################################################################
 # 손실함수와 옵티마이저 지정
 ################################################################################
@@ -77,7 +77,7 @@ loss_function = nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(model.parameters(), lr = 1e-2)
 
 ################################################################################
-# 모델 학습 함수
+# 모델 학습 함수(배치 size 단위로 하이퍼 파라미처 갱신함 )
 ################################################################################
 
 def model_train(dataloader, model, loss_function, optimizer):
@@ -85,17 +85,23 @@ def model_train(dataloader, model, loss_function, optimizer):
     # 신경망을 학습모드(모델 파라미터를 업데이터 하는 모드) 로 전환
     model.train()
 
-    train_loss_sum = 0
-    train_correct = 0
-    train_total = 0
+    train_loss_sum = 0  # 학습 단계 손실값 합계
+    train_correct = 0   # 학습 단계 정확도
+    train_total = 0     # 학습 단계에서 사용한 데이터 건수
+    for_looping_count = 0
 
+    # 51,000개 train data를 32 batch size로 1593.75 번 나누어서 데이터를 로드함
     total_train_batch = len(dataloader)
-    print('len(dataloader) = ', len(dataloader))
+    # print('len(dataloader) = ', len(dataloader))
+    # len(dataloader) =  1594
 
-    for images, labels in dataloader: # images에는 이미지, labels에는 0-9 숫자
-
+    # images에는 이미지, labels에는 0-9 숫자
+    for images, labels in dataloader:
         # reshape input image into [batch_size by 784]
         # label is not one-hot encoded
+
+        for_looping_count += 1  # for 문 count
+
         x_train = images.view(-1, 28 * 28) #처음 크기는 (batch_size, 1, 28, 28) / 이걸 (batch_size, 784)로 변환
         y_train = labels
         # print('lables = ', labels)
@@ -145,30 +151,45 @@ def model_train(dataloader, model, loss_function, optimizer):
         # print(' loss = ', loss)
         # loss = tensor(2.3035, grad_fn= < NllLossBackward0 >)
 
+        ######################################################################################
         # 역전파 코드. 즉 학습이 진행함에 따라 모델 파라미터(가중치, 바이어스) 업데이트 하면서 최적화 시킴
+        ######################################################################################
+        # 역전파 단계 전에, optimizer 객체를 사용하여 (모델의 학습 가능한 가중치인) 갱신할
+        # 변수들에 대한 모든 변화도(gradient)를 0으로 만듬. 이렇게 하는 이유는 기본적으로
+        # .backward()를 호출할 때마다 변화도가 버퍼(buffer)에 (덮어쓰지 않고) 누적되기 때문
         optimizer.zero_grad()
+        # 역전파 단계: 모델의 매개변수들에 대한 손실의 변화도 계산
         loss.backward()
+        # optimizer의 step 함수를 호출하면 매개변수가 갱신됨
         optimizer.step()
 
+        # 모델에서 계산된 loss 가 있다면, loss.item()을 통해 loss의 스칼라 값을 가져올 수 있음
+        # train_loss_sum에 손실함수값을 더함
         train_loss_sum += loss.item()
         # print('train_loss_sum = ', train_loss_sum)
         # print('loss.item() = ', loss.item())
-        # train_loss_sum = 2.303469657897949
+        # # train_loss_sum = 2.303469657897949
         # loss.item() = 2.303469657897949
 
+        # batch size(32) 만큼 train_total에 더함
         train_total += y_train.size(0)  # label 열 사이즈 같음
         # print('train_total = ', train_total)
         # print('y_train.size(0) = ', y_train.size(0))
-        # train_total = 32
+        # # train_total = 32
         # y_train.size(0) = 32
 
         train_correct += ((torch.argmax(outputs, 1)==y_train)).sum().item() # 예측한 값과 일치한 값의 합
 
+    # 학습 데이터 평균 오차 계산 = 학습단계 오차 합계 / 전체 train 배치 작업 횟수 (1,594)
     train_avg_loss = train_loss_sum / total_train_batch
-    train_avg_accuracy = 100*train_correct / train_total
+    # 학습 데이터 평균 정확도 = 학습 단계 일치건수 / 전체 학습 건수
+    train_avg_accuracy = train_correct / train_total * 100
+    print('train_total_count = ', train_total)
+
+    # print('for looping count = ', for_looping_count)
+    # for looping count =  1594
 
     return (train_avg_loss, train_avg_accuracy)
-
 
 ################################################################################
 # 모델 평가 함수
@@ -178,7 +199,7 @@ def model_evaluate(dataloader, model, loss_function, optimizer):
 
     model.eval()
 
-    with torch.no_grad(): #미분하지 않겠다는 것
+    with torch.no_grad(): #미분하지 않겠다는 것(모델 하이퍼 파라이며를 업데이터를 시키지 않겠다는 의미)
 
         val_loss_sum = 0
         val_correct=0
@@ -202,16 +223,16 @@ def model_evaluate(dataloader, model, loss_function, optimizer):
             val_correct += ((torch.argmax(outputs, 1)==y_val)).sum().item() # 예측한 값과 일치한 값의 합
 
         val_avg_loss = val_loss_sum / total_val_batch
-        val_avg_accuracy = 100*val_correct / val_total
+        val_avg_accuracy = val_correct / val_total * 100
 
     return (val_avg_loss, val_avg_accuracy)
-
 
 ################################################################################
 # 모델 테스트
 ################################################################################
 def model_test(dataloader, model):
 
+    # 신경망을 추론(검증) 단계로 전환
     model.eval()
 
     with torch.no_grad(): #test set으로 데이터를 다룰 때에는 gradient를 주면 안된다.
@@ -249,15 +270,20 @@ def model_test(dataloader, model):
 ################################################################################
 # 모델 학습 및 평가
 ################################################################################
+
+# 학습 오차를 리스트로 저장
 train_loss_list = []
+# 학습 정확도를 리스트로 저장
 train_accuracy_list = []
 
+# 검증 오차를 리스트로 저장
 val_loss_list = []
+# 검증 정확도를 리스트로 저장
 val_accuracy_list = []
 
 start_time = datetime.datetime.now()
 
-EPOCHS = 1
+EPOCHS = 20
 
 for epoch in range(EPOCHS):
 
@@ -291,6 +317,10 @@ print('elapsed time => ', end_time-start_time)
 # test dataset 으로 정확도 및 오차 테스트
 ################################################################################
 model_test(test_dataset_loader, model)
+
+################################################################################
+# 테스트 결과 시각화
+################################################################################
 
 import matplotlib.pyplot as plt
 
