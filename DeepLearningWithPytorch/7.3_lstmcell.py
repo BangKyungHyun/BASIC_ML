@@ -128,8 +128,13 @@ class LSTMCell(nn.Module):
         # 하나의 LSTM 셀을 통과하면 셀(Ct) 상태와 은닉 상태(Ht)가 출력으로 주어짐
         # 이 때 셀 상태는 입력,망각, 셀 게이트에 의해 계산되며, 은닉상태는 출력 게이트에 의해 계산
         cy = torch.mul(cx, forgetgate) + torch.mul(ingate, cellgate)
+        # torch.muldms 텐서에 곱셈을 할 때 사용
         hy = torch.mul(outgate, F.tanh(cy))
         return (hy, cy)
+
+################################################################################
+# LSTM 셀의 전반적인 네트워크
+################################################################################
 
 class LSTMModel(nn.Module):
     def __init__(self, input_dim, hidden_dim, layer_dim, output_dim, bias=True):
@@ -137,11 +142,17 @@ class LSTMModel(nn.Module):
         self.hidden_dim = hidden_dim
 
         self.layer_dim = layer_dim
+        
+        # LSTMCell 대한 문법
+        # input_dim  : 입력에 대한 특성(feature)수 (컬럼 갯수)
+        # hidden_dim : 은닉층의 뉴런(유닛) 갯수
+        # layer_dim  : 은닉층의 계층 갯수
         self.lstm = LSTMCell(input_dim, hidden_dim, layer_dim)
         self.fc = nn.Linear(hidden_dim, output_dim)
 
     def forward(self, x):
         if torch.cuda.is_available():
+        # (은닉층의 계층 갯수, 배치 크기, 은닉층의 뉴런 갯수) 형태를 은닉상태를 0으로 초기화  
             h0 = Variable(
                 torch.zeros(self.layer_dim, x.size(0), self.hidden_dim).cuda())
         else:
@@ -150,15 +161,17 @@ class LSTMModel(nn.Module):
 
         if torch.cuda.is_available():
             c0 = Variable(
+        # (은닉층의 계층 갯수, 배치 크기, 은닉층의 뉴런 갯수) 형태를 셀상태를 0으로 초기화  
                 torch.zeros(self.layer_dim, x.size(0), self.hidden_dim).cuda())
         else:
             c0 = Variable(torch.zeros(self.layer_dim, x.size(0), hidden_dim))
 
         outs = []
-        cn = c0[0, :, :]
-        hn = h0[0, :, :]
+        cn = c0[0, :, :] #(은닉층의 계층 갯수, 배치 크기, 은닉층의 뉴런 갯수) 크기를 갖는 셀 상태에 대한 텐서
+        hn = h0[0, :, :] #(은닉층의 계층 갯수, 배치 크기, 은닉층의 뉴런 갯수) 크기를 갖는 은닉 상태에 대한 텐서
 
-        for seq in range(x.size(1)):
+        for seq in range(x.size(1)): # LSTM쉘 계층을 반복하여 쌓아 올림
+            # 은닉상태(hh)와 셀 상태를 LSTMCell에 적용한 결과를 또 다시 hn, cn에 저장
             hn, cn = self.lstm(x[:, seq, :], (hn, cn))
             outs.append(hn)
 
@@ -166,6 +179,9 @@ class LSTMModel(nn.Module):
         out = self.fc(out)
         return out
 
+################################################################################
+# 옵티마이저와 손실함수 지정
+################################################################################
 
 input_dim = 28
 hidden_dim = 128
@@ -178,6 +194,10 @@ if torch.cuda.is_available():
 criterion = nn.CrossEntropyLoss()
 learning_rate = 0.1
 optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
+
+################################################################################
+# 모델 학습과 성능 확인
+################################################################################
 
 seq_dim = 28
 loss_list = []

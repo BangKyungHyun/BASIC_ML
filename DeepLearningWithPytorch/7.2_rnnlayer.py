@@ -55,12 +55,10 @@ class BasicRNN(nn.Module):
 
     def __init__(self, n_layers, hidden_dim, n_vocab, embed_dim, n_classes, dropout_p = 0.2):
         super(BasicRNN, self).__init__()
-        # RNN 계층에 대한 개수
-        self.n_layers = n_layers
-        # 워드 임베딩 적용
-        self.embed = nn.Embedding(n_vocab, embed_dim)
-        self.hidden_dim = hidden_dim
-        # 드롭아웃 적용
+
+        self.n_layers = n_layers                      # RNN 계층에 대한 개수
+        self.embed = nn.Embedding(n_vocab, embed_dim) # 워드 임베딩 적용
+        self.hidden_dim = hidden_dim                  # 드롭아웃 적용
         self.dropout = nn.Dropout(dropout_p)
 
         # RNN 계층에 대한 문법
