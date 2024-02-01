@@ -103,7 +103,7 @@ class LSTMCell(nn.Module):
 
     # 모델의 파라미터 초기화
     def reset_parameters(self):
-        std = 1.0 / math.sqrt(self.hidden_size)
+        std = 1.0 / math.sqrt(self.hidden_size)  # math.sqrt 제곱근 계산 9의 제곱근은 3
         for w in self.parameters():
             w.data.uniform_(-std, std) # -std, std 사이의 임의의 실수인 난수 발생
 
@@ -137,16 +137,16 @@ class LSTMCell(nn.Module):
 ################################################################################
 
 class LSTMModel(nn.Module):
+
     def __init__(self, input_dim, hidden_dim, layer_dim, output_dim, bias=True):
         super(LSTMModel, self).__init__()
         self.hidden_dim = hidden_dim
-
         self.layer_dim = layer_dim
         
         # LSTMCell 대한 문법
-        # input_dim  : 입력에 대한 특성(feature)수 (컬럼 갯수)
-        # hidden_dim : 은닉층의 뉴런(유닛) 갯수
-        # layer_dim  : 은닉층의 계층 갯수
+        # input_dim  : 입력에 대한 특성(feature)수 (컬럼 갯수)  28
+        # hidden_dim : 은닉층의 뉴런(유닛) 갯수                128
+        # layer_dim  : 은닉층의 계층 갯수                     1
         self.lstm = LSTMCell(input_dim, hidden_dim, layer_dim)
         self.fc = nn.Linear(hidden_dim, output_dim)
 
@@ -191,52 +191,61 @@ output_dim = 10
 model = LSTMModel(input_dim, hidden_dim, layer_dim, output_dim)
 if torch.cuda.is_available():
     model.cuda()
+
 criterion = nn.CrossEntropyLoss()
 learning_rate = 0.1
 optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 
 ################################################################################
-# 모델 학습과 성능 확인
+# 모델 학습과 정확도 확인
 ################################################################################
 
 seq_dim = 28
 loss_list = []
 iter = 0
-for epoch in range(num_epochs):
-    for i, (images, labels) in enumerate(train_loader):
+
+for epoch in range(num_epochs):      # num_epochs = 10으로 정의한 상태임
+
+    for i, (images, labels) in enumerate(train_loader): # 훈련 데이터셋을 이용한 모델 학습
+
         if torch.cuda.is_available():
+        # 현재 버젼에서는 모든 텐서가 자동으로 Variable의 성질을 갖기 때문에 torch.autograd.Variable을 
+        # 사용할 필요가 없지만 학급/연습 및 이전 버젼에서 구현된 파이토치 코드를 이해를 해야 하기 위해 사용
             images = Variable(images.view(-1, seq_dim, input_dim).cuda())
             labels = Variable(labels.cuda())
         else:
+            #     images를  seq_dim(28) * input_dim(28) = 784로 불러 드림
             images = Variable(images.view(-1, seq_dim, input_dim))
             labels = Variable(labels)
 
         optimizer.zero_grad()
         outputs = model(images)
-        loss = criterion(outputs, labels)
+        loss = criterion(outputs, labels)  # 손실함수를 이용하여 오차 계산
 
         if torch.cuda.is_available():
             loss.cuda()
 
         loss.backward()
-        optimizer.step()
+        optimizer.step()                  # 파라미터 업데이트
         loss_list.append(loss.item())
         iter += 1
 
-        if iter % 500 == 0:
+        if iter % 500 == 0:               # 정확도 계산
             correct = 0
             total = 0
-            for images, labels in valid_loader:
+            for images, labels in valid_loader: # 검증 데이터셋을 이용한 모델 성능 검증
+
                 if torch.cuda.is_available():
-                    images = Variable(
-                        images.view(-1, seq_dim, input_dim).cuda())
+                    images = Variable(images.view(-1, seq_dim, input_dim).cuda())
                 else:
                     images = Variable(images.view(-1, seq_dim, input_dim))
 
                 outputs = model(images)
+                # 모델을 통과한 결과의 최댓값으로 부터 예측 결과 가져오기(softmax)
                 _, predicted = torch.max(outputs.data, 1)
 
-                total += labels.size(0)
+                total += labels.size(0)   # 총 레이블 수
+
                 if torch.cuda.is_available():
                     correct += (predicted.cpu() == labels.cpu()).sum()
                 else:
@@ -245,12 +254,18 @@ for epoch in range(num_epochs):
             accuracy = 100 * correct / total
             print('Iteration: {}. Loss: {}. Accuracy: {}'.format(iter,
                                                                  loss.item(),
-                                                                 accuracy))
+                                                                  accuracy))
+print('max Iteration = ', iter)
 
+################################################################################
+# 테스트 데이터셋을 이욯한 모델 예측 정확도 확인
+################################################################################
 
 def evaluate(model, val_iter):
+
     corrects, total, total_loss = 0, 0, 0
     model.eval()
+
     for images, labels in val_iter:
         if torch.cuda.is_available():
             images = Variable(images.view(-1, seq_dim, input_dim).cuda())
@@ -258,15 +273,22 @@ def evaluate(model, val_iter):
             images = Variable(images.view(-1, seq_dim, input_dim)).to(device)
 
         logit = model(images).to(device)
+        # reduction = "sum"을 지정했기 때문에 모든 오차를 더함
         loss = F.cross_entropy(logit, labels, reduction="sum")
-        _, predicted = torch.max(logit.data, 1)
+
+        _, predicted = torch.max(logit.data, 1) # logit.data 텐서에서 최대값인 인덱스를 반환
         total += labels.size(0)
         total_loss += loss.item()
         corrects += (predicted == labels).sum()
 
     avg_loss = total_loss / len(val_iter.dataset)
     avg_accuracy = corrects / total
+
     return avg_loss, avg_accuracy
+
+################################################################################
+# 모델 예측 정확도 확인
+################################################################################
 
 test_loss, test_acc = evaluate(model,test_loader)
 print("Test Loss: %5.2f | Test Accuracy: %5.2f" % (test_loss, test_acc))
