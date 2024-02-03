@@ -77,7 +77,7 @@ print('len(test_dataset) = ',len(test_dataset))
 ################################################################################
 
 batch_size = 100
-n_iters = 6000
+n_iters = 600
 # num_epochs = 6000 / (60000 / 100) = 6000/600  = 10
 num_epochs = n_iters / (len(train_dataset) / batch_size)
 
@@ -85,14 +85,19 @@ num_epochs = int(num_epochs)
 
 print('num_epochs = ',num_epochs)
 
+# class는 프로그램 순서에 따라 정의함(생성은 class 호출 시 됨)
+
 ################################################################################
 # LSTM 셀 네트워크 구축
 ################################################################################
 
 class LSTMCell(nn.Module):
 
+    print('1. class LSTMCell(nn.Module): start')
+
     def __init__(self, input_size, hidden_size, bias=True):
         super(LSTMCell, self).__init__()
+
         self.input_size = input_size
         self.hidden_size = hidden_size
         self.bias = bias
@@ -101,13 +106,26 @@ class LSTMCell(nn.Module):
         self.h2h = nn.Linear(hidden_size, 4 * hidden_size, bias=bias)
         self.reset_parameters()
 
-    # 모델의 파라미터 초기화
+    # 모델의 파라미터 초기화 (프로그램 실행 시 초기에 1번에 실행됨)
     def reset_parameters(self):
+        print('def reset_parameters(self): start')
+
         std = 1.0 / math.sqrt(self.hidden_size)  # math.sqrt 제곱근 계산 9의 제곱근은 3
+        print('self.hidden_size =', self.hidden_size)
+        print('math.sqrt(self.hidden_size) =', math.sqrt(self.hidden_size))
+        print('std =', std)
+        #
+        # self.hidden_size = 128
+        # math.sqrt(self.hidden_size) = 11.313708498984761
+        # std = 0.08838834764831843
+        #
         for w in self.parameters():
             w.data.uniform_(-std, std) # -std, std 사이의 임의의 실수인 난수 발생
+        print('def reset_parameters(self): end')
 
     def forward(self, x, hidden):
+
+        # print('def forward(self, x, hidden): start')
         hx, cx = hidden
         x = x.view(-1, x.size(1))
 
@@ -130,29 +148,36 @@ class LSTMCell(nn.Module):
         cy = torch.mul(cx, forgetgate) + torch.mul(ingate, cellgate)
         # torch.muldms 텐서에 곱셈을 할 때 사용
         hy = torch.mul(outgate, F.tanh(cy))
+
+        # print('def forward(self, x, hidden): end')
+
         return (hy, cy)
+
+print('2. class LSTMCell(nn.Module): end')
 
 ################################################################################
 # LSTM 셀의 전반적인 네트워크
 ################################################################################
 
 class LSTMModel(nn.Module):
+    print('3. class LSTMModel(nn.Module) start')
 
     def __init__(self, input_dim, hidden_dim, layer_dim, output_dim, bias=True):
         super(LSTMModel, self).__init__()
         self.hidden_dim = hidden_dim
         self.layer_dim = layer_dim
-        
+
         # LSTMCell 대한 문법
         # input_dim  : 입력에 대한 특성(feature)수 (컬럼 갯수)  28
         # hidden_dim : 은닉층의 뉴런(유닛) 갯수                128
         # layer_dim  : 은닉층의 계층 갯수                     1
+        print('self.lstm = LSTMCell(input_dim, hidden_dim, layer_dim)')
         self.lstm = LSTMCell(input_dim, hidden_dim, layer_dim)
         self.fc = nn.Linear(hidden_dim, output_dim)
 
     def forward(self, x):
         if torch.cuda.is_available():
-        # (은닉층의 계층 갯수, 배치 크기, 은닉층의 뉴런 갯수) 형태를 은닉상태를 0으로 초기화  
+            # (은닉층의 계층 갯수, 배치 크기, 은닉층의 뉴런 갯수) 형태를 은닉상태를 0으로 초기화
             h0 = Variable(
                 torch.zeros(self.layer_dim, x.size(0), self.hidden_dim).cuda())
         else:
@@ -161,16 +186,16 @@ class LSTMModel(nn.Module):
 
         if torch.cuda.is_available():
             c0 = Variable(
-        # (은닉층의 계층 갯수, 배치 크기, 은닉층의 뉴런 갯수) 형태를 셀상태를 0으로 초기화  
+                # (은닉층의 계층 갯수, 배치 크기, 은닉층의 뉴런 갯수) 형태를 셀상태를 0으로 초기화
                 torch.zeros(self.layer_dim, x.size(0), self.hidden_dim).cuda())
         else:
             c0 = Variable(torch.zeros(self.layer_dim, x.size(0), hidden_dim))
 
         outs = []
-        cn = c0[0, :, :] #(은닉층의 계층 갯수, 배치 크기, 은닉층의 뉴런 갯수) 크기를 갖는 셀 상태에 대한 텐서
-        hn = h0[0, :, :] #(은닉층의 계층 갯수, 배치 크기, 은닉층의 뉴런 갯수) 크기를 갖는 은닉 상태에 대한 텐서
+        cn = c0[0, :, :]  # (은닉층의 계층 갯수, 배치 크기, 은닉층의 뉴런 갯수) 크기를 갖는 셀 상태에 대한 텐서
+        hn = h0[0, :, :]  # (은닉층의 계층 갯수, 배치 크기, 은닉층의 뉴런 갯수) 크기를 갖는 은닉 상태에 대한 텐서
 
-        for seq in range(x.size(1)): # LSTM쉘 계층을 반복하여 쌓아 올림
+        for seq in range(x.size(1)):  # LSTM쉘 계층을 반복하여 쌓아 올림
             # 은닉상태(hh)와 셀 상태를 LSTMCell에 적용한 결과를 또 다시 hn, cn에 저장
             hn, cn = self.lstm(x[:, seq, :], (hn, cn))
             outs.append(hn)
@@ -178,6 +203,8 @@ class LSTMModel(nn.Module):
         out = outs[-1].squeeze()
         out = self.fc(out)
         return out
+
+    print('4. class LSTMModel(nn.Module) end')
 
 ################################################################################
 # 옵티마이저와 손실함수 지정
@@ -188,7 +215,10 @@ hidden_dim = 128
 layer_dim = 1
 output_dim = 10
 
+print ('5. model = LSTMModel(input_dim, hidden_dim, layer_dim, output_dim) start')
 model = LSTMModel(input_dim, hidden_dim, layer_dim, output_dim)
+print ('6. model = LSTMModel(input_dim, hidden_dim, layer_dim, output_dim) end')
+
 if torch.cuda.is_available():
     model.cuda()
 
@@ -216,10 +246,14 @@ for epoch in range(num_epochs):      # num_epochs = 10으로 정의한 상태임
         else:
             #     images를  seq_dim(28) * input_dim(28) = 784로 불러 드림
             images = Variable(images.view(-1, seq_dim, input_dim))
+            print('images =', len(images))
             labels = Variable(labels)
 
         optimizer.zero_grad()
+        print('outputs = model(images) start')
         outputs = model(images)
+        print('outputs = model(images) end')
+
         loss = criterion(outputs, labels)  # 손실함수를 이용하여 오차 계산
 
         if torch.cuda.is_available():
