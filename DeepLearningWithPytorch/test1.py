@@ -22,10 +22,20 @@
 # import mxnet as mx
 # from mxnet.gluon.data.vision import tranforms
 
-import torch
+# import torch
+#
+# print(torch.__version__)
+#
+# print(torchaudio.__version__)
+#
+# print(torvision.__version__)
 
-print(torch.__version__)
 
-print(torchaudio.__version__)
+import nltk
+nltk.download()
+text = nltk.word_tokenize("It is possible ditinguishing cats and dogs")
+print(text)
 
-print(torvision.__version__)
+nltk.download('averaged_perceptron_tagger')
+
+nltk.post_tag(text)

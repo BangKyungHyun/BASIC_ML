@@ -171,7 +171,7 @@ class LSTM(nn.Module):
 # 변수 값 설정
 ################################################################################
 
-num_epochs = 1000               # 100번의 에포크
+num_epochs = 100               # 100번의 에포크
 learning_rate = 0.0001
 
 input_size = 5                  # 입력 데이터셋의 컬럼(feature) 갯수
@@ -190,25 +190,34 @@ optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 ################################################################################
 
 for epoch in range(num_epochs):
-    outputs = model.forward(X_train_tensors_f)
+    outputs = model.forward(X_train_tensors_f) # Feed forward 학습
     optimizer.zero_grad()
-    loss = criterion(outputs, y_train_tensors)
-    loss.backward()
-    optimizer.step()
-    if epoch % 100 == 0:
+    loss = criterion(outputs, y_train_tensors) # 손실 함수를 이용한 오차 계산
+    loss.backward()    # 기울기 계산, 역전파
+    optimizer.step()   # 오차 업데이트
+    if epoch % 10000 == 0:
         print("Epoch: %d, loss: %1.5f" % (epoch, loss.item()))
 
-df_x_ss = ss.transform(data.iloc[:, :-1])
-df_y_ms = ms.transform(data.iloc[:, -1:])
+################################################################################
+# 모델 예측 결과를 출력하기 위한 데이터 크기 재구성
+################################################################################
+
+df_x_ss = ss.transform(data.iloc[:, :-1])  # 데이터 정규화(분포 조정)
+df_y_ms = ms.transform(data.iloc[:, -1:])  # 데이터 정규화
 
 df_x_ss = Variable(torch.Tensor(df_x_ss))
 df_y_ms = Variable(torch.Tensor(df_y_ms))
 df_x_ss = torch.reshape(df_x_ss, (df_x_ss.shape[0], 1, df_x_ss.shape[1]))
 
-train_predict = model(df_x_ss)
-predicted = train_predict.data.numpy()
+################################################################################
+# 모델 예측 결과 출력
+###############################################################################
+
+train_predict = model(df_x_ss)  # 훈련 데이터셋을 모델에 적용하여 모델 학습
+predicted = train_predict.data.numpy() # 모델 학습 결과를 넘파이로 변경
 label_y = df_y_ms.data.numpy()
 
+# 모델 학습을 위해 전처리(정규화)했던 것을 해제(그래프의 본래 값을 출력하기 위한 목적)
 predicted= ms.inverse_transform(predicted)
 label_y = ms.inverse_transform(label_y)
 plt.figure(figsize=(10,6))
