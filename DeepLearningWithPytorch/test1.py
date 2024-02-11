@@ -31,11 +31,27 @@
 # print(torvision.__version__)
 
 
-import nltk
-nltk.download()
-text = nltk.word_tokenize("It is possible ditinguishing cats and dogs")
-print(text)
+# import nltk
+# nltk.download()
+# text = nltk.word_tokenize("It is possible ditinguishing cats and dogs")
+# print(text)
+#
+# nltk.download('averaged_perceptron_tagger')
+#
+# nltk.pos_tag(text)
+#
+# print(nltk.pos_tag(text))
 
-nltk.download('averaged_perceptron_tagger')
+# import nltk
+#
+# nltk.download('punkt')
+#
+# string1 = "my favorite subject is math"
+# string2 = "my favorite subject is math, english, economic and computer science"
+# print(nltk.word_tokenize(string1))
+# print(nltk.word_tokenize(string2))
+#
 
-nltk.post_tag(text)
+from konply.tag import Komoran
+komoran = Komoran()
+print(komoran.morphs('딥러닝이 쉽나요?, 어렵나요?'))
