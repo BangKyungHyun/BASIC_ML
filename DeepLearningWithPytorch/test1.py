@@ -29,433 +29,227 @@
 # print(torchaudio.__version__)
 #
 # print(torvision.__version__)
-################################################################################
-#9.1.1 자연어처리 용어 및 프로세스
-################################################################################
 
-# import nltk
-# nltk.download()
-# text = nltk.word_tokenize("It is possible distinguishing cats and dogs")
-# print(text)
+# #10.1.1 희소표현(Sparse Representation)
 #
-# nltk.download('averaged_perceptron_tagger')
+# # one hot encoding 사용
+# import pandas as pd
+# class2=pd.read_csv("data/class2.csv")
+# # class2=pd.read_csv("../chap10/data/class2.csv")
 #
-# nltk.pos_tag(text)
+# from sklearn import preprocessing
+# label_encoder = preprocessing.LabelEncoder()
+# onehot_encoder = preprocessing.OneHotEncoder()
 #
-# print(nltk.pos_tag(text))
+# train_x = label_encoder.fit_transform(class2['class2'])
+# print(train_x)
 
-################################################################################
-# 9.1.2 자연어처리를 위한 라이브러리 NLTK
-################################################################################
+#10.1.2 횟수기반 임베딩 Counter Vector
 
-# import nltk
-
-# nltk.download('punkt')
+# 코퍼스에 카운터 벡터 사용
+from sklearn.feature_extraction.text import CountVectorizer
+corpus = [
+    'This is last chance.',
+    'and if you do not have this chance.',
+    'you will never get any chance.',
+    'will you do get this one?',
+    'please, get this chance',
+]
+vect = CountVectorizer()
+vect.fit(corpus)
 #
-# string1 = "my favorite subject is math"
-# string2 = "my favorite subject is math, english, economic and computer science"
-# print(nltk.word_tokenize(string1))
-# print(nltk.word_tokenize(string2))
-
-################################################################################
-# KoNLPy
-################################################################################
-
-# from konlpy.tag import Okt
-# okt = Okt()
+# print(vect.vocabulary_)
 #
-# print(okt.pos('프로그램 설치를 했습니다. 뭐 하나 쉬운 게 없네'))
+# # {'this': 13, 'is': 7, 'last': 8, 'chance': 2, 'and': 0, 'if': 6, 'you': 15, 'do': 3, 'not': 10, 'have': 5, 'will': 14, 'never': 9, 'get': 4, 'any': 1, 'one': 11, 'please': 12}
 #
-# from konlpy.tag import Komoran
-# komoran = Komoran()
-# print(komoran.morphs('딥러닝이 쉽나요?, 어렵나요?'))
+# # 배열 변환
+# print(vect.transform(['you will never get any chance.']).toarray())
 #
-# print(komoran.pos('소파 위에 있는 것이 고양이인가요? 강아지인가요?'))
+# # [[0 1 1 0 1 0 0 0 0 1 0 0 0 0 1 1]]
 
-################################################################################
-#9.2 전처리
-#9.2.1 결측치 확인하기
-################################################################################
+# 불용어를 제거한 카운터 벡터
+vect = CountVectorizer(stop_words=["and", "is", "please", "this"]).fit(corpus)
+print(vect.vocabulary_)
 
-import pandas as pd
-df = pd.read_csv('data\class2.csv')
+# {'last': 6, 'chance': 1, 'if': 5, 'you': 11, 'do': 2, 'not': 8, 'have': 4, 'will': 10, 'never': 7, 'get': 3, 'any': 0, 'one': 9}
+
+#TF-IDF
+
+# from sklearn.feature_extraction.text import TfidfVectorizer
+# doc = ['I like machine learning', 'I love deep learning', 'I run everyday']
+# tfidf_vectorizer = TfidfVectorizer(min_df=1)
+# tfidf_matrix = tfidf_vectorizer.fit_transform(doc)
+# doc_distance = (tfidf_matrix * tfidf_matrix.T)
+# print ('유사도를 위한', str(doc_distance.get_shape()[0]), 'x', str(doc_distance.get_shape()[1]), 'matrix를 만들었습니다.')
+# print(doc_distance.toarray())
 #
-# print(df) # 주어진 테이블 확인
-# #   Unnamed: 0      id tissue class class2      x      y      r
-# # 0           0  mdb000      C  CIRC      N  535.0  475.0  192.0
-# # 1           1  mdb001      A  CIRA      N  433.0  268.0   58.0
-# # 2           2  mdb002      A  CIRA      I    NaN    NaN    NaN
-# # 3           3  mdb003      C  CIRC      B    NaN    NaN    NaN
-# # 4           4  mdb004      F  CIRF      I  488.0  145.0   29.0
-# # 5           5  mdb005      F  CIRF      B  544.0  178.0   26.0
+# 유사도를 위한 3 x 3 matrix를 만들었습니다.
+# [[1.       0.224325 0.      ]
+#  [0.224325 1.       0.      ]
+#  [0.       0.       1.      ]]
+
+#10.1.3 예측기반 임베딩 Word2Vec
+
+# 데이터셋을 메모리로 로딩하고 토근화 적용
+# from nltk.tokenize import sent_tokenize, word_tokenize
+# import warnings
 #
-# # isnull()메서더를 사용하여 결측치가 있는지 확인한 후, sum()메서드를 사용하여 결측치가
-# # 몇 개인지 합산하여 보여 줌
-# print(df.isnull().sum())
+# warnings.filterwarnings(action='ignore')
+# import gensim
+# from gensim.models import Word2Vec
 #
-# # Unnamed: 0    0
-# # id            0
-# # tissue        0
-# # class         0
-# # class2        0
-# # x             2
-# # y             2
-# # r             2
-# # dtype: int64
+# sample = open("data/peter.txt", "r", encoding='UTF8')
+# s = sample.read()
 #
-# # 결측치 비율 확인
-# print(df.isnull().sum()/len(df))
-# # Unnamed: 0    0.000000
-# # id            0.000000
-# # tissue        0.000000
-# # class         0.000000
-# # class2        0.000000
-# # x             0.333333
-# # y             0.333333
-# # r             0.333333
-# # dtype: float64
-
-# 결측치 삭제 처리
-# df = df.dropna(how='all') # 모든 행이 NaN일 때만 삭제
-# print(df)
-# #
-# #    Unnamed: 0      id tissue class class2      x      y      r
-# # 0           0  mdb000      C  CIRC      N  535.0  475.0  192.0
-# # 1           1  mdb001      A  CIRA      N  433.0  268.0   58.0
-# # 2           2  mdb002      A  CIRA      I    NaN    NaN    NaN
-# # 3           3  mdb003      C  CIRC      B    NaN    NaN    NaN
-# # 4           4  mdb004      F  CIRF      I  488.0  145.0   29.0
-# # 5           5  mdb005      F  CIRF      B  544.0  178.0   26.0
-
-# 데이터에 하나라도 NaN 값이 있으면 행을 삭제
-# df = df.dropna()
-# print(df)
+# f = s.replace("\n", " ")  # 줄바꿈을 공백으로 변환
+# data = []
 #
-# #    Unnamed: 0      id tissue class class2      x      y      r
-# # 0           0  mdb000      C  CIRC      N  535.0  475.0  192.0
-# # 1           1  mdb001      A  CIRA      N  433.0  268.0   58.0
-# # 4           4  mdb004      F  CIRF      I  488.0  145.0   29.0
-# # 5           5  mdb005      F  CIRF      B  544.0  178.0   26.0
+# for i in sent_tokenize(f):    #로딩한 파일의 각 문장마다 반복
+#     temp = []
+#     for j in word_tokenize(i):  # 문장을 단어로 토근화
+#         temp.append(j.lower())  # 토근화된 단어를 소문자로 변환하여 temp에 저장
+#     data.append(temp)
 
-# 결측치를 0으로 채우기
-# df2 = df.fillna(0)
-# print(df2)
-# #
-# #    Unnamed: 0      id tissue class class2      x      y      r
-# # 0           0  mdb000      C  CIRC      N  535.0  475.0  192.0
-# # 1           1  mdb001      A  CIRA      N  433.0  268.0   58.0
-# # 2           2  mdb002      A  CIRA      I    0.0    0.0    0.0
-# # 3           3  mdb003      C  CIRC      B    0.0    0.0    0.0
-# # 4           4  mdb004      F  CIRF      I  488.0  145.0   29.0
-# # 5           5  mdb005      F  CIRF      B  544.0  178.0   26.0
+# print(data)
 
-# 결측치를 평균으로 채우기
-# df['x'].fillna(df['x'].mean(), inplace=True) # x열에 대해 평균값(500.0)으로 NaN값이 채워짐
-# print(df)
+# [['once', 'upon', 'a', 'time', 'in', 'london', ',', 'the', 'darlings', 'went', 'out', 'to', 'a', 'dinner', 'party', 'leaving',
+#   'their', 'three', 'children', 'wendy', ',', 'jhon', ',', 'and', 'michael', 'at', 'home', '.'],
+#  ['after', 'wendy', 'had', 'tucked', 'her', 'younger', 'brothers', 'jhon', 'and', 'michael', 'to', 'bed', ',', 'she', 'went', 'to', 'read', 'a', 'book', '.'],
+
+#CBOW
+
+# # 데이터셋에 CBOW 적용후 peter 와 wedny 유사성 확인
+# model1 = gensim.models.Word2Vec(data, min_count = 1,
+#                               vector_size = 100, window = 5, sg=0)
+# print("Cosine similarity between 'peter' " +
+#                  "wendy' - CBOW : ",
+#       model1.wv.similarity('peter', 'wendy'))
 #
-# #    Unnamed: 0      id tissue class class2      x      y      r
-# # 0           0  mdb000      C  CIRC      N  535.0  475.0  192.0
-# # 1           1  mdb001      A  CIRA      N  433.0  268.0   58.0
-# # 2           2  mdb002      A  CIRA      I  500.0    NaN    NaN
-# # 3           3  mdb003      C  CIRC      B  500.0    NaN    NaN
-# # 4           4  mdb004      F  CIRF      I  488.0  145.0   29.0
-# # 5           5  mdb005      F  CIRF      B  544.0  178.0   26.0
-
-#9.2.2 토큰화
-
-# 문장 토큰화
-# from nltk import sent_tokenize
-# text_sample = 'Natural Language Processing, or NLP, is the process of extracting ' \
-#               'the meaning, or intent, behind human language. In the field of ' \
-#               'Conversational artificial intelligence (AI), NLP allows machines ' \
-#               'and applications to understand the intent of human language inputs, ' \
-#               'and then generate appropriate responses, resulting in a natural conversation flow.'
-# tokenized_sentences = sent_tokenize(text_sample)
-# print(tokenized_sentences)
-# #
-# # ['Natural Language Processing, or NLP, is the process of extracting the meaning, or intent, behind human language.',
-# #  'In the field of Conversational artificial intelligence (AI), NLP allows machines and applications to understand the '
-# #  'intent of human language inputs, and then generate appropriate responses, resulting in a natural conversation flow.']
-
-# 단어 토큰화
-# from nltk import word_tokenize
-# sentence = " This book is for deep learning learners"
-# words = word_tokenize(sentence)
-# print(words)
+# # Cosine similarity between 'peter' wendy' - CBOW :  0.07439385
 #
-# # ['This', 'book', 'is', 'for', 'deep', 'learning', 'learners']
-
-# 아포스트로피가 포함한 문장에서 단어 토큰화
-# from nltk.tokenize import WordPunctTokenizer
-# sentence = "it’s nothing that you don’t already know except most people aren’t aware of how their inner world works."
-# words = WordPunctTokenizer().tokenize(sentence)
-# print(words)
+# # 데이터셋에 CBOW 적용후 peter 와 hook 유사성 확인
 #
-# # ['it', '’', 's', 'nothing', 'that', 'you', 'don', '’', 't', 'already', 'know', 'except', 'most', 'people', 'aren', '’', 't', 'aware', 'of', 'how', 'their', 'inner', 'world', 'works', '.']
-
-################################################################################
-#한국어 토큰화 예제
-################################################################################
-
-# #라이브러리 호출 및 데이터셋 준비
-# import csv
-# from konlpy.tag import Okt
-# from gensim.models import word2vec
+# print("Cosine similarity between 'peter' " +
+#                  "hook' - CBOW : ",
+#       model1.wv.similarity('peter', 'hook'))
 #
-# f = open(r'data\ratings_train.txt', 'r', encoding='utf-8')
-# rdr = csv.reader(f, delimiter='\t')
-# rdw = list(rdr)
-# f.close()
+# # Cosine similarity between 'peter' hook' - CBOW :  0.027709909
 #
+# #Skip-gram
+# # 데이터셋에 skip-gram 적용후 peter 와 wedny 유사성 확인
 #
-# # 오픈 소스 한글 형태소 분석기 호출
-# twitter = Okt()  # 오픈 소스 한글 형태소 분석기 Twitter(Okt))를 사용
+# model2 = gensim.models.Word2Vec(data, min_count = 1, vector_size = 100,
+#                                               window = 5, sg = 1)
+# # print("Cosine similarity between 'peter' " +
+#           "wendy' - Skip Gram : ",
+#     model2.wv.similarity('peter', 'wendy'))
 #
-# result = []
-# for line in rdw:   # 테스트를 한 줄씩 처리
-#     malist = twitter.pos( line[1], norm=True, stem=True)  # 형태소 분석
-#     r = []
-#     for word in malist:
-#         if not word[1] in ["Josa","Eomi","Punctuation"]: # 조사, 어미, 문장부호는 제외하고 처리
-#             r.append(word[0])
-#     rl = (" ".join(r)).strip()  # 형태소 사
-#     result.append(rl)
-#     # print(rl)
+# # Cosine similarity between 'peter' wendy' - Skip Gram :  0.4008868
+
+# print("Cosine similarity between 'peter' " +
+#             "hook' - Skip Gram : ",
+#       model2.wv.similarity('peter', 'hook'))
 #
-# # 형태소 저장
-# with open("NaverMovie.nlp",'w', encoding='utf-8') as fp:
-#     fp.write("\n".join(result))
+# # Cosine similarity between 'peter' hook' - Skip Gram :  0.52016735
+
+# #FastText
 #
-# # Word2Vec 모델 생성
-# mData = word2vec.LineSentence("NaverMovie.nlp")
-# mModel =word2vec.Word2Vec(mData, vector_size=200, window=10, hs=1, min_count=2, sg=1)
-# mModel.save("NaverMovie.model")
-
-################################################################################
-#9.2.3 불용어 제거
-################################################################################
-
-# import nltk
-# from nltk.corpus import stopwords
-# nltk.download('stopwords')
-# nltk.download('punkt')
-# from nltk.tokenize import word_tokenize
+# from gensim.test.utils import common_texts
+# from gensim.models import FastText
 #
-# sample_text = "One of the first things that we ask ourselves is what are the pros and cons of any task we perform."
-# text_tokens = word_tokenize(sample_text)
+# model = FastText('data/peter.txt', vector_size=4, window=3, min_count=1, epochs=10)
 #
-# tokens_without_sw = [word for word in text_tokens if not word in stopwords.words('english')]
-# print("불용어 제거 미적용:", text_tokens, '\n')
-# print("불용어 제거 적용:",tokens_without_sw)
+# # peter 와 wendy에 대한 코사인 유사도
 #
-# # 불용어 제거 미적용: ['One', 'of', 'the', 'first', 'things', 'that', 'we', 'ask', 'ourselves', 'is', 'what', 'are', 'the', 'pros', 'and', 'cons', 'of', 'any', 'task', 'we', 'perform', '.']
-# #
-# # 불용어 제거 적용: ['One', 'first', 'things', 'ask', 'pros', 'cons', 'task', 'perform', '.']
-
-
-#9.2.4 어간 추출
-
-# #포터 알고리즘
-# from nltk.stem import PorterStemmer
-# stemmer = PorterStemmer()
+# sim_score = model.wv.similarity('peter', 'wendy')
+# print(sim_score)
+# # 0.45924556
+# # peter 와 hook에 대한 코사인 유사도
 #
-# print(stemmer.stem('obesses'),stemmer.stem('obssesed'))
-# print(stemmer.stem('standardizes'),stemmer.stem('standardization'))
-# print(stemmer.stem('national'), stemmer.stem('nation'))
-# print(stemmer.stem('absentness'), stemmer.stem('absently'))
-# print(stemmer.stem('tribalical'), stemmer.stem('tribalicalized'))
+# sim_score = model.wv.similarity('peter', 'hook')
+# print(sim_score)
+# # 0.04382518
+
+# from gensim.models import KeyedVectors
 #
-# # obess obsses
-# # standard standard
-# # nation nation
-# # absent absent
-# # tribal tribalic
-
-#랭커스터 알고리즘
-# from nltk.stem import LancasterStemmer
-# stemmer = LancasterStemmer()
+# model_kr = KeyedVectors.load_word2vec_format('data/wiki.ko.vec')
 #
-# print(stemmer.stem('obsesses'),stemmer.stem('obsessed'))
-# print(stemmer.stem('standardizes'),stemmer.stem('standardization'))
-# print(stemmer.stem('national'), stemmer.stem('nation'))
-# print(stemmer.stem('absentness'), stemmer.stem('absently'))
-# print(stemmer.stem('tribalical'), stemmer.stem('tribalicalized'))
+# find_similar_to = '노력'
 #
-# # obsess obsess
-# # standard standard
-# # nat nat
-# # abs abs
-# # trib trib
-
-#표제어 추출(Lemmatization)
-# import nltk
-# nltk.download('wordnet')
-# from nltk.stem import LancasterStemmer
-# stemmer = LancasterStemmer()
+# for similar_word in model_kr.similar_by_word(find_similar_to):
+#     print("Word: {0}, Similarity: {1:.2f}".format(
+#         similar_word[0], similar_word[1]
+#     ))
 #
-# from nltk.stem import WordNetLemmatizer  # 표제어 추출 라이브러리
-# lemma = WordNetLemmatizer()
+# # Word: 노력함, Similarity: 0.80
+# # Word: 노력중, Similarity: 0.75
+# # Word: 노력만, Similarity: 0.72
+# # Word: 노력과, Similarity: 0.71
+# # Word: 노력의, Similarity: 0.69
+# # Word: 노력가, Similarity: 0.69
+# # Word: 노력이나, Similarity: 0.69
+# # Word: 노력없이, Similarity: 0.68
+# # Word: 노력맨, Similarity: 0.68
+# # Word: 노력보다는, Similarity: 0.68
+
+# similarities = model_kr.most_similar(positive=['동물', '육식동물'], negative=['사람'])
+# print(similarities)
 #
-# print(stemmer.stem('obsesses'),stemmer.stem('obsessed'))
-# print(lemma.lemmatize('standardizes'),lemma.lemmatize('standardization'))
-# print(lemma.lemmatize('national'), lemma.lemmatize('nation'))
-# print(lemma.lemmatize('absentness'), lemma.lemmatize('absently'))
-# print(lemma.lemmatize('tribalical'), lemma.lemmatize('tribalicalized'))
+# # [('초식동물', 0.7804122567176819), ('거대동물', 0.7547270059585571), ('육식동물의', 0.7547166347503662), ('유두동물', 0.7535113096237183), ('반추동물', 0.7470757365226746), ('독동물', 0.7466291785240173), ('육상동물', 0.746031641960144), ('유즐동물', 0.7450904250144958), ('극피동물', 0.7449344396591187), ('복모동물', 0.7424346208572388)]
+
+#10.1.4 횟수/예측기반 임베딩
+#GloVe
+
+# import os
 #
-# # obsess obsess
-# # standardizes standardization
-# # national nation
-# # absentness absently
-# # tribalical tribalicalized
-
-# 품사 정보가 추가된 표제어 추출
-# from nltk.stem import WordNetLemmatizer  # 표제어 추출 라이브러리
-# lemma = WordNetLemmatizer()
+# import numpy as np
+# # %matplotlib notebook
+# import matplotlib.pyplot as plt
+# # plt.style.use('ggplot')
+# from sklearn.decomposition import PCA
+# from gensim.test.utils import datapath, get_tmpfile
+# from gensim.models import KeyedVectors
+# from gensim.scripts.glove2word2vec import glove2word2vec
 #
-# print(lemma.lemmatize('obsesses', 'v'),lemma.lemmatize('obsessed','a'))
-# print(lemma.lemmatize('standardizes','v'),lemma.lemmatize('standardization','n'))
-# print(lemma.lemmatize('national','a'), lemma.lemmatize('nation','n'))
-# print(lemma.lemmatize('absentness','n'), lemma.lemmatize('absently','r'))
-# print(lemma.lemmatize('tribalical','a'), lemma.lemmatize('tribalicalized','v'))
+# glove_file = datapath('C:\\Users\\bangkh21\\PycharmProjects\\BASIC_ML\\DeepLearningWithPytorch\data\\glove.6B.100d.txt')
+# word2vec_glove_file = get_tmpfile("glove.6B.100d.word2vec.txt")
+# print(glove2word2vec(glove_file, word2vec_glove_file))
+# # (400000, 100)
 #
-# # obsess obsessed
-# # standardize standardization
-# # national nation
-# # absentness absently
-# # tribalical tribalicalized
-
-# 9.2.5정규화(Normalization)
-
-import pandas as pd
-import torch
-import torch.nn as nn
-from torch.utils.data import Dataset, DataLoader
-
-# 데이터셋을 훈련과 테스트 용도로 분리하기 위한 라이브러리
-from sklearn.model_selection import train_test_split
-# 정규화와 관련된 라이브러리
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
-
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-# 데이터셋 경로 지정 및 훈련과 테스트 용도로 분리
-df = pd.read_csv('data/diabetes.csv')
-X = df[df.columns[:-1]]   # 여덟 개의 컬럼은 당뇨병을 예측하는 사용
-y = df['Outcome']         # 당뇨병인지 아닌지 나타내는 레이블(정답)
-
-X = X.values
-y = torch.tensor(y.values)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
-
-# 훈련과 테스트용 테이터를 정류화
-ms = MinMaxScaler()
-ss = StandardScaler()
-
-X_train = ss.fit_transform(X_train)
-y_train =y_train.reshape(-1, 1) # (?,1) 의 형태를 갖도록 변경. 즉 열의 수만 1로 고정
-y_train = ms.fit_transform(y_train)
-
-X_test = ss.fit_transform(X_test)
-y_test = y_test.reshape(-1, 1)
-y_test = ms.fit_transform(y_test)
-
-# 커스텀 데이터셋 생성
-class customdataset(Dataset):
-    def __init__(self, X, y):
-        self.X = X
-        self.y = y
-        self.len = len(self.X)
-    def __getitem__(self, index):
-        return self.X[index], self.y[index]
-    def __len__(self):
-        return self.len
-
-# 데이터 로더에 데이터 담기
-train_data = customdataset(torch.FloatTensor(X_train),torch.FloatTensor(y_train))
-test_data = customdataset(torch.FloatTensor(X_test),torch.FloatTensor(y_test))
-
-train_loader = DataLoader(dataset=train_data, batch_size=64, shuffle=True)
-test_loader = DataLoader(dataset=test_data, batch_size=64, shuffle=False)
-
-# 네트워크 생성
-class binaryClassification(nn.Module):
-    def __init__(self):
-        super(binaryClassification, self).__init__()
-        self.layer_1 = nn.Linear(8, 64, bias=True) # 컬럼이 여덟개이므로 입력 크기는 8을 사용
-        self.layer_2 = nn.Linear(64, 64, bias=True)
-        self.layer_out = nn.Linear(64, 1, bias=True) # 출력으로 당뇨인지 아닌지를 나타내는 0과 1의 값만 가지므로 1를 사용
-        self.relu = nn.ReLU()
-        self.dropout = nn.Dropout(p=0.1)
-        self.batchnorm1 = nn.BatchNorm1d(64)
-        self.batchnorm2 = nn.BatchNorm1d(64)
-
-    def forward(self, inputs):
-        x = self.relu(self.layer_1(inputs))
-        x = self.batchnorm1(x)
-        x = self.relu(self.layer_2(x))
-        x = self.batchnorm2(x)
-        x = self.dropout(x)
-        x = self.layer_out(x)
-        return x
-
-# 손실함수와 옵티마이저 지정
-epochs = 100000+1
-print_epoch = 1000
-LEARNING_RATE = 1e-2
-
-model = binaryClassification()
-model.to(device)
-print(model)
-BCE = nn.BCEWithLogitsLoss()
-optimizer = torch.optim.SGD(model.parameters(), lr=LEARNING_RATE)
-
-# 모델 성능 측정 함수 정의
-def accuracy(y_pred, y_test):
-    y_pred_tag = torch.round(torch.sigmoid(y_pred))
-    # 실제 정답과 모델의 결과가 일치하는 갯수를 실수 형태로 변수에 저장
-    correct_results_sum = (y_pred_tag == y_test).sum().float()
-    acc = correct_results_sum/y_test.shape[0]
-    acc = torch.round(acc * 100)
-    return acc
-
-# 모델 학습
-for epoch in range(epochs):
-    iteration_loss = 0.     # 변수를 0으로 초기화
-    iteration_accuracy = 0.
-
-    model.train()  # 모델 학습
-    for i, data in enumerate(train_loader):
-        X, y = data
-        X, y = X.to(device), y.to(device)
-        y_pred = model(X.float()).to(device) # 독립 변수를 모델에 적용하여 훈련
-        # 모델에 적용하여 훈련시킨 결과 정답 레이브를 손실함수에 적용
-        loss = BCE(y_pred, y.reshape(-1, 1).float())
-
-        iteration_loss += loss # 오차 값을 변수에 누적하여 저장
-        iteration_accuracy += accuracy(y_pred, y) # 모델성능(정확도)을 변수에 누적하여 저장
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-
-    if (epoch % print_epoch == 0):
-        print('Train: epoch: {0} - loss: {1:.5f}; acc: {2:.3f}'.format(epoch,
-                                                                       iteration_loss / (
-                                                                                   i + 1),
-                                                                       iteration_accuracy / (
-                                                                                   i + 1)))
-    iteration_loss = 0.
-    iteration_accuracy = 0.
-    model.eval()
-    for i, data in enumerate(test_loader):
-        X, y = data
-        X, y = X.to(device), y.to(device)
-        y_pred = model(X.float()).to(device)
-        loss = BCE(y_pred, y.reshape(-1, 1).float())
-        iteration_loss += loss
-        iteration_accuracy += accuracy(y_pred, y)
-    if (epoch % print_epoch == 0):
-        print('Test: epoch: {0} - loss: {1:.5f}; acc: {2:.3f}'.format(epoch,
-                                                                      iteration_loss / (
-                                                                                  i + 1),
-                                                                      iteration_accuracy / (
-                                                                                  i + 1)))
+# # bill과 유사한 단어의 리스트를 반환
+# # load_word2vec_format() 메서드를 이용하여 word2vec.c 형식을 벡터를 가져옴
+# model = KeyedVectors.load_word2vec_format(word2vec_glove_file)
+#
+# # 단어(bill) 기준으로 가장 유사한 단어들의 리스트를 보여줌
+# print(model.most_similar('bill'))
+# # [('legislation', 0.8072139620780945), ('proposal', 0.730686366558075), ('senate', 0.7142541408538818), ('bills', 0.704440176486969), ('measure', 0.6958035230636597), ('passed', 0.6906245350837708), ('amendment', 0.6846878528594971), ('provision', 0.6845566630363464), ('plan', 0.6816462874412537), ('clinton', 0.6663140058517456)]
+#
+# # 단어(cherry) 기준으로 가장 유사한 단어들의 리스트를 보여줌
+# print(model.most_similar('cherry'))
+# # [('peach', 0.688809871673584), ('mango', 0.6838189959526062), ('plum', 0.6684104204177856), ('berry', 0.6590359807014465), ('grove', 0.6581552028656006), ('blossom', 0.6503506302833557), ('raspberry', 0.6477391719818115), ('strawberry', 0.6442098021507263), ('pine', 0.6390928626060486), ('almond', 0.6379212737083435)]
+# [
+# # 단어(cherry) 와 관련성이 없는 단어의 리스트를 반환
+# print(model.most_similar(negative='cherry'))
+# # [('kazushige', 0.48343509435653687), ('askerov', 0.47781863808631897), ('lakpa', 0.46915262937545776), ('ex-gay', 0.45713329315185547), ('tadayoshi', 0.4522107243537903), ('turani', 0.44810065627098083), ('saglam', 0.4469599425792694), ('aijun', 0.4435270130634308), ('adjustors', 0.44235295057296753), ('nyum', 0.4423118531703949)]
+#
+# # woman, king과 유사성이 높으면서 man과 관련성이 없는 단어를 반환
+# result = model.most_similar(positive=['woman', 'king'], negative=['man'])
+# print("{}: {:.4f}".format(*result[0]))
+# # queen: 0.7699
+#
+# def analogy(x1, x2, y1):
+#     result = model.most_similar(positive=[y1, x2], negative=[x1])
+#     return result[0][0]
+#
+# # 'australia', 'beer', 'france'와 관련성이 있는 단어를 유추
+# print(analogy('australia', 'beer', 'france'))
+# # champagne
+#
+# # 'tall', 'tallest', 'long' 단어를 기반으로 새로운 단어를 유추
+# print(analogy('tall', 'tallest', 'long'))
+# # longest
+#
+# # breakfast cereal dinner lunch 중 유사도가 낮은 단어를 반환
+# print(model.doesnt_match("breakfast cereal dinner lunch".split()))
+# # cereal
+#
