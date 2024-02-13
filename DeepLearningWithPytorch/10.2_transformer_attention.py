@@ -217,11 +217,14 @@ def Model(model, input_tensor, target_tensor, model_optimizer, criterion):
     epoch_loss = loss.item() / num_iter
     return epoch_loss
 
+################################################################################
+# 모델 훈련 함수 정의
+################################################################################
 
 def trainModel(model, input_lang, output_lang, pairs, num_iteration=20000):
     model.train()
-    optimizer = optim.SGD(model.parameters(), lr=0.01)
-    criterion = nn.NLLLoss()
+    optimizer = optim.SGD(model.parameters(), lr=0.01) # 옵티마이져 SGD를 사용
+    criterion = nn.NLLLoss() # NLLLoss 역시 크로스엔트로피손실함수와 마찬가지로 분류문제에 사용함
     total_loss_iterations = 0
 
     training_pairs = [
@@ -243,37 +246,43 @@ def trainModel(model, input_lang, output_lang, pairs, num_iteration=20000):
     torch.save(model.state_dict(), 'data/mytraining.pt')
     return model
 
+################################################################################
+# 모델 평가
+################################################################################
 
 def evaluate(model, input_lang, output_lang, sentences, max_length=MAX_LENGTH):
     with torch.no_grad():
-        input_tensor = tensorFromSentence(input_lang, sentences[0])
-        output_tensor = tensorFromSentence(output_lang, sentences[1])
+        input_tensor = tensorFromSentence(input_lang, sentences[0]) # 입력문자열를 텐서로 변환
+        output_tensor = tensorFromSentence(output_lang, sentences[1]) # 출력 문자열을 텐서로 변환
         decoded_words = []
         output = model(input_tensor, output_tensor)
 
         for ot in range(output.size(0)):
-            topv, topi = output[ot].topk(1)
+            topv, topi = output[ot].topk(1)  # 각 출력에서 가장 높은 값을 찾아 인덱스로 변환
 
             if topi[0].item() == EOS_token:
-                decoded_words.append('<EOS>')
+                decoded_words.append('<EOS>') # EOS 토큰를 만나면 평가를 멈춤
                 break
-            else:
+            else: # 예측 결과를 출력 문자열에 추가
                 decoded_words.append(output_lang.index2word[topi[0].item()])
     return decoded_words
 
-
+# 훈련 데이터셋으로부터 임의의 문장을 가져와서 모델 평가
 def evaluateRandomly(model, input_lang, output_lang, pairs, n=10):
     for i in range(n):
-        pair = random.choice(pairs)
+        pair = random.choice(pairs)  # 임의의 문장을 가져온다.
         print('input {}'.format(pair[0]))
         print('output {}'.format(pair[1]))
-        output_words = evaluate(model, input_lang, output_lang, pair)
+        output_words = evaluate(model, input_lang, output_lang, pair) # 모델 평가 결과는 output_words에 저장
         output_sentence = ' '.join(output_words)
         print('predicted {}'.format(output_sentence))
 
+################################################################################
+# 모델 훈련
+################################################################################
 
-lang1 = 'eng'
-lang2 = 'fra'
+lang1 = 'eng'  # 입력으로 사용할 영어
+lang2 = 'fra'  # 출력으로 사용할 프랑스어
 input_lang, output_lang, pairs = process_data(lang1, lang2)
 
 randomize = random.choice(pairs)
@@ -281,7 +290,7 @@ print('random sentence {}'.format(randomize))
 
 input_size = input_lang.n_words
 output_size = output_lang.n_words
-print('Input : {} Output : {}'.format(input_size, output_size))
+print('Input : {} Output : {}'.format(input_size, output_size)) # 입력과 출력에 대한 단어 수 출력
 
 embed_size = 256
 hidden_size = 512
@@ -289,7 +298,10 @@ num_layers = 1
 num_iteration = 10000
 # num_iteration = 75000
 
+# 인코더에 훈련 데이터셋을 입력과 모든 출력과 은닉 상태를 저장
 encoder = Encoder(input_size, hidden_size, embed_size, num_layers)
+# 디코더의 첫번째 입력으로 <SOS>토큰이 제공되고 인코더의 마지막 은닉 상태가 디코더의
+# 첫번째 은닉상태로 제공
 decoder = Decoder(output_size, hidden_size, embed_size, num_layers)
 
 model = Seq2Seq(encoder, decoder, device).to(device)
@@ -299,7 +311,15 @@ print(decoder)
 
 model = trainModel(model, input_lang, output_lang, pairs, num_iteration)
 
+################################################################################
+# 임의의 문장에 대한 평가 결과
+################################################################################
+
 evaluateRandomly(model, input_lang, output_lang, pairs)
+
+################################################################################
+# 어텐션이 적용된 디코더
+################################################################################
 
 class AttnDecoderRNN(nn.Module):
     def __init__(self, hidden_size, output_size, dropout_p=0.1, max_length=MAX_LENGTH):
@@ -309,7 +329,9 @@ class AttnDecoderRNN(nn.Module):
         self.dropout_p = dropout_p
         self.max_length = max_length
 
-        self.embedding = nn.Embedding(self.output_size, self.hidden_size)
+        self.embedding = nn.Embedding(self.output_size, self.hidden_size) # 임베딩 계층 초기화
+        # 어텐션은 입력을 디코더로 변환. 즉 어텐션은 입력 시퀀스와 길이가 같은 인코딩된 시퀀스로 시퀀스로 변환하는 역할
+        # 따라서 self.max_length는 모든 입력 시퀀스의 최대 길이이여야함
         self.attn = nn.Linear(self.hidden_size * 2, self.max_length)
         self.attn_combine = nn.Linear(self.hidden_size * 2, self.hidden_size)
         self.dropout = nn.Dropout(self.dropout_p)
@@ -322,6 +344,10 @@ class AttnDecoderRNN(nn.Module):
 
         attn_weights = F.softmax(
             self.attn(torch.cat((embedded[0], hidden[0]), 1)), dim=1)
+        # torch.bmm 함수는 배치 행렬 곱(batch matrix multiplication, BMM)을 수행하는 함수
+        # 따라서 attn_weights.unsqueeze(0), encoder_outputs.unsqueeze(0)은 가중치와
+        # 인코더의 출력 벡터를 곱하겠다는 의미이며, 그 결과(attn_applied)는 입력 시퀀스의 특정 부분에
+        # 관한 정보를 포함하고 있기 때문에 디코더가 적절한 출력 결과를 선택하도록 도와 줌
         attn_applied = torch.bmm(attn_weights.unsqueeze(0),
                                  encoder_outputs.unsqueeze(0))
 
@@ -334,12 +360,16 @@ class AttnDecoderRNN(nn.Module):
         output = F.log_softmax(self.out(output[0]), dim=1)
         return output, hidden, attn_weights
 
+################################################################################
+# 어텐션 디코더 모델 학습을 위한 함수
+################################################################################
+
 def trainIters(encoder, decoder, n_iters, print_every=1000, plot_every=100, learning_rate=0.01):
     start = time.time()
     plot_losses = []
     print_loss_total = 0
     plot_loss_total = 0
-
+    # 인코더와 디코더에 SGD 옵티마이져 적용
     encoder_optimizer = optim.SGD(encoder.parameters(), lr=learning_rate)
     decoder_optimizer = optim.SGD(decoder.parameters(), lr=learning_rate)
     training_pairs = [tensorsFromPair(input_lang, output_lang, random.choice(pairs))
@@ -348,16 +378,20 @@ def trainIters(encoder, decoder, n_iters, print_every=1000, plot_every=100, lear
 
     for iter in range(1, n_iters + 1):
         training_pair = training_pairs[iter - 1]
-        input_tensor = training_pair[0]
-        target_tensor = training_pair[1]
+        input_tensor = training_pair[0]  # 입력+출력 쌍에서 입력을 input_tensor로 사용
+        target_tensor = training_pair[1] # 입력+출력 쌍에서 출력을 target_tensor로 사용
         loss = Model(model, input_tensor, target_tensor, decoder_optimizer, criterion)
         print_loss_total += loss
         plot_loss_total += loss
 
-        if iter % 5000 == 0:
+        if iter % 5000 == 0: # 모델을 훈련하면서 5000번째마다 오차를 출력
             print_loss_avg = print_loss_total / 5000
             print_loss_total = 0
             print('%d,  %.4f' % (iter, print_loss_avg))
+
+################################################################################
+# 어텐션 디코더 모델 훈련
+################################################################################
 
 import time
 
@@ -372,6 +406,6 @@ attn_decoder1 = AttnDecoderRNN(hidden_size, output_size, dropout_p=0.1).to(devic
 
 print(encoder1)
 print(attn_decoder1)
-
+# 인코더와 어텐션 디코드를 이용한 모델 생성
 attn_model = trainIters(encoder1, attn_decoder1, 10000, print_every=5000, plot_every=100, learning_rate=0.01)
 # attn_model = trainIters(encoder1, attn_decoder1, 75000, print_every=5000, plot_every=100, learning_rate=0.01)
