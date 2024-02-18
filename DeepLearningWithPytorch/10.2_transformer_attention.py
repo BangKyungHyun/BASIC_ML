@@ -295,7 +295,7 @@ print('Input : {} Output : {}'.format(input_size, output_size)) # 입력과 출�
 embed_size = 256
 hidden_size = 512
 num_layers = 1
-num_iteration = 10000
+num_iteration = 30000
 # num_iteration = 75000
 
 # 인코더에 훈련 데이터셋을 입력과 모든 출력과 은닉 상태를 저장
@@ -407,5 +407,5 @@ attn_decoder1 = AttnDecoderRNN(hidden_size, output_size, dropout_p=0.1).to(devic
 print(encoder1)
 print(attn_decoder1)
 # 인코더와 어텐션 디코드를 이용한 모델 생성
-attn_model = trainIters(encoder1, attn_decoder1, 10000, print_every=5000, plot_every=100, learning_rate=0.01)
+attn_model = trainIters(encoder1, attn_decoder1, 30000, print_every=5000, plot_every=100, learning_rate=0.01)
 # attn_model = trainIters(encoder1, attn_decoder1, 75000, print_every=5000, plot_every=100, learning_rate=0.01)
