@@ -321,6 +321,8 @@ class LSTM:
             # print('def train => len(input_idx) = \n', len(input_idx))
             # def train => len(input_idx) = 42
 
+
+
             predictions = self.forward(input_idx)
             # print('def train => seq, len(predictions) = ', _, len(predictions))
             # def train => seq, len(predictions) = 0 42
