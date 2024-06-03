@@ -18,12 +18,33 @@ def data_preprocessing(data):
     return tokens, vocab_size, word_to_ix, ix_to_word
 
 def init_weights(h_size, vocab_size):
+
     U = np.random.randn(h_size, vocab_size) * 0.01  # 100*42   x1 가중치
     W = np.random.randn(h_size, h_size) * 0.01      # 100*100  h0 가중치
     V = np.random.randn(vocab_size, h_size) * 0.01  # 42*100   h1 가중치
+
+    # print('init_weights U shape = ', U.shape)
+    # print('init_weights W shape = ', W.shape)
+    # print('init_weights V shape = ', V.shape)
+
+    # init_weights  U shape = (100, 42)
+    # init_weights  W shape = (100, 100)
+    # init_weights  V shape = (42, 100)
+
+    # print('init_weights U  = ', U)
+    #
+    # [[0.00866254 - 0.00345567  0.01051043...    0.00677608 - 0.0156563    0.00699676]
+    #  [-0.01529971  0.00725647 - 0.0013497...  - 0.0031064  - 0.00179495 - 0.00144175]
+    #  [0.00761764    0.00502334 - 0.01789428... - 0.00665269   0.01618736 - 0.00589379]
+    #  ...
+    #  [-0.00665883   0.01887875 - 0.00791347...   0.0237582  - 0.00564357   0.00872708]
+    #  [-0.01004637  0.00907099  - 0.01513228...   0.00460009   0.01204605   0.01948734]
+    #  [0.00414538 - 0.01077217    0.0108689...  - 0.00910713   0.01076645 - 0.00173939]]
+
     return U,W,V
 
 def feedforward(inputs, targets, hprev):
+
     loss = 0
     xs, hs, ps, ys = {}, {}, {}, {}
     hs[-1] = np.copy(hprev)
@@ -32,9 +53,11 @@ def feedforward(inputs, targets, hprev):
 
         xs[i] = np.zeros((vocab_size, 1))   # vocab_size = 42  => [42,1]
 
-        # xs[i] = [[0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.]
-        #          [0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.]
-        #          [0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.]]
+        # xs[i] = [[0.][0.][0.][0.][0.][0.][0.][0.][0.][0.]
+        #          [0.][0.][0.][0.][0.][0.][0.][0.][0.][0.]
+        #          [0.][0.][0.][0.][0.][0.][0.][0.][0.][0.]
+        #          [0.][0.][0.][0.][0.][0.][0.][0.][0.][0.]
+        #          [0.][0.]]
 
         # print('xs[i], inputs[i] =', xs[i], inputs[i])
         # [i], inputs[i] = [0] 7
@@ -94,6 +117,7 @@ def backward(ps, hs, xs):
 
         for d in [dU, dW, dV]:
             np.clip(d, -1, 1, out=d)
+
     return dU, dW, dV, hs[len(inputs) - 1]
 
 def predict(word, length):
@@ -117,7 +141,7 @@ def predict(word, length):
 
 
 # 기본적인 parameters
-epochs = 1000
+epochs = 1
 h_size = 100
 seq_len = 3
 learning_rate = 1e-2
@@ -148,9 +172,17 @@ hprev = np.zeros((h_size, 1))
 
 for epoch in range(epochs):     
                    # 43-3 = 40
-    for p in range(len(tokens)-seq_len):   # seq_len이 3이므로 전체 문자열(43)에서 3을 뺀 만큼 반복함
+    for p in range(len(tokens)-seq_len):   # seq_len이 3이므로 전체 문자열(43)에서 3을 뺀 40번 만큼 반복함
 
-        # print('len(tokens)-seq_len , p, p + seq_len  =', len(tokens)-seq_len, p, p + seq_len)
+        # print('len(tokens)-seq_len, p, p + seq_len  =', len(tokens)-seq_len, p, p + seq_len)
+        # len(tokens) - seq_len, p, p + seq_len = 40 0 3
+        # len(tokens) - seq_len, p, p + seq_len = 40 0 3
+        # len(tokens) - seq_len, p, p + seq_len = 40 1 4
+        # .............
+        # len(tokens) - seq_len, p, p + seq_len = 40 37 40
+        # len(tokens) - seq_len, p, p + seq_len = 40 38 41
+        # len(tokens) - seq_len, p, p + seq_len = 40 39 42
+
         inputs = [word_to_ix[tok] for tok in tokens[p:p + seq_len]]
 
         # print('inputs =', inputs)
