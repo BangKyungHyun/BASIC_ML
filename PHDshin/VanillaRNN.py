@@ -45,29 +45,59 @@ def init_weights(h_size, vocab_size):
 
 def feedforward(inputs, targets, hprev):
 
+    # print('feedforward inputs = ', inputs)
+    # print('feedforward targets = ', targets)
+    # print('feedforward hprev = ', hprev)
+
+    # feedforward inputs = [39, 3, 11] 예) 나라의 말씀이 중국과
+    # feedforward targets = [3, 11, 7] 예) 말씀이 중국과 달라
+    # feedforward hprev = [[0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.]
+    #                      [0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.]
+    #                      [0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.]
+    #                      [0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.]
+    #                      [0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.]]
+    #                      예) [0.] 이 100개임
+
     loss = 0
+
     xs, hs, ps, ys = {}, {}, {}, {}
+
+    # 이전 은닉값을 0를 100개로 초기화
     hs[-1] = np.copy(hprev)
 
     for i in range(seq_len):     # seq_len = 3
 
+        # 입력값 초기화
         xs[i] = np.zeros((vocab_size, 1))   # vocab_size = 42  => [42,1]
 
-        # xs[i] = [[0.][0.][0.][0.][0.][0.][0.][0.][0.][0.]
-        #          [0.][0.][0.][0.][0.][0.][0.][0.][0.][0.]
-        #          [0.][0.][0.][0.][0.][0.][0.][0.][0.][0.]
-        #          [0.][0.][0.][0.][0.][0.][0.][0.][0.][0.]
+        # xs[i] = [[0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.]
+        #          [0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.]
         #          [0.][0.]]
 
-        # print('xs[i], inputs[i] =', xs[i], inputs[i])
-        # [i], inputs[i] = [0] 7
+        # xs[i][0] = 9
+        # xs[i][1] = 11
+        # xs[i] = [[9.][11.][0.][0.][0.][0.][1.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.]
+        #          [0.][0.] [0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.]
+        #          [0.][0.]]
 
-        xs[i][inputs[i]] = 1  # 각각의 word에 대한 one hot coding
+        # print('feedforward inputs[i] =', inputs[i])
+        # inputs[i] = 0    예) 나라의
 
-        # print('xs[i] =', xs[i])
-        # xs[i] = [[0.][0.][0.][0.][0.][0.][0.][1.][0.][0.][0.][0.][0.][0.]
-        #          [0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.]
-        #          [0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.]]
+
+        # 초기화된 입력값에 각각의 word에 대한 one hot coding
+        xs[i][inputs[i]] = 1
+        # print('feedforwardxs[i][inputs[i]] =', xs[i][inputs[i]])
+        # feedforwardxs[i][inputs[i]] = [1.]
+
+        # print('feedforward xs[i] =', xs[i])
+        # xs[i] = [[1.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.]
+        #          [0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.]
+        #          [0.][0.]]
+
+        # print('def feedforward(inputs, targets, hprev): = ', i)
+        # def feedforward(inputs, targets, hprev): = 0
+        # def feedforward(inputs, targets, hprev): = 1
+        # def feedforward(inputs, targets, hprev): = 2
 
         hs[i] = np.tanh(np.dot(U, xs[i]) + np.dot(W, hs[i - 1]))
         ys[i] = np.dot(V, hs[i])
@@ -120,25 +150,87 @@ def backward(ps, hs, xs):
 
     return dU, dW, dV, hs[len(inputs) - 1]
 
+#===============================================================================
+#===============================================================================
 def predict(word, length):
 
-    print('length = ', length)
     x = np.zeros((vocab_size, 1))
     x[word_to_ix[word]] = 1    # 입력단어를 원핫인코딩 처리
+
+    print('predict word =', word)
+    print('predict length = ', length)
+    print('predict x[word_to_ix[word]] =', x[word_to_ix[word]])
+    print('predict h_size =', h_size)
+
     ixes = []
     h = np.zeros((h_size,1))
 
     for t in range(length):
+        #print('predict x =', x)
+        # x = [[1.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.]
+        #      [0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.][0.]
+        #      [0.][0.]]
         h = np.tanh(np.dot(U, x) + np.dot(W, h))
         y = np.dot(V, h)
         p = np.exp(y) / np.sum(np.exp(y))    # 소프트맥스
+
         ix = np.argmax(p)                    # 가장 높은 확률의 index를 리턴
+
         x = np.zeros((vocab_size, 1))        # 다음번 input x를 준비
         x[ix] = 1
-        ixes.append(ix)
-    pred_words = ' '.join(ix_to_word[i] for i in ixes)
-    return pred_words
+        print('predict ix, x[ix] = ', ix, x[ix])
 
+        ixes.append(ix)
+
+    # predict ix, x[ix] =  30 [1.]
+    # predict ix, x[ix] =  36 [1.]
+    # predict ix, x[ix] =  25 [1.]
+    # predict ix, x[ix] =  13 [1.]
+    # predict ix, x[ix] =  29 [1.]
+    # predict ix, x[ix] =  30 [1.]
+    # predict ix, x[ix] =  36 [1.]
+    # predict ix, x[ix] =  25 [1.]
+    # predict ix, x[ix] =  13 [1.]
+    # predict ix, x[ix] =  29 [1.]
+    # predict ix, x[ix] =  30 [1.]
+    # predict ix, x[ix] =  36 [1.]
+    # predict ix, x[ix] =  25 [1.]
+    # predict ix, x[ix] =  13 [1.]
+    # predict ix, x[ix] =  29 [1.]
+    # predict ix, x[ix] =  30 [1.]
+    # predict ix, x[ix] =  36 [1.]
+    # predict ix, x[ix] =  25 [1.]
+    # predict ix, x[ix] =  13 [1.]
+    # predict ix, x[ix] =  29 [1.]
+    # predict ix, x[ix] =  30 [1.]
+    # predict ix, x[ix] =  36 [1.]
+    # predict ix, x[ix] =  25 [1.]
+    # predict ix, x[ix] =  13 [1.]
+    # predict ix, x[ix] =  29 [1.]
+    # predict ix, x[ix] =  30 [1.]
+    # predict ix, x[ix] =  36 [1.]
+    # predict ix, x[ix] =  25 [1.]
+    # predict ix, x[ix] =  13 [1.]
+    # predict ix, x[ix] =  29 [1.]
+    # predict ix, x[ix] =  30 [1.]
+    # predict ix, x[ix] =  36 [1.]
+    # predict ix, x[ix] =  25 [1.]
+    # predict ix, x[ix] =  13 [1.]
+    # predict ix, x[ix] =  29 [1.]
+    # predict ix, x[ix] =  30 [1.]
+    # predict ix, x[ix] =  36 [1.]
+    # predict ix, x[ix] =  25 [1.]
+    # predict ix, x[ix] =  13 [1.]
+    # predict ix, x[ix] =  29 [1.]
+    # predict ixes =  [30, 36, 25, 13, 29, 30, 36, 25, 13, 29, 30, 36, 25, 13, 29, 30, 36, 25, 13, 29, 30, 36, 25, 13, 29, 30, 36, 25, 13, 29, 30, 36, 25, 13, 29, 30, 36, 25, 13, 29]
+
+    print('predict ixes = ', ixes)
+
+    pred_words = ' '.join(ix_to_word[i] for i in ixes)
+
+    # 까닭으로 바가 뜻을 능히 통하지 까닭으로 바가 뜻을 능히 통하지 까닭으로 바가 뜻을 능히 통하지 까닭으로 바가 뜻을 능히 통하지 까닭으로 바가 뜻을 능히 통하지 까닭으로 바가 뜻을 능히 통하지 까닭으로 바가 뜻을 능히 통하지 까닭으로 바가 뜻을 능히 통하지
+
+    return pred_words
 
 # 기본적인 parameters
 epochs = 1
@@ -149,28 +241,29 @@ learning_rate = 1e-2
 tokens, vocab_size, word_to_ix, ix_to_word = data_preprocessing(data)
 
 print('tokens =', tokens)
-print('vocab_size =', vocab_size)
-# vocab_size = 42
 print('word_to_ix =', word_to_ix)
 print('ix_to_word =', ix_to_word)
-
 #                         100,    42
 U, W, V = init_weights(h_size, vocab_size)
 
-print('len(U) =',len(U))
-print('len(W) =',len(W))
-print('len(V) =',len(V))
+print('U.shape =',U.shape)
+print('W.shape =',W.shape)
+print('V.shape =',V.shape)
 print('len(tokens) =', len(tokens))
+# len(tokens) = 43
+print('vocab_size =', vocab_size)
+# vocab_size = 42
 
 # len(U) = 100
 # len(W) = 100
 # len(V) = 42
-
 p = 0
 hprev = np.zeros((h_size, 1))
 # print('hprev =',hprev)
 
-for epoch in range(epochs):     
+for epoch in range(epochs):
+
+    # count = 0
                    # 43-3 = 40
     for p in range(len(tokens)-seq_len):   # seq_len이 3이므로 전체 문자열(43)에서 3을 뺀 40번 만큼 반복함
 
@@ -185,12 +278,19 @@ for epoch in range(epochs):
 
         inputs = [word_to_ix[tok] for tok in tokens[p:p + seq_len]]
 
+        # token_seq = tokens[p]
+        # print('[word_to_ix[token_seq]] = ', [word_to_ix[token_seq]])
+        # [word_to_ix[token_seq]] = [26]  예) 나라의
+        # [word_to_ix[token_seq]] = [23]  예) 말이
+        # .....
+        # [word_to_ix[token_seq]] = [23]  예) 편안케
+
         # print('inputs =', inputs)
-        # inputs = [18, 23, 21]  나라의 말씀이 중국과
+        # inputs = [18, 23, 21] 예) 나라의 말씀이 중국과
 
         targets = [word_to_ix[tok] for tok in tokens[p + 1:p + seq_len + 1]]
         # print('targets =', targets)
-        # targets = [23, 21, 2] 말씀이 중국과 달라
+        # targets = [23, 21, 2] 예) 말씀이 중국과 달라
 
         loss, ps, hs, xs = feedforward(inputs, targets, hprev)
 
@@ -201,7 +301,8 @@ for epoch in range(epochs):
         U -= learning_rate * dU
         V -= learning_rate * dV
 
-        # p += seq_len
+        # count += 1
+        # print('loop count = ',count)
 
     if epoch % 100 == 0:
         print(f'epoch {epoch}, loss: {loss}')
