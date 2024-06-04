@@ -99,10 +99,11 @@ def feedforward(inputs, targets, hprev):
         # def feedforward(inputs, targets, hprev): = 1
         # def feedforward(inputs, targets, hprev): = 2
 
-        hs[i] = np.tanh(np.dot(U, xs[i]) + np.dot(W, hs[i - 1]))
+        hs[i] = np.tanh(np.dot(U, xs[i]) + np.dot(W, hs[i - 1]))  # hidden state 계산
         ys[i] = np.dot(V, hs[i])
         ps[i] = np.exp(ys[i]) / np.sum(np.exp(ys[i]))  # softmax계산
         loss += -np.log(ps[i][targets[i], 0])
+        print('feedforward i ys[i], ps[i], targets[i], loss =',i, ys[i], ps[i], targets[i], loss)
 
     return loss, ps, hs, xs
 
@@ -307,12 +308,12 @@ for epoch in range(epochs):
     if epoch % 100 == 0:
         print(f'epoch {epoch}, loss: {loss}')
 
-while 1:
-    try:
-        user_input = input("input: ")
-        if user_input == 'break':
-            break
-        response = predict(user_input,40)
-        print(response)
-    except:
-        print('Uh oh try again!')
+# while 1:
+#     try:
+#         user_input = input("input: ")
+#         if user_input == 'break':
+#             break
+#         response = predict(user_input,40)
+#         print(response)
+#     except:
+#         print('Uh oh try again!')
