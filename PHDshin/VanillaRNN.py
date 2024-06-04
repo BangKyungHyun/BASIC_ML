@@ -60,7 +60,7 @@ def feedforward(inputs, targets, hprev):
 
     loss = 0
 
-    xs, hs, ps, ys = {}, {}, {}, {}
+    xs, hs, ps, ys, hs1,  hs2 = {}, {}, {}, {}, {}, {}
 
     # 이전 은닉값을 0를 100개로 초기화
     hs[-1] = np.copy(hprev)
@@ -99,11 +99,21 @@ def feedforward(inputs, targets, hprev):
         # def feedforward(inputs, targets, hprev): = 1
         # def feedforward(inputs, targets, hprev): = 2
 
+        # u : 100*42 , xs[i] 42* 1  => 100*1
+        # hs1[i] = np.dot(U, xs[i])
+        # hs2[i] = np.dot(W, hs[i - 1])  # hidden state 계산
+
         hs[i] = np.tanh(np.dot(U, xs[i]) + np.dot(W, hs[i - 1]))  # hidden state 계산
         ys[i] = np.dot(V, hs[i])
         ps[i] = np.exp(ys[i]) / np.sum(np.exp(ys[i]))  # softmax계산
+
         loss += -np.log(ps[i][targets[i], 0])
-        print('feedforward i ys[i], ps[i], targets[i], loss =',i, ys[i], ps[i], targets[i], loss)
+
+        global total_count   # 전역 변수 선언
+        total_count += 1
+        # print('feedforward hs[i] ys[i] ps[i] =',hs1[i], hs2[i],hs[i], ys[i], ps[i])
+
+        print('feedforward total_count, i ys[i], ps[i], targets[i], loss =',total_count, i, ys[i], ps[i], targets[i], loss)
 
     return loss, ps, hs, xs
 
@@ -238,6 +248,7 @@ epochs = 1
 h_size = 100
 seq_len = 3
 learning_rate = 1e-2
+total_count = 0
 
 tokens, vocab_size, word_to_ix, ix_to_word = data_preprocessing(data)
 
