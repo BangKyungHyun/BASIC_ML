@@ -1,5 +1,8 @@
+import torch
+import torch.nn as nn
 import numpy as np
 import re
+
 
 data = """
 나라의 말이 중국과 달라 문자와 서로 통하지 아니하기에 이런 까닭으로 어리석은 백성이 이르고자 할 바가 있어도 마침내 제 뜻을 능히 펴지 못할 사람이 많으니라 내가 이를 위해 가엾이 여겨 새로 스물여덟 글자를 만드노니 사람마다 하여 쉬이 익혀 날로 씀에 편안케 하고자 할 따름이니라
@@ -60,7 +63,7 @@ def feedforward(inputs, targets, hprev):
 
     loss = 0
 
-    xs, hs, ps, ys, hs1,  hs2 = {}, {}, {}, {}, {}, {}
+    xs, hs, ps, ys, hs1,  hs2, y_hat = {}, {}, {}, {}, {}, {}, {}
 
     # 이전 은닉값을 0를 100개로 초기화
     hs[-1] = np.copy(hprev)
@@ -100,20 +103,31 @@ def feedforward(inputs, targets, hprev):
         # def feedforward(inputs, targets, hprev): = 2
 
         # u : 100*42 , xs[i] 42* 1  => 100*1
-        # hs1[i] = np.dot(U, xs[i])
-        # hs2[i] = np.dot(W, hs[i - 1])  # hidden state 계산
+        hs1[i] = np.dot(U, xs[i])
+        hs2[i] = np.dot(W, hs[i - 1])  # hidden state 계산
 
         hs[i] = np.tanh(np.dot(U, xs[i]) + np.dot(W, hs[i - 1]))  # hidden state 계산
         ys[i] = np.dot(V, hs[i])
         ps[i] = np.exp(ys[i]) / np.sum(np.exp(ys[i]))  # softmax계산
 
+        # torch.tensor(y_hat[i])
+
+        y_hat = np.argmax(ps[i])                    # 가장 높은 확률의 index를 리턴
+
+        # print('feedforward i, y_hat[i], targets[i] =', i, y_hat[i], targets[i], targets[i].size)
+
+        # print('feedforward i, y_hat[i], targets[i] =', i, y_hat[i], targets[i], y_hat[i].size, targets[i].size)
+
+        # loss = bce_loss(y_hat, targets[i])
         loss += -np.log(ps[i][targets[i], 0])
 
         global total_count   # 전역 변수 선언
         total_count += 1
-        # print('feedforward hs[i] ys[i] ps[i] =',hs1[i], hs2[i],hs[i], ys[i], ps[i])
+        # print('feedforward hs[i] ys[i] ps[i] =', hs1[i], hs2[i],hs[i], ys[i], ps[i])
 
-        print('feedforward total_count, i ys[i], ps[i], targets[i], loss =',total_count, i, ys[i], ps[i], targets[i], loss)
+        # print('feedforward total_count, i, xs[i],y_hat[i],  ys[i], ps[i], targets[i], loss =',total_count, i, inputs[i], y_hat, ys[i], ps[i], targets[i], loss)
+        print('feedforward i, y_hat[i], targets[i] loss =', i, y_hat, targets[i], loss)
+
 
     return loss, ps, hs, xs
 
@@ -244,11 +258,12 @@ def predict(word, length):
     return pred_words
 
 # 기본적인 parameters
-epochs = 1
+epochs = 1000
 h_size = 100
 seq_len = 3
 learning_rate = 1e-2
 total_count = 0
+bce_loss = nn.BCELoss()
 
 tokens, vocab_size, word_to_ix, ix_to_word = data_preprocessing(data)
 
@@ -319,12 +334,12 @@ for epoch in range(epochs):
     if epoch % 100 == 0:
         print(f'epoch {epoch}, loss: {loss}')
 
-# while 1:
-#     try:
-#         user_input = input("input: ")
-#         if user_input == 'break':
-#             break
-#         response = predict(user_input,40)
-#         print(response)
-#     except:
-#         print('Uh oh try again!')
+while 1:
+    try:
+        user_input = input("input: ")
+        if user_input == 'break':
+            break
+        response = predict(user_input,40)
+        print(response)
+    except:
+        print('Uh oh try again!')
