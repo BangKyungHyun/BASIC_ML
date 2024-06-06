@@ -100,7 +100,7 @@ print(f'Number of testing examples: {len(test_data)}')
 ################################################################################
 
 # 단어 집합이란 IMDB 데이터셋에 포함된 단어들을 이용하여 하나의 딕셔너리와 같은 집합을 만듬
-# 단어 집합을 만들때는 단어들의 중복은 제거된 상태에서 제거
+# 단어 집합을 만들때는 단어들의 중복은 제거된 상태에서 진행
 
 # 단어 집합 생성은 TEXT.build_vocab()을 이용
 # train_data : 훈련 데이터셋
@@ -120,8 +120,8 @@ LABEL.build_vocab(train_data)
 # print(f"Unique tokens in TEXT vocabulary: {len(TEXT.vocab)}")
 # print(f"Unique tokens in LABEL vocabulary: {len(LABEL.vocab)}")
 
-# Unique tokens in TEXT vocabulary: 10002
-# Unique tokens in LABEL vocabulary: 3
+# Unique tokens in TEXT vocabulary: 10002 => <unk>': 0, '<pad>': 1 가 추가되어 10002 개가 됨
+# Unique tokens in LABEL vocabulary: 3 => <unk>': 0 이 추가되어 3개가 됨
 
 ################################################################################
 # 테스트 데이터셋의 단어 집합 확인
@@ -130,7 +130,10 @@ LABEL.build_vocab(train_data)
 # LABEL.vocab.stoi을 통해 현재 단어 집합의 단어와 그것에 부여된 고유정수(인덱스)를 확인
 # <unk>는 사전에 없는 단어를 의미
 
-# print(TEXT.vocab.stoi)
+print(TEXT.vocab.stoi)
+
+# defaultdict(<bound method Vocab._default_unk_index of <torchtext.legacy.vocab.Vocab object at 0x0000014C2DA44160>>, {'<unk>': 0, '<pad>': 1, 'the': 2, 'and': 3, 'a': 4, 'of': 5, 'to': 6, 'is': 7, 'in': 8, 'it': 9, 'i': 10, 'this': 11, 'that': 12, 'was': 13, 'as': 14, 'with': 15, 'for': 16, 'movie': 17, 'but': 18, 'film': 19, 'on': 20, 'not': 21})
+# defaultdict(<bound method Vocab._default_unk_index of <torchtext.legacy.vocab.Vocab object at 0x0000014C51ABC0D0>>, {'<unk>': 0, 'pos': 1, 'neg': 2})
 
 # defaultdict(<bound method Vocab._default_unk_index of <torchtext.legacy.vocab.Vocab object at 0x00000285A6584280>>, {'<unk>': 0, '<pad>': 1, 'the': 2, 'and': 3, 'a': 4, 'of': 5, 'to': 6, 'is': 7, 'in':
 #  ......................................
@@ -160,7 +163,7 @@ hidden_size = 300
 # BucketIterator()는 데이터 로더와 쓰임새가 같음. 즉, 배치 크기 단위로 값을 차례대로 꺼내어
 # 메모리로 가져오고 싶을 때 사용
 # 특히 Field에서 fix_length를 사용하지 않는다면 BucketIterator()에서 데이터 길이를 조정할 수 있음
-# BucketIterator()는 비슷한 길이의 데이터를 한 배치에 할당하여 패딩을 최소화 시팀
+# BucketIterator()는 비슷한 길이의 데이터를 한 배치에 할당하여 패딩을 최소화 시킴
 # 1번째 파라미터 : 배치 크기 단위로 데이터를 가져올 데이터셋
 # 2번째 파라미터 : 한번에 가져올 데이터 크기(배치 크기)
 # 3번째 파라미터 : 어떤 장치(CPU OR GPU)를 사용할 지 결정
@@ -178,7 +181,7 @@ train_iterator, valid_iterator, test_iterator = \
 
 class RNNCell_Encoder(nn.Module):
 
-    # hidden_size = 300
+    #                  input_dim = 100, hidden_size = 300
     def __init__(self, input_dim, hidden_size):
         super(RNNCell_Encoder, self).__init__()
 
@@ -223,7 +226,7 @@ class Net(nn.Module):
         # len(TEXT.vocab.stoi) : 임베딩을 할 단어 수(단어 집합의 크기)
         # embeding_dim : 임베딩할 벡터의 차원 ==> 100
         self.em = nn.Embedding(len(TEXT.vocab.stoi), embeding_dim)
-
+        #                           embeding_dim = 100, hidden_size =  300
         self.rnn = RNNCell_Encoder(embeding_dim, hidden_size)
         self.fc1 = nn.Linear(hidden_size, 256)
         self.fc2 = nn.Linear(256, 3)
@@ -274,7 +277,10 @@ def training(epoch, model, trainloader, validloader):
         loss.backward()
         optimizer.step()
 
+        # torch.no_grad()의 주된 목적은 autograd를 끔으로써 메모리 사용량을 줄이고 연산 속도를 높히기 위함
         with torch.no_grad():
+            print('y_pred, torch.argmax(y_pred, dim=1), y =', y_pred, torch.argmax(y_pred, dim=1), y)
+
             y_pred = torch.argmax(y_pred, dim=1)
             correct += (y_pred == y).sum().item()
             total += y.size(0)
