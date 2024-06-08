@@ -18,8 +18,18 @@ TEXT = torchtext.legacy.data.Field(sequential = True, batch_first = True, lower 
 LABEL = torchtext.legacy.data.Field(sequential = False, batch_first = True)
 
 from torchtext.legacy import datasets
+
 train_data, test_data = datasets.IMDB.splits(TEXT, LABEL)
 train_data, valid_data = train_data.split(split_ratio = 0.8)
+
+# print(vars(train_data.examples[0]))
+# {'text': ["it's", 'been', 'about', '14', 'years', 'since', 'sharon', 'stone', 'awarded', 'viewers', 'a', 'leg-crossing', 'that', 'twisted', 'many', "people's", 'minds.', 'and', 'now,', 'god', 'knows', 'why,', "she's", 'in', 'the', 'game', 'again.', '"basic', 'instinct', '2"', 'is', 'the', 'sequel', 'to', 'the', 'smash-hit', 'erotica', '"basic', 'instinct"', 'featuring', 'a', 'sexy', 'stone', 'and', 'a', 'vulnerable', 'michael', 'douglas.', 'however,', 'fans', 'of', 'the', 'original', 'might', 'not', 'even', 'get', 'close', 'to', 'this', 'one,', 'since', '"instinct', '2"', 'is', 'painful', 'film-making,', 'as', 'the', 'mediocre', 'director', 'michael', 'caton-jones', 'assassinates', 'the', 'legacy', 'of', 'the', 'first', 'film.<br', '/><br', '/>the', 'plot', 'of', 'the', 'movie', 'starts', 'when', 'a', 'car', 'explosion', 'breaks', 'in', 'right', 'at', 'the', 'beginning.', 'catherine', 'tramell', '(sharon', 'stone,', 'trying', 'to', 'look', 'forcefully', 'sexy)', 'is', 'a', 'suspect', 'and', 'appears', 'to', 'be', 'involved', 'in', 'the', 'murder.', 'a', 'psychiatrist', '(a', 'horrible', 'david', 'morrisey)', 'is', 'appointed', 'to', 'examine', 'her,', 'but', 'eventually', 'falls', 'for', 'an', 'intimate', 'game', 'of', 'seduction.<br', '/><br', '/>and', 'there', 'it', 'is,', 'without', 'no', 'further', 'explanations,', 'the', 'basic', 'force', 'that', 'moves', 'this', '"instinct".', 'nothing', 'much', 'is', 'explained', 'and', 'we', 'have', 'to', 'sit', 'through', 'a', 'sleazy,', 'c-class', 'erotic', 'film.', 'sharon', 'stone', 'stars', 'in', 'her', 'first', 'role', 'where', 'she', 'is', 'most', 'of', 'the', 'time', 'a', 'turn-off.', 'part', 'of', 'it', 'because', 'of', 'the', 'amateurish', 'writing,', 'the', 'careless', 'direction,', 'and', 'terrifyingly', 'low', 'chemistry.', 'the', 'movie', 'is', 'full', 'of', 'vulgar', 'dialogues', 'and', 'even', 'more', 'sexuality', '(a', 'menage', 'a', 'trois', 'scene', 'was', 'cut', 'off', 'so', 'that', 'this', "wouldn't", 'be', 'rated', 'nc-17)', 'than', 'the', 'first', 'entrance', 'in', 'the', 'series.', '"instinct"', 'is', 'a', 'compelling', 'torture.<br', '/><br', '/>to', 'top', 'it', 'off,', 'everything', 'that', 'made', 'the', 'original', 'film', 'a', 'guilty', 'pleasure', 'is', 'not', 'found', 'anywhere', 'in', 'the', 'film.', 'the', 'acting', 'here', 'is', 'really', 'bad.', 'sharon', 'stone', 'has', 'some', 'highlights,', 'but', 'here,', 'she', 'gets', 'extremely', 'obnoxious.', 'david', 'morrisey', 'stars', 'in', 'the', 'worst', 'role', 'of', 'his', 'life,', 'and', 'seems', 'to', 'never', 'make', 'more', 'than', 'two', 'expressions', 'in', 'the', 'movie-', 'confused', 'and', 'aroused.', '"instinct', '2"', 'is', 'a', 'horrible', 'way', 'to', 'continue', 'an', 'otherwise', 'original', 'series,', 'that', 'managed', 'to', 'put', 'in', 'thriller', 'with', 'erotica', 'extremely', 'well.', 'paul', 'verhoeven,', 'how', 'i', 'miss', 'you....<br', '/><br', '/>"basic', 'instinct', '2"', 'never', 'sounded', 'like', 'a', 'good', 'movie,', 'and,', 'indeed,', 'it', "isn't.", 'some', 'films', 'should', 'never', 'get', 'out', 'of', 'paper,', 'and', 'that', 'is', 'the', 'feeling', 'you', 'get', 'after', 'watching', 'this.', 'now,', 'it', 'is', 'much', 'easier', 'to', 'understand', 'why', 'douglas', 'and', 'david', 'cronenberg', 'dropped', 'out,', 'and', 'why', 'sharon', 'stone', 'was', 'expecting', 'a', 'huge', 'paycheck', 'for', 'this......-----3/10'], 'label': 'neg'}
+
+# print(train_data.examples[0])
+# <torchtext.legacy.data.example.Example object at 0x0000024CF7D63910>
+
+# print(vars(train_data.examples))
+# TypeError: vars() argument must have __dict__ attribute
 
 TEXT.build_vocab(train_data, max_size=10000, min_freq=10, vectors=None)
 LABEL.build_vocab(train_data)
@@ -34,16 +44,28 @@ device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 # BucketIterator을 이용하여 훈련, 검증, 테스트 데이터셋으로 분리
 
 train_iterator, valid_iterator, test_iterator = torchtext.legacy.data.BucketIterator.splits(
-    (train_data, valid_data, test_data),
-    batch_size = BATCH_SIZE,
-    device = device)
+    (train_data, valid_data, test_data), batch_size = BATCH_SIZE, device = device)
 
 ################################################################################
 # 변수 값 지정
 ################################################################################
 
 vocab_size = len(TEXT.vocab)
+print('TEXT.vocab = ', TEXT.vocab)
+# TEXT.vocab =  <torchtext.legacy.vocab.Vocab object at 0x0000018F8C91E8E0>
 
+print('len(TEXT.vocab) = ', len(TEXT.vocab))
+# len(TEXT.vocab) =  10002
+
+print(TEXT.vocab.stoi)
+# defaultdict(<bound method Vocab._default_unk_index of <torchtext.legacy.vocab.Vocab object at 0x000002486EA8E910>>, {'<unk>': 0, '<pad>': 1, 'the': 2, 'a': 3, 'and': 4, 'of': 5, 'to': 6,
+# 'is': 7, 'in': 8, 'i': 9, 'this': 10, 'that': 11, 'it': 12, '/><br': 13, 'was': 14, 'as': 15, 'for': 16, 'with': 17, 'but': 18, 'on': 19, 'movie': 20, 'his': 21, 'are': 22, 'not': 23, 'film':
+# 24, 'you': 25, 'have': 26, 'he': 27, 'be': 28, 'at': 29, 'one': 30, 'by': 31, 'an': 32, 'they': 33, 'from': 34, 'all': 35, 'who': 36, 'like': 37, 'so': 38, 'just': 39, 'or': 40, 'has': 41,
+# 'her': 42, 'about': 43, "it's":
+# -----------
+# 9972, 'relates': 9973, 'revolution,': 9974, 'rhyme': 9975, 'ride,': 9976, 'riff': 9977, 'rivers': 9978, 'road.': 9979, 'rookie': 9980, 'sake,': 9981, 'sale': 9982,
+# 'sarandon': 9983, 'scale.': 9984, 'scheming': 9985, 'secure': 9986, 'senator': 9987, 'serials': 9988, 'seth': 9989, 'sexuality,': 9990, 'shop,': 9991, 'sight.': 9992, 'smile.': 9993,
+# 'snowman': 9994, 'so-so': 9995, 'soul,': 9996, 'spade': 9997, 'span': 9998, 'speaking,': 9999, 'spectacle': 10000, 'spectacular.': 10001})
 # POS(긍정) NEG(부정)
 n_classes = 2
 
@@ -72,11 +94,15 @@ class BasicRNN(nn.Module):
         self.out = nn.Linear(self.hidden_dim, n_classes)
 
     def forward(self, x):
+
         x = self.embed(x)
+
         # 최초 은닉 상태의 값을 0으로 초기화
         h_0 = self._init_state(batch_size = x.size(0))
-            # RNN 계층을 의미하며, 파라미터로 입력과 이전 은닉 상태의 값을 받음
+
+        # RNN 계층을 의미하며, 파라미터로 입력과 이전 은닉 상태의 값을 받음
         x, _ = self.rnn(x, h_0)
+
         # 모든 네트워크를 거쳐서 가장 마지막에 나온 단어의 임베딩 값(마지막 은닉 상태의 값)
         h_t = x[:, -1, :]
         self.dropout(h_t)
@@ -84,10 +110,11 @@ class BasicRNN(nn.Module):
         return logit
 
     def _init_state(self, batch_size = 1):
+
         # 모델의 파라미터 값을 가져와서 weight 변수에 저장
         weight = next(self.parameters()).data
-        # 크기가(계층의 개수, 배치 크기, 은닉칭의 뉴런/유닛 개수)인 은닉상태(텐서)를 생성하여
-        # 0으로 초기화 한 반환
+        # 크기가(계층의 개수, 배치 크기, 은닉칭의 뉴런/유닛 개수)인 은닉상태(텐서)를 생성하여 0으로 초기화 한 반환
+
         return weight.new(self.n_layers, batch_size, self.hidden_dim).zero_()
 
 ################################################################################
@@ -105,8 +132,11 @@ optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
 ################################################################################
 
 def train(model, optimizer, train_iter):
+
     model.train()
+
     for b, batch in enumerate(train_iter):
+
         x, y = batch.text.to(device), batch.label.to(device)
         # sub()는 뺄셈에 대한 함수이며 함수명에 '-'이 붙은 것은 inplace 연산을 하겠다는 의미
         # 그리고 앞에서 IMDB의 레이블의 경우 긍정은 2, 부정은 1의 값을 갖음
@@ -165,7 +195,9 @@ BATCH_SIZE = 100
 LR = 0.001
 EPOCHS = 5
 for e in range(1, EPOCHS + 1):
+
     train(model, optimizer, train_iterator)
+
     val_loss, val_accuracy = evaluate(model, valid_iterator)
     print("[EPOCH: %d], Validation Loss: %5.2f | Validation Accuracy: %5.2f" % (e, val_loss, val_accuracy))
 
