@@ -1,5 +1,5 @@
 ################################################################################
-# 라이브러리 호출
+# 라이브러리 호출 2024.6.9 너무 어려움..다음에
 ################################################################################
 import torch
 import torch.nn as nn
@@ -86,11 +86,7 @@ print('num_epochs = ',num_epochs)
 
 class LSTMCell(nn.Module):
 
-    print('1. class LSTMCell(nn.Module): start')
-
     def __init__(self, input_size, hidden_size, bias=True):
-
-        print('1. def __init__: start')
 
         super(LSTMCell, self).__init__()
 
@@ -108,14 +104,9 @@ class LSTMCell(nn.Module):
         # self.h2h = Linear(in_features=128, out_features=512, bias=True)
 
         self.reset_parameters()
-        print('1. def __init__: end')
-
-    print('1-1. class LSTMCell(nn.Module): start')
 
     # 모델의 파라미터 초기화 (프로그램 실행 시 초기에 1번에 실행됨)
     def reset_parameters(self):
-
-        print('2. def reset_parameters(self): start')
 
         std = 1.0 / math.sqrt(self.hidden_size)  # math.sqrt 제곱근 계산 9의 제곱근은 3
         print('self.hidden_size =', self.hidden_size)
@@ -129,13 +120,7 @@ class LSTMCell(nn.Module):
         for w in self.parameters():
             w.data.uniform_(-std, std) # -std, std 사이의 임의의 실수인 난수 발생
 
-        print('2. def reset_parameters(self): end')
-
-    print('1-2. class LSTMCell(nn.Module): start')
-
     def forward(self, x, hidden):
-
-        print('2. def forward(self, x, hidden): start')
 
         # print('2. def forward(self, x, hidden): x.shape =', x.shape)
         # 2.def forward(self, x, hidden): x.shape = torch.Size([64, 28])
@@ -175,19 +160,13 @@ class LSTMCell(nn.Module):
         # torch.muldms 텐서에 곱셈을 할 때 사용
         hy = torch.mul(outgate, F.tanh(cy))
 
-        print('2. def forward(self, x, hidden): end')
-
         return (hy, cy)
-
-print('2. class LSTMCell(nn.Module): end')
 
 ################################################################################
 # LSTM 셀의 전반적인 네트워크
 ################################################################################
 
 class LSTMModel(nn.Module):
-
-    print('3. class LSTMModel(nn.Module) start')
 
     def __init__(self, input_dim, hidden_dim, layer_dim, output_dim, bias=True):
         super(LSTMModel, self).__init__()
@@ -201,7 +180,6 @@ class LSTMModel(nn.Module):
         # output_dim : 0~9까지의 숫자                        10
 
         self.lstm = LSTMCell(input_dim, hidden_dim, layer_dim)
-
         self.fc = nn.Linear(hidden_dim, output_dim)
 
 
@@ -225,6 +203,7 @@ class LSTMModel(nn.Module):
 
         for seq in range(x.size(1)):  # LSTM쉘 계층을 반복하여 쌓아 올림
             # 은닉상태(hh)와 셀 상태를 LSTMCell에 적용한 결과를 또 다시 hn, cn에 저장
+            print('x[:, seq, :], (hn, cn) =', x[:, seq, :], (hn, cn))
             hn, cn = self.lstm(x[:, seq, :], (hn, cn))
             outs.append(hn)
 
@@ -241,11 +220,7 @@ hidden_dim = 128
 layer_dim = 1
 output_dim = 10
 
-print ('5. model = LSTMModel(input_dim, hidden_dim, layer_dim, output_dim) start')
-
 model = LSTMModel(input_dim, hidden_dim, layer_dim, output_dim)
-
-print ('6. model = LSTMModel(input_dim, hidden_dim, layer_dim, output_dim) end')
 
 if torch.cuda.is_available():
     model.cuda()
