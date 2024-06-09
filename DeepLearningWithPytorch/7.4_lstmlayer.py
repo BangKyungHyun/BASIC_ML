@@ -24,7 +24,7 @@ device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 # https://finance.yahoo.com/quote/subx/history에서 가져옴
 ################################################################################
 
-data=pd.read_csv('data/SBUX.csv')
+data=pd.read_csv('../DATA/SBUX.csv')
 print(data.dtypes)
 # 스타벅스 주가 데이터넷의 각 컬럼과 데이터 타입을 보여줌
 # Date          object
@@ -171,7 +171,7 @@ class LSTM(nn.Module):
 # 변수 값 설정
 ################################################################################
 
-num_epochs = 100               # 100번의 에포크
+num_epochs = 600000               # 100번의 에포크
 learning_rate = 0.0001
 
 input_size = 5                  # 입력 데이터셋의 컬럼(feature) 갯수
@@ -190,13 +190,15 @@ optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 ################################################################################
 
 for epoch in range(num_epochs):
+
     outputs = model.forward(X_train_tensors_f) # Feed forward 학습
     optimizer.zero_grad()
     loss = criterion(outputs, y_train_tensors) # 손실 함수를 이용한 오차 계산
     loss.backward()    # 기울기 계산, 역전파
     optimizer.step()   # 오차 업데이트
+
     if epoch % 10000 == 0:
-        print("Epoch: %d, loss: %1.5f" % (epoch, loss.item()))
+        print("Epoch: %d, loss: %1.10f" % (epoch, loss.item()))
 
 ################################################################################
 # 모델 예측 결과를 출력하기 위한 데이터 크기 재구성
@@ -228,9 +230,3 @@ plt.plot(predicted, label='Predicted Data')
 plt.title('Time-Series Prediction')
 plt.legend()
 plt.show()
-
-
-
-
-
-

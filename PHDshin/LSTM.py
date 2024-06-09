@@ -194,7 +194,7 @@ class LSTM:
             self.C[t] = tanh(np.dot(self.Wc, self.X[t]) + self.bc)    # 후보자 게이트
             self.O[t] = sigmoid(np.dot(self.Wo, self.X[t]) + self.bo) # 출력 게이트
 
-            # 현재 셀 상태 = 이전 셀 상태 * 망각게이트 + 후보자게이트 * 입력게이트
+            # 현재 셀 상태 = (이전 셀 상태 * 망각게이트) + (후보자게이트 * 입력게이트)
             self.CS[t] = self.CS[t - 1] * self.F[t] + self.I[t] * self.C[t]
 
             # 은닉상태 = 출력 게이트 * 셀 상태
