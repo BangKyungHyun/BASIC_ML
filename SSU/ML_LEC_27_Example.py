@@ -131,8 +131,7 @@ class NeuralNetwork:
 
         self.b2 = self.b2 - self.learning_rate * loss_2
 
-    def predict(self,
-                input_data):  # input_data 는 행렬로 입력됨 즉, (1, 784) shape 을 가짐
+    def predict(self,input_data):  # input_data 는 행렬로 입력됨 즉, (1, 784) shape 을 가짐
 
         Z2 = np.dot(input_data, self.W2) + self.b2
         A2 = sigmoid(Z2)

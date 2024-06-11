@@ -125,11 +125,11 @@ X_test_tensors = Variable(torch.Tensor(X_test))
 y_test_tensors = Variable(torch.Tensor(y_test))
 
 # torch.reshape는 텐서의 형태를 바꿀 때 사용
-# 훈련 데이터셋(x_train_tensors)의 형태(200,5)fmf (200,1,5)로 변경하겠다는 의미
+# 훈련 데이터셋(x_train_tensors)의 형태(200,5)를 (200,1,5)로 변경하겠다는 의미
 # 이와 같이 데이터셋의 형태를 변경하는 이유는 LSTM네트워크의 입력 형태와 맞추기 위함
 #                                                           200               ,1, 5 
 X_train_tensors_f = torch.reshape(X_train_tensors, (X_train_tensors.shape[0], 1, X_train_tensors.shape[1]))
-X_test_tensors_f = torch.reshape(X_test_tensors, (X_test_tensors.shape[0], 1, X_test_tensors.shape[1]))
+X_test_tensors_f = torch.reshape(X_test_tensors,   (X_test_tensors.shape[0],  1, X_test_tensors.shape[1]))
 
 print("Training Shape", X_train_tensors_f.shape, y_train_tensors.shape)
 print("Testing Shape", X_test_tensors_f.shape, y_test_tensors.shape)
