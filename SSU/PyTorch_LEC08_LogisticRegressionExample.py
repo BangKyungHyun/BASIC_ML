@@ -41,7 +41,6 @@ for param in model.parameters():
 loss_function = nn.BCELoss()
 optimizer = torch.optim.SGD(model.parameters(), lr=1e-1)
 
-
 train_loss_list = []
 train_accuracy_list = []
 
@@ -50,6 +49,9 @@ nums_epoch = 3
 for epoch in range(nums_epoch+1):
 
     outputs = model(x_train)
+    # print('outputs.shape =', outputs.shape)
+    # outputs.shape = torch.Size([759, 1])
+    #
     # print('outputs =', outputs)
     # outputs = tensor([[0.4057],
     #                   [0.4356],
@@ -65,10 +67,13 @@ for epoch in range(nums_epoch+1):
 
 
     loss = loss_function(outputs, y_train)
-    # print('loss =', loss)
-    # print('loss.item() =', loss.item())
+    # print('loss.shape =', loss.shape)
+    # loss.shape = torch.Size([])
 
+    # print('loss =', loss)
     # loss = tensor(0.6997, grad_fn= < BinaryCrossEntropyBackward0 >)
+
+    # print('loss.item() =', loss.item())
     # loss.item() = 0.6791601181030273
     # loss.item() = 0.6749033331871033
     # loss.item() = 0.6710168123245239
@@ -83,6 +88,8 @@ for epoch in range(nums_epoch+1):
     # train_loss_list = [0.6791601181030273, 0.6749033331871033,0.6710168123245239, 0.6674610376358032]
 
     prediction = outputs > 0.5
+    # print('prediction.shape =', prediction.shape)
+    # prediction.shape = torch.Size([759, 1])
 
     # print('prediction =', prediction)
     # prediction = tensor([[False],
@@ -102,6 +109,9 @@ for epoch in range(nums_epoch+1):
     #                              [1.],
 
     correct = (prediction.float() == y_train)
+    # print('correct.shape =', correct.shape)
+    # correct.shape = torch.Size([759, 1])
+
     # print('correct =', correct)
     # correct = tensor([[True],
     #                   [False],
@@ -109,11 +119,20 @@ for epoch in range(nums_epoch+1):
     #                   [False],
 
     accuracy = correct.sum().item() / len(correct)
+    print('accuracy.shape =', accuracy.shape)
+    # AttributeError: 'float' object has no attribute 'shape'
+
     # print('len(correct) =', len(correct))
     # len(correct) = 759
     # len(correct) = 759
     # len(correct) = 759
 
+    # print('correct.sum() =', correct.sum())
+    # correct.sum() = tensor(445)
+    # correct.sum() = tensor(453)
+    # correct.sum() = tensor(456)
+    # correct.sum() = tensor(460)
+    #
     # print('correct.sum().item() =', correct.sum().item())
     # correct.sum().item() = 445
     # correct.sum().item() = 453
@@ -143,12 +162,14 @@ for epoch in range(nums_epoch+1):
     # epoch =  0  current loss =  0.6791601181030273  accuracy =  0.5862977602108037
 
 
-for name, child in model.named_children():
-    for param in child.parameters():
-        print(name, param)
+# for name, child in model.named_children():
+#     for param in child.parameters():
+#         print(name, param)
+#
+# for param in model.parameters():
+#     print(param)
 
-for param in model.parameters():
-    print(param)
+
 import matplotlib.pyplot as plt
 
 plt.title('Loss Trend')
