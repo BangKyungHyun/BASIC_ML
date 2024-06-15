@@ -117,9 +117,12 @@ for epoch in range(nums_epoch+1):
     #                   [False],
     #                   [True],
     #                   [False],
+    # print('correct =', correct.item())
+    # RuntimeError: a Tensor with 759 elements cannot be converted to Scalar
+    #
 
     accuracy = correct.sum().item() / len(correct)
-    print('accuracy.shape =', accuracy.shape)
+    # print('accuracy.shape =', accuracy.shape)
     # AttributeError: 'float' object has no attribute 'shape'
 
     # print('len(correct) =', len(correct))
@@ -132,6 +135,8 @@ for epoch in range(nums_epoch+1):
     # correct.sum() = tensor(453)
     # correct.sum() = tensor(456)
     # correct.sum() = tensor(460)
+
+    # item()은 tensor -> scalar로 변경하는 명령어
     #
     # print('correct.sum().item() =', correct.sum().item())
     # correct.sum().item() = 445
