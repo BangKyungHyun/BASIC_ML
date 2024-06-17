@@ -62,16 +62,17 @@ def model_train(dataloader, model, loss_function, optimizer):
     model.train()
 
     train_loss_sum = 0
-    train_correct = 0
-    train_total = 0
+    train_correct_cnt = 0
+    train_epoch_per_data_cnt = 0
+    i = 0
 
-    total_train_batch = len(dataloader)
-
+    train_epoch_per_loop_cnt = len(dataloader)
     print('len(dataloader) = ',len(dataloader))
     # 1594  = 51000/32
 
     for images, labels in dataloader: # images에는 이미지, labels에는 0-9 숫자
 
+        i += 1
         # reshape input image into [batch_size by 784]
         # label is not one-hot encoded
         x_train = images.view(-1, 28 * 28) #처음 크기는 (batch_size, 1, 28, 28) / 이걸 (batch_size, 784)로 변환
@@ -86,22 +87,21 @@ def model_train(dataloader, model, loss_function, optimizer):
 
         train_loss_sum += loss.item()
 
-        train_total += y_train.size(0)  # label 열 사이즈 같음
+        train_epoch_per_data_cnt += y_train.size(0)  # label 열 사이즈 같음
 
-        # print('y_train.size(0) =', y_train.size(0))
-        # y_train.size(0) = 32
+        # print('i, y_train.size(0) =', i, y_train.size(0))
+        # i, y_train.size(0) = 1594  32
 
-        train_correct += ((torch.argmax(outputs, 1)==y_train)).sum().item() # 예측한 값과 일치한 값의 합
+        train_correct_cnt += ((torch.argmax(outputs, 1)==y_train)).sum().item() # 예측한 값과 일치한 값의 합
 
-    train_avg_loss = train_loss_sum / total_train_batch
-    train_avg_accuracy = 100*train_correct / train_total
+    train_avg_loss = train_loss_sum / train_epoch_per_loop_cnt
+    train_avg_accuracy = 100*train_correct_cnt / train_epoch_per_data_cnt
 
-    print('train_avg_loss, train_loss_sum,  total_train_batch =', train_avg_loss,  train_loss_sum, total_train_batch)
-    print('train_avg_accuracy, train_correct, train_total =', train_avg_accuracy, train_correct, train_total)
+    print('train_avg_loss, train_loss_sum,  train_epoch_per_loop_cnt =', train_avg_loss,  train_loss_sum, train_epoch_per_loop_cnt)
+    print('train_avg_accuracy, train_correct_cnt, train_epoch_per_data_cnt =', train_avg_accuracy, train_correct_cnt, train_epoch_per_data_cnt)
     # len(dataloader) =  1594
-    # train_avg_loss, train_loss_sum,  total_train_batch = 0.9933313936406426 1583.3702414631844 1594
-    # train_avg_accuracy, train_correct, train_total = 67.69019607843137 34522 51000
-    # epoch: 01 train loss = 0.9933 train accuracy = 67.6902 validation loss = 0.6526 validation accuracy = 78.0556
+    # train_avg_loss, train_loss_sum,  train_epoch_per_loop_cnt = 0.9933313936406426 1583.3702414631844 1594
+    # train_avg_accuracy, train_correct_cnt, train_epoch_per_data_cnt = 67.69019607843137 34522 51000
 
     return (train_avg_loss, train_avg_accuracy)
 
