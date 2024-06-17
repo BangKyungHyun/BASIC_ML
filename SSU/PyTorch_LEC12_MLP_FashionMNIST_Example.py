@@ -17,8 +17,6 @@ test_dataset = datasets.FashionMNIST(root='FashionMNIST_data/', train=False,
                                      # 0~255까지의 값을 0~1 사이의 값으로 변환시켜줌
                                      download=True)
 
-
-
 print(len(train_dataset))
 
 train_dataset_size = int(len(train_dataset) * 0.85)
@@ -30,14 +28,11 @@ print(len(train_dataset), len(validation_dataset), len(test_dataset))
 
 BATCH_SIZE = 32
 
-train_dataset_loader = DataLoader(dataset=train_dataset, batch_size=BATCH_SIZE,
-                                  shuffle=True)
+train_dataset_loader = DataLoader(dataset=train_dataset, batch_size=BATCH_SIZE,shuffle=True)
 
-validation_dataset_loader = DataLoader(dataset=validation_dataset,
-                                       batch_size=BATCH_SIZE, shuffle=True)
+validation_dataset_loader = DataLoader(dataset=validation_dataset, batch_size=BATCH_SIZE, shuffle=True)
 
-test_dataset_loader = DataLoader(dataset=test_dataset, batch_size=BATCH_SIZE,
-                                 shuffle=True)
+test_dataset_loader = DataLoader(dataset=test_dataset, batch_size=BATCH_SIZE, shuffle=True)
 
 class MyDeepLearningModel(nn.Module):
     def __init__(self):
@@ -56,8 +51,6 @@ class MyDeepLearningModel(nn.Module):
         logits = self.fc2(data)
         return logits
 
-
-
 model = MyDeepLearningModel()
 
 loss_function = nn.CrossEntropyLoss()
@@ -73,6 +66,9 @@ def model_train(dataloader, model, loss_function, optimizer):
     train_total = 0
 
     total_train_batch = len(dataloader)
+
+    print('len(dataloader) = ',len(dataloader))
+    # 1594  = 51000/32
 
     for images, labels in dataloader: # images에는 이미지, labels에는 0-9 숫자
 
@@ -91,10 +87,21 @@ def model_train(dataloader, model, loss_function, optimizer):
         train_loss_sum += loss.item()
 
         train_total += y_train.size(0)  # label 열 사이즈 같음
+
+        # print('y_train.size(0) =', y_train.size(0))
+        # y_train.size(0) = 32
+
         train_correct += ((torch.argmax(outputs, 1)==y_train)).sum().item() # 예측한 값과 일치한 값의 합
 
     train_avg_loss = train_loss_sum / total_train_batch
     train_avg_accuracy = 100*train_correct / train_total
+
+    print('train_avg_loss, train_loss_sum,  total_train_batch =', train_avg_loss,  train_loss_sum, total_train_batch)
+    print('train_avg_accuracy, train_correct, train_total =', train_avg_accuracy, train_correct, train_total)
+    # len(dataloader) =  1594
+    # train_avg_loss, train_loss_sum,  total_train_batch = 0.9933313936406426 1583.3702414631844 1594
+    # train_avg_accuracy, train_correct, train_total = 67.69019607843137 34522 51000
+    # epoch: 01 train loss = 0.9933 train accuracy = 67.6902 validation loss = 0.6526 validation accuracy = 78.0556
 
     return (train_avg_loss, train_avg_accuracy)
 
