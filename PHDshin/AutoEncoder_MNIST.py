@@ -13,6 +13,9 @@ os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 
 # 오토인코더 모델 클래스 생성
 # 인코더와 디코더가 똑 같은 구조이면서 서로 대칭함
+
+# encoding : 차원을 줄여서 잠재공간 생성
+# decoding : 잠재공원에서 차원을 증가하여 데이터 복원
 class Autoencoder(nn.Module):
     def __init__(self):
         super(Autoencoder, self).__init__()
@@ -37,6 +40,7 @@ class Autoencoder(nn.Module):
             nn.Linear(128, 28*28),
             nn.Tanh()       # Output a value between 0 and 1 (아웃풋값 0~1)
         )
+
     # 순전파
     def forward(self, x):
         x_encoded = self.encoder(x)
@@ -44,17 +48,17 @@ class Autoencoder(nn.Module):
         return x, x_encoded
 
 # Load and transform the dataset
-# 데이터 변환
+# 데이터를 파이토치 텐서로 변환
 transform = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize((0.5,), (0.5,))
 ])
 # Load the train dataset
-train_dataset = datasets.MNIST(root='./data', train=True, download=True, transform=transform)
+train_dataset = datasets.MNIST(root='../DATA', train=True, download=True, transform=transform)
 train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
 
 # Load the test dataset
-test_dataset = datasets.MNIST(root='./data', train=False, download=True, transform=transforms.ToTensor())
+test_dataset = datasets.MNIST(root='../DATA', train=False, download=True, transform=transforms.ToTensor())
 test_loader = DataLoader(test_dataset, batch_size=1000, shuffle=True)  # Larger batch size for testing
 
 # Initialize the model, loss function, and optimizer
@@ -64,10 +68,11 @@ optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
 # Training loop
 num_epochs = 20
+
 for epoch in range(num_epochs):
     for data in train_loader:
         img, _ = data
-        img = img.view(img.size(0), -1)  # 1차원 행렬 784로 바꾸어 줌 Flatten the images
+        img = img.view(img.size(0), -1)  # 1차원 행렬 784로 바꾸어 줌 Flatten the images (batch_size(64), 784)
         output,_ = model(img)            # 인코더에 넣어서 최종 아웃풋을 구함
         loss = criterion(output, img)    # MSE을 사용하여 손실을 구함
 
@@ -79,12 +84,13 @@ for epoch in range(num_epochs):
 
 print("Training Complete")
 
-# 모델 테스트
+# 모델 테스트 데이터
 # Testing the model and visualizing some results
 # Get a batch of data
 dataiter = iter(test_loader)
 images, _ = next(dataiter)
 images_flattened = images.view(images.size(0), -1)
+
 # 테스트 이미지 순전파
 # Forward pass the images through the autoencoder
 output, _ = model(images_flattened)
