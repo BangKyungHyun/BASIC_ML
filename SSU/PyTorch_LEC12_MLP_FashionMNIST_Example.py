@@ -97,14 +97,13 @@ def model_train(dataloader, model, loss_function, optimizer):
     train_avg_loss = train_loss_sum / train_epoch_per_loop_cnt
     train_avg_accuracy = 100*train_correct_cnt / train_epoch_per_data_cnt
 
-    print('train_avg_loss, train_loss_sum,  train_epoch_per_loop_cnt =', train_avg_loss,  train_loss_sum, train_epoch_per_loop_cnt)
-    print('train_avg_accuracy, train_correct_cnt, train_epoch_per_data_cnt =', train_avg_accuracy, train_correct_cnt, train_epoch_per_data_cnt)
-    # len(dataloader) =  1594
+    # print('train_avg_loss, train_loss_sum,  train_epoch_per_loop_cnt =', train_avg_loss,  train_loss_sum, train_epoch_per_loop_cnt)
+    # print('train_avg_accuracy, train_correct_cnt, train_epoch_per_data_cnt =', train_avg_accuracy, train_correct_cnt, train_epoch_per_data_cnt)
+
     # train_avg_loss, train_loss_sum,  train_epoch_per_loop_cnt = 0.9933313936406426 1583.3702414631844 1594
     # train_avg_accuracy, train_correct_cnt, train_epoch_per_data_cnt = 67.69019607843137 34522 51000
 
     return (train_avg_loss, train_avg_accuracy)
-
 
 def model_evaluate(dataloader, model, loss_function, optimizer):
 
@@ -224,11 +223,8 @@ plt.grid()
 
 plt.plot(train_accuracy_list, label='train accuracy')
 plt.plot(val_accuracy_list, label='validation accuracy')
-
 plt.legend()
-
 plt.show()
-
 
 plt.figure(figsize=(10,5))
 
