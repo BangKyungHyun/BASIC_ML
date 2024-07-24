@@ -20,7 +20,7 @@ BATCH_SIZE = 20         # 학습을 위한 배치사이즈 개수
 ################################################################################
 # 1.데이터 불러오기
 ################################################################################
-
+print('1-1.데이터 불러오기 ')
 import FinanceDataReader as fdr
 
 # 삼성전자 (005930) 주가
@@ -32,21 +32,28 @@ print('df.tail(10) =', df.tail(10))
 
 print('len(df) =', len(df))
 
+print('1-2.데이터 불러오기 ')
+
 # len(df) = 136
 ################################################################################
 # 2.데이터 train, test 용 분리하기
 ################################################################################
 
 # train : test - 70 : 30 분리
+print('2-1.데이터 train, test 용 분리하기 ')
 
 SPLIT = int(0.7*len(df))  # train : test = 7 : 3
 
 train_df = df[ :SPLIT ]
 test_df = df[ SPLIT: ]
 
+print('2-2.데이터 train, test 용 분리하기 ')
+
 ################################################################################
 # 3.변수 정규화
 ################################################################################
+
+print('3-1.변수 정규화 시작 ')
 
 scaler_x = MinMaxScaler()  # feature scaling
 
@@ -58,19 +65,21 @@ scaler_y = MinMaxScaler()  # label scaling
 train_df.iloc[ : , -1 ] = scaler_y.fit_transform(train_df.iloc[ : , [-1] ])
 test_df.iloc[ : , -1 ] = scaler_y.fit_transform(test_df.iloc[ : , [-1] ])
 
+print('3-2.변수 정규화 끝 ')
+
 ################################################################################
-# 5. 순차적 Numpy Data 만들기
+# 5. 순차적 Numpy Data 만들기(함수는 실제 호출 시에만 실행됨)
 ################################################################################
 
 def MakeSeqNumpyData(data, seq_length):
+    print('5-1.순차적 Numpy Data 만들기 ')
 
     x_seq_list = []
     y_seq_list = []
 
-    print('len(data) =',len(data))
-    print('data.shape =',data.shape)
-
-    print('seq_length =',seq_length)
+    # print('len(data) =',len(data))
+    # print('data.shape =',data.shape)
+    # print('seq_length =',seq_length)
 
     # len(data) = 95 --> train
     # data.shape = (95, 5)
@@ -87,16 +96,15 @@ def MakeSeqNumpyData(data, seq_length):
     x_seq_numpy = np.array(x_seq_list)
     y_seq_numpy = np.array(y_seq_list)
 
-    print('def MakeSeqNumpyData(data, seq_length)')
-    print('x_seq_numpy.shape = ',x_seq_numpy.shape)
-    print('x_seq_numpy.size = ',x_seq_numpy.size)
-    print('y_seq_numpy.shape = ',y_seq_numpy.shape)
-    print('y_seq_numpy.size = ',y_seq_numpy.size)
+    print('5-2. def MakeSeqNumpyData(data, seq_length)')
+    print('5-2. x_seq_numpy.shape = ',x_seq_numpy.shape)
+    print('5-2. x_seq_numpy.size = ',x_seq_numpy.size)
+    print('5-2. y_seq_numpy.shape = ',y_seq_numpy.shape)
+    print('5-2. y_seq_numpy.size = ',y_seq_numpy.size)
 
     # def MakeSeqNumpyData(data, seq_length) --> train
 
-
-    # 5일간의 주가를 바탕으로 6일째 주가를 예측하기 위해
+    # 5일간의 주가를 바탕으로 6일째 주가를 예측함
     # x_seq_numpy.shape =  (90, 5, 4)
     # x_seq_numpy.size =  1800
 
@@ -109,6 +117,7 @@ def MakeSeqNumpyData(data, seq_length):
 
     # y_seq_numpy.shape =  (36, 1)
     # y_seq_numpy.size =  36
+    print('5-3. 순차적 Numpy Data 만들기 ')
 
     return x_seq_numpy, y_seq_numpy
 
@@ -116,12 +125,14 @@ def MakeSeqNumpyData(data, seq_length):
 # 4. 순차적 Numpy Data 만들기 -> 텐서 데이터셋으로 변환
 ################################################################################
 
+print('4-1. 순차적 Numpy Data 만들기 -> 텐서 데이터셋으로 변환 ')
+
 x_train_data, y_train_data = MakeSeqNumpyData(np.array(train_df), SEQ_LENGTH)
 
 x_test_data, y_test_data = MakeSeqNumpyData(np.array(test_df), SEQ_LENGTH)
 
-print(x_train_data.shape, y_train_data.shape)
-print(x_test_data.shape, y_test_data.shape)
+# print(x_train_data.shape, y_train_data.shape)
+# print(x_test_data.shape, y_test_data.shape)
 
 # (90, 5, 4) (90, 1)  -> train
 # (36, 5, 4) (36, 1)  -> test
@@ -185,27 +196,36 @@ y_test_tensor = torch.FloatTensor(y_test_data).to(DEVICE)
 train_dataset = TensorDataset(x_train_tensor, y_train_tensor)
 test_dataset = TensorDataset(x_test_tensor, y_test_tensor)
 
-print('train_dataset = ',train_dataset)
+# print('train_dataset = ',train_dataset)
 # train_dataset =  <torch.utils.data.dataset.TensorDataset object at 0x00000259FEB2FEE0>
 
 train_loader = DataLoader(dataset=train_dataset, batch_size=BATCH_SIZE, shuffle=False)
 test_loader = DataLoader(dataset=test_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
+print('4-2. 순차적 Numpy Data 만들기 -> 텐서 데이터셋으로 변환 ')
+
 ################################################################################
-# 7.
+# 6. MyLSTMModel 클래스 정의
+# __init__ 부분은 클래스가 호출될 때 1번 실행, forward부분은 실제 실행시마다 호출됨
 ################################################################################
+
 class MyLSTMModel(nn.Module):
+    print('6-1. class MyLSTMModel(nn.Module) ')
 #                          4            4          1
     def __init__(self, input_size, hidden_size, num_layers):
+        print('6-2. class MyLSTMModel(nn.Module) ')
         super().__init__()
         self.num_layers = num_layers
         self.hidden_size = hidden_size
         self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True)
         self.fc = nn.Linear(hidden_size, 1)
+        print('6-3. class MyLSTMModel(nn.Module) ')
 
     def forward(self, data):
-        print('data.size(0) =', data.size(0))
-        # 90개를 20개 단위으로 배치 처리함
+        print('6-4. class MyLSTMModel(nn.Module) ')
+
+        # print('data.size(0) =', data.size(0))
+        # 90개를 20개 단위로 배치 처리함
         # data.size(0) = 20
         # data.size(0) = 20
         # data.size(0) = 20
@@ -220,11 +240,15 @@ class MyLSTMModel(nn.Module):
         last_hs = outputs[:, -1, :]
         prediction = self.fc(last_hs)
 
-        return prediction
+        print('6-5. class MyLSTMModel(nn.Module) ')
 
+        return prediction
+print('6-6. class MyLSTMModel(nn.Module) ')
 ################################################################################
-# 6.
+#7. model = MyLSTMModel(FEATURE_NUMS, HIDDEN_SIZE, NUM_LAYERS).to(DEVICE)
 ################################################################################
+
+print('7-1. model = MyLSTMModel(FEATURE_NUMS, HIDDEN_SIZE, NUM_LAYERS).to(DEVICE) ')
 
 model = MyLSTMModel(FEATURE_NUMS, HIDDEN_SIZE, NUM_LAYERS).to(DEVICE)
 
@@ -232,11 +256,15 @@ loss_function = nn.MSELoss()
 
 optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
+print('7-2. model = MyLSTMModel(FEATURE_NUMS, HIDDEN_SIZE, NUM_LAYERS).to(DEVICE) ')
+
 ################################################################################
-# 7.
+# 8. def model_train(dataloader, model, loss_function, optimizer):
 ################################################################################
 
 def model_train(dataloader, model, loss_function, optimizer):
+
+    print('9-1. def model_train(dataloader, model, loss_function, optimizer): ')
 
     model.train()
 
@@ -259,13 +287,17 @@ def model_train(dataloader, model, loss_function, optimizer):
 
     train_avg_loss = train_loss_sum / total_train_batch
 
+    print('9-2. def model_train(dataloader, model, loss_function, optimizer): ')
+
     return train_avg_loss
 
 ################################################################################
-#
+# 9.def model_evaluate(dataloader, model, loss_function, optimizer):
 ################################################################################
 
 def model_evaluate(dataloader, model, loss_function, optimizer):
+
+    print('10-1. def model_evaluate(dataloader, model, loss_function, optimizer): ')
 
     model.eval()
 
@@ -287,12 +319,15 @@ def model_evaluate(dataloader, model, loss_function, optimizer):
 
         val_avg_loss = val_loss_sum / total_val_batch
 
+    print('10-2. def model_evaluate(dataloader, model, loss_function, optimizer): ')
+
     return val_avg_loss
 
+################################################################################
+# 8. 메인 처리
+################################################################################
 
-################################################################################
-# 6. 메인 처리
-################################################################################
+print('8-1. 메인 처리 ')
 
 from datetime import datetime
 
@@ -308,12 +343,14 @@ for epoch in range(EPOCHS):
 
     train_loss_list.append(avg_loss)
 
-    if (epoch % 1 == 0):
+    if (epoch % 100 == 0):
         print('epoch: ', epoch, ', train loss = ', avg_loss)
 
 end_time = datetime.now()
 
 print('elapsed time => ', end_time-start_time)
+
+print('8-2. 메인 처리 ')
 
 # import matplotlib.pyplot as plt
 #
