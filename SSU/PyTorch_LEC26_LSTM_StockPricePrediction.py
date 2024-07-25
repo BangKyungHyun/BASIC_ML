@@ -72,7 +72,7 @@ print('3-2.변수 정규화 끝 ')
 ################################################################################
 
 def MakeSeqNumpyData(data, seq_length):
-    print('5-1.순차적 Numpy Data 만들기 ')
+    print('5-1. 순차적 Numpy Data 만들기 start')
 
     x_seq_list = []
     y_seq_list = []
@@ -96,11 +96,11 @@ def MakeSeqNumpyData(data, seq_length):
     x_seq_numpy = np.array(x_seq_list)
     y_seq_numpy = np.array(y_seq_list)
 
-    print('5-2. def MakeSeqNumpyData(data, seq_length)')
-    print('5-2. x_seq_numpy.shape = ',x_seq_numpy.shape)
-    print('5-2. x_seq_numpy.size = ',x_seq_numpy.size)
-    print('5-2. y_seq_numpy.shape = ',y_seq_numpy.shape)
-    print('5-2. y_seq_numpy.size = ',y_seq_numpy.size)
+    # print('5-2. def MakeSeqNumpyData(data, seq_length)')
+    # print('5-2. x_seq_numpy.shape = ',x_seq_numpy.shape)
+    # print('5-2. x_seq_numpy.size = ',x_seq_numpy.size)
+    # print('5-2. y_seq_numpy.shape = ',y_seq_numpy.shape)
+    # print('5-2. y_seq_numpy.size = ',y_seq_numpy.size)
 
     # def MakeSeqNumpyData(data, seq_length) --> train
 
@@ -117,15 +117,47 @@ def MakeSeqNumpyData(data, seq_length):
 
     # y_seq_numpy.shape =  (36, 1)
     # y_seq_numpy.size =  36
-    print('5-3. 순차적 Numpy Data 만들기 ')
+    print('5-3. 순차적 Numpy Data 만들기 end ')
 
     return x_seq_numpy, y_seq_numpy
+
+# 1-2.데이터 불러오기
+# 2-1.데이터 train, test 용 분리하기
+# 2-2.데이터 train, test 용 분리하기
+# 3-1.변수 정규화 시작
+# 3-2.변수 정규화 끝
+# 4-1. 순차적 Numpy Data 만들기 -> 텐서 데이터셋으로 변환 start
+# 5-1. 순차적 Numpy Data 만들기 start
+# 5-3. 순차적 Numpy Data 만들기 end
+# 5-1. 순차적 Numpy Data 만들기 start
+# 5-3. 순차적 Numpy Data 만들기 end
+# 4-2. 순차적 Numpy Data 만들기 -> 텐서 데이터셋으로 변환 end
+# 6-1. class MyLSTMModel(nn.Module) 정의 start
+# 6-2. class MyLSTMModel(nn.Module) 선언 start
+# 6-8. class MyLSTMModel(nn.Module) 정의 end
+# 7-1. 7. 객체 생성, 손실함수 정의, 옵티마이저 정의
+# 6-3. class MyLSTMModel(nn.Module) __init__ start
+# 6-4. class MyLSTMModel(nn.Module) __init__ end
+# 7-2. 7. 객체 생성, 손실함수 정의, 옵티마이저 정의
+# 8-1. 메인 처리 start
+# 9-1. train 함수 정의 start
+# 6-5. class MyLSTMModel(nn.Module) forward start
+# 6-6. class MyLSTMModel(nn.Module) forward end
+# 6-5. class MyLSTMModel(nn.Module) forward start
+# 6-6. class MyLSTMModel(nn.Module) forward end
+# 6-5. class MyLSTMModel(nn.Module) forward start
+# 6-6. class MyLSTMModel(nn.Module) forward end
+# 6-5. class MyLSTMModel(nn.Module) forward start
+# 6-6. class MyLSTMModel(nn.Module) forward end
+# 6-5. class MyLSTMModel(nn.Module) forward start
+# 6-6. class MyLSTMModel(nn.Module) forward end
+# 9-2. train 함수 정의 end
 
 ################################################################################
 # 4. 순차적 Numpy Data 만들기 -> 텐서 데이터셋으로 변환
 ################################################################################
 
-print('4-1. 순차적 Numpy Data 만들기 -> 텐서 데이터셋으로 변환 ')
+print('4-1. 순차적 Numpy Data 만들기 -> 텐서 데이터셋으로 변환 start ')
 
 x_train_data, y_train_data = MakeSeqNumpyData(np.array(train_df), SEQ_LENGTH)
 
@@ -202,27 +234,31 @@ test_dataset = TensorDataset(x_test_tensor, y_test_tensor)
 train_loader = DataLoader(dataset=train_dataset, batch_size=BATCH_SIZE, shuffle=False)
 test_loader = DataLoader(dataset=test_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
-print('4-2. 순차적 Numpy Data 만들기 -> 텐서 데이터셋으로 변환 ')
+print('4-2. 순차적 Numpy Data 만들기 -> 텐서 데이터셋으로 변환 end ')
 
 ################################################################################
 # 6. MyLSTMModel 클래스 정의
 # __init__ 부분은 클래스가 호출될 때 1번 실행, forward부분은 실제 실행시마다 호출됨
 ################################################################################
 
+print('6-1. class MyLSTMModel(nn.Module) 정의 start')
+
 class MyLSTMModel(nn.Module):
-    print('6-1. class MyLSTMModel(nn.Module) ')
+    print('6-2. class MyLSTMModel(nn.Module) 선언 start ')
 #                          4            4          1
     def __init__(self, input_size, hidden_size, num_layers):
-        print('6-2. class MyLSTMModel(nn.Module) ')
+
+        print('6-3. class MyLSTMModel(nn.Module) __init__ start')
         super().__init__()
         self.num_layers = num_layers
         self.hidden_size = hidden_size
         self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True)
         self.fc = nn.Linear(hidden_size, 1)
-        print('6-3. class MyLSTMModel(nn.Module) ')
+        print('6-4. class MyLSTMModel(nn.Module) __init__ end ' )
 
     def forward(self, data):
-        print('6-4. class MyLSTMModel(nn.Module) ')
+
+        # print('6-5. class MyLSTMModel(nn.Module) forward start')
 
         # print('data.size(0) =', data.size(0))
         # 90개를 20개 단위로 배치 처리함
@@ -232,6 +268,7 @@ class MyLSTMModel(nn.Module):
         # data.size(0) = 20
         # data.size(0) = 10
 
+        # 은닉상태 / 셀상태 초기화
         #                        1         배치크기(20)                 4
         h0 = torch.zeros(self.num_layers, data.size(0), self.hidden_size).to(DEVICE)
         c0 = torch.zeros(self.num_layers, data.size(0), self.hidden_size).to(DEVICE)
@@ -240,15 +277,18 @@ class MyLSTMModel(nn.Module):
         last_hs = outputs[:, -1, :]
         prediction = self.fc(last_hs)
 
-        print('6-5. class MyLSTMModel(nn.Module) ')
+        # print('6-6. class MyLSTMModel(nn.Module) forward end')
 
         return prediction
-print('6-6. class MyLSTMModel(nn.Module) ')
+        print('6-7. class MyLSTMModel(nn.Module) 선언 end ')
+
+print('6-8. class MyLSTMModel(nn.Module) 정의 end ')
+
 ################################################################################
-#7. model = MyLSTMModel(FEATURE_NUMS, HIDDEN_SIZE, NUM_LAYERS).to(DEVICE)
+# 7. 객체 생성, 손실함수 정의, 옵티마이저 정의
 ################################################################################
 
-print('7-1. model = MyLSTMModel(FEATURE_NUMS, HIDDEN_SIZE, NUM_LAYERS).to(DEVICE) ')
+print('7-1. 7. 객체 생성, 손실함수 정의, 옵티마이저 정의 ')
 
 model = MyLSTMModel(FEATURE_NUMS, HIDDEN_SIZE, NUM_LAYERS).to(DEVICE)
 
@@ -256,15 +296,15 @@ loss_function = nn.MSELoss()
 
 optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
-print('7-2. model = MyLSTMModel(FEATURE_NUMS, HIDDEN_SIZE, NUM_LAYERS).to(DEVICE) ')
+print('7-2. 7. 객체 생성, 손실함수 정의, 옵티마이저 정의 ')
 
 ################################################################################
-# 8. def model_train(dataloader, model, loss_function, optimizer):
+# 9. train 함수 정의
 ################################################################################
 
 def model_train(dataloader, model, loss_function, optimizer):
 
-    print('9-1. def model_train(dataloader, model, loss_function, optimizer): ')
+    print('9-1. train 함수 정의 start ')
 
     model.train()
 
@@ -287,17 +327,17 @@ def model_train(dataloader, model, loss_function, optimizer):
 
     train_avg_loss = train_loss_sum / total_train_batch
 
-    print('9-2. def model_train(dataloader, model, loss_function, optimizer): ')
+    print('9-2. train 함수 정의 end')
 
     return train_avg_loss
 
 ################################################################################
-# 9.def model_evaluate(dataloader, model, loss_function, optimizer):
+# 10. 평가 함수 정의
 ################################################################################
 
 def model_evaluate(dataloader, model, loss_function, optimizer):
 
-    print('10-1. def model_evaluate(dataloader, model, loss_function, optimizer): ')
+    print('10-1. 평가 함수 정의 start')
 
     model.eval()
 
@@ -319,7 +359,7 @@ def model_evaluate(dataloader, model, loss_function, optimizer):
 
         val_avg_loss = val_loss_sum / total_val_batch
 
-    print('10-2. def model_evaluate(dataloader, model, loss_function, optimizer): ')
+    print('10-2. 평가 함수 정의 end')
 
     return val_avg_loss
 
@@ -327,7 +367,7 @@ def model_evaluate(dataloader, model, loss_function, optimizer):
 # 8. 메인 처리
 ################################################################################
 
-print('8-1. 메인 처리 ')
+print('8-1. 메인 처리 start ')
 
 from datetime import datetime
 
@@ -350,7 +390,7 @@ end_time = datetime.now()
 
 print('elapsed time => ', end_time-start_time)
 
-print('8-2. 메인 처리 ')
+print('8-2. 메인 처리 end')
 
 # import matplotlib.pyplot as plt
 #
