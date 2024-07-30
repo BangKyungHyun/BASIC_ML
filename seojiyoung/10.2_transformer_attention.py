@@ -35,7 +35,8 @@ global word_count1
 global word_count2
 global word_count3
 
-class Lang:   # 딕셔너리를 위한 클래스
+# 딕셔너리를 위한 클래스
+class Lang:
 
     # Go.Va !
     # Run!    Cours !
@@ -43,14 +44,15 @@ class Lang:   # 딕셔너리를 위한 클래스
     # Wow!    Ça
     # alors !
 
-
-    def __init__(self):  # 단어의 인덱스를 저장하기 위한 컨테이너를 초기화
+    # 단어의 인덱스를 저장하기 위한 컨테이너를 초기화
+    def __init__(self):
         self.word2index = {}
-        self.word2count = {}
         self.index2word = {0: "SOS", 1: "EOS"} # 문장의 시작, 문자의 끝
+        self.word2count = {}
         self.n_words = 2                       # SOS와 EOS에 대한 카운트
 
-    def addSentence(self, sentence): # 문장을 단어 단위로 분리한 후 컨테이너(word)에 추가
+    # 문장을 단어 단위로 분리한 후 컨테이너(word)에 추가
+    def addSentence(self, sentence):
 
         for word in sentence.split(' '):
             # global word_count
@@ -116,7 +118,8 @@ class Lang:   # 딕셔너리를 위한 클래스
 
             self.addWord(word)
 
-    def addWord(self, word):  # 컨테이너에 단어가 없다면 추가되고 있다는 카운트를 업데이트
+    # 컨테이너에 단어가 없다면 추가되고 있다는 카운트를 업데이트
+    def addWord(self, word):
         #
         # global word_count
         # word_count += 1
@@ -211,17 +214,24 @@ def read_sentence(df, lang1, lang2):
 
     return sentence1, sentence2
 
+################################################################################
+# 데이터셋을 불러오기 위해 read_csv 사용
+################################################################################
+
 def read_file(loc, lang1, lang2):
-    # 데이터셋을 불러오기 위해 read_csv 사용
+
     # loc : 예제에서 사용할 데이터셋
     # delimeter : csv파일의 데이터가 어떤 형태(\t,' ','+')로 나뉘었는지 의미
     # header : 일반적으로 데이터셋의 첫 번째를 header(열 이름)로 지정해서 사용되게 되는데
-    #          불러올 데이터에 header가 없는 경우에는 heaer=None 옵션 사용
+    #          불러올 데이터에 header가 없는 경우에는 header=None 옵션 사용
     # names : 열 이름을 리스트로 형태로 입력. 데이터셋은 총 두개의 열이 있기 때문에 lang1, lang2를 사용
     df = pd.read_csv(loc, delimiter='\t', header=None, names=[lang1, lang2])
     return df
 
-# 데이터셋 불러오기
+################################################################################
+# # 데이터셋 불러오기
+################################################################################
+
 def process_data(lang1,lang2):
 
     df = read_file('../data/%s-%s.txt' % (lang1, lang2), lang1, lang2)
@@ -243,7 +253,7 @@ def process_data(lang1,lang2):
     for i in range(len(df)):
 
         # MAX_LENGTH = 20
-
+        # split( )을 사용하면 길이에 상관없이 공백을 모두 제거 분리하고, split(' ')을 사용하면 공백 한 개마다 분리하는 것
         if len(sentence1[i].split(' ')) < MAX_LENGTH and len(sentence2[i].split(' ')) < MAX_LENGTH:
             #
             # print('process data sentence1[i] =', sentence1[i])
@@ -253,8 +263,8 @@ def process_data(lang1,lang2):
 
             # process data sentence1[i] = i won!
             # process data sentence2[i] = je l'ai emporte !
-            # process data len(sentence1[i].split() = 2
-            # process data len(sentence2[i].split() = 4
+            # process data len(sentence1[i].split() = 2   공백으로 분리하면 2개 단어가 됨
+            # process data len(sentence2[i].split() = 4   공백으로 분리하면 4개 단어가 됨
 
             full = [sentence1[i], sentence2[i]]      # 첫번째와 두번째 열을 합쳐서 저장
             input_lang.addSentence(sentence1[i])     # 입력으로 영어를 사용
@@ -262,7 +272,6 @@ def process_data(lang1,lang2):
             pairs.append(full)                       # pairs에는 입력과 출력이 합쳐진 것을 사용
 
     return input_lang, output_lang, pairs
-
 
 ################################################################################
 # 텐서로 변환
@@ -442,6 +451,7 @@ class Seq2Seq(nn.Module):
             topv, topi = decoder_output.topk(1)
             input = (output_lang[t] if teacher_force else topi)
 
+            # teacher force 활성화하지 않으면 자체 예측 값을 다음 입력으로 사용
             if (teacher_force == False and input.item() == EOS_token):
                 break
 
@@ -479,7 +489,7 @@ def trainModel(model, input_lang, output_lang, pairs, num_iteration=2000):
 
     model.train()
     optimizer = optim.SGD(model.parameters(), lr=0.01) # 옵티마이져 SGD를 사용
-    criterion = nn.NLLLoss() # NLLLoss 역시 크로스엔트로피손실함수와 마찬가지로 분류문제에 사용함
+    criterion = nn.NLLLoss() # NLLLoss 역시 크로스엔트로피 손실함수와 마찬가지로 분류문제에 사용함
     total_loss_iterations = 0
 
     training_pairs = [tensorsFromPair(input_lang, output_lang, random.choice(pairs))
@@ -539,13 +549,18 @@ def evaluateRandomly(model, input_lang, output_lang, pairs, n=10):
 
 lang1 = 'eng'  # 입력으로 사용할 영어
 lang2 = 'fra'  # 출력으로 사용할 프랑스어
+
+# 데이터셋 불러오기
 input_lang, output_lang, pairs = process_data(lang1, lang2)
 
-print('input_lang {}' .format(input_lang))
-print('output_lang {}' .format(output_lang))
+# print('input_lang {}' .format(input_lang))
+# print('output_lang {}' .format(output_lang))
+#
+# input_lang <__main__.Lang object at 0x00000283B8115220>
+# output_lang <__main__.Lang object at 0x00000283B81150D0>
 
-randomize = random.choice(pairs)
-print('random sentence {}'.format(randomize))
+# print('random sentence {}'.format(randomize))
+# random sentence ['tom is married to mary.', 'tom est marie a mary.']
 
 # randomize = pairs
 # print('random sentence {}'.format(randomize))
