@@ -35,7 +35,10 @@ global word_count1
 global word_count2
 global word_count3
 
+################################################################################
 # 딕셔너리를 위한 클래스
+################################################################################
+
 class Lang:
 
     # Go.Va !
@@ -59,7 +62,7 @@ class Lang:
             # word_count += 1
             # if word_count > 50:
             #     sys.exit()
-            # print('word =', word)
+            print('word =', word)
 
             # word = go.
             # word = va
@@ -128,20 +131,30 @@ class Lang:
 
         if word not in self.word2index:
 
-            self.word2index[word] = self.n_words
-            # print('addWord not in => self.word2index[word] =',word,self.n_words,self.word2index, self.word2index[word])
+            # print('def addWord self.n_words =', self.n_words)
+
+            self.word2index[word] = self.n_words  # 초기값이 2부터 시작
             self.word2count[word] = 1
             self.index2word[self.n_words] = word
+
+            print('def addWord not in => word, self.n_words, self.word2index, self.word2index[word], self.index2word[self.n_words] ='
+                  ,word, self.n_words, self.word2index, self.word2index[word], self.index2word[self.n_words])
+            # def addWord not in => word, self.n_words, self.word2index, self.word2index[word], self.index2word[self.n_words] = i 2 {'i': 2} 2 i
+            # def addWord not in => word, self.n_words, self.word2index, self.word2index[word], self.index2word[self.n_words] = made 3 {'i': 2, 'made': 3} 3 made
+            # def addWord not in => word, self.n_words, self.word2index, self.word2index[word], self.index2word[self.n_words] = two. 4 {'i': 2, 'made': 3, 'two.': 4} 4 two.
             self.n_words += 1
+
         else:
-            self.word2count[word] += 1
-            # print('addWord     in => self.word2index[word] =',word,self.n_words,self.word2index)
+            self.word2count[word] += 1  # 단어별 갯수를 계산
+            print('def addWord     in => word, self.n_words, self.word2index, self.word2index[word],self.index2word[self.n_words] ='
+                  ,word, self.n_words, self.word2index, self.word2index[word], self.index2word[self.n_words])
 
 # addWord     in => self.word2index[word] = i 14 {'go.': 2, 'run!': 3, 'wow!': 4, 'fire!': 5, 'help!': 6, 'jump.': 7, 'stop!': 8, 'wait!': 9, 'i': 10, 'see.': 11, 'try.': 12, 'won!': 13}
 # addWord     in => self.word2index[word] = won! 14 {'go.': 2, 'run!': 3, 'wow!': 4, 'fire!': 5, 'help!': 6, 'jump.': 7, 'stop!': 8, 'wait!': 9, 'i': 10, 'see.': 11, 'try.': 12, 'won!': 13}
 # addWord     in => self.word2index[word] = je 23 {'va': 2, '!': 3, 'cours!': 4, 'courez!': 5, 'ca': 6, 'alors!': 7, 'au': 8, 'feu': 9, 'a': 10, "l'aide!": 11, 'saute.': 12, 'suffit!': 13, 'stop!': 14, 'arrete-toi': 15, 'attends': 16, 'attendez': 17, 'je': 18, 'comprends.': 19, "j'essaye.": 20, "j'ai": 21, 'gagne': 22}
 # addWord not in => self.word2index[word] = l'ai 23 {'va': 2, '!': 3, 'cours!': 4, 'courez!': 5, 'ca': 6, 'alors!': 7, 'au': 8, 'feu': 9, 'a': 10, "l'aide!": 11, 'saute.': 12, 'suffit!': 13, 'stop!': 14, 'arrete-toi': 15, 'attends': 16, 'attendez': 17, 'je': 18, 'comprends.': 19, "j'essaye.": 20, "j'ai": 21, 'gagne': 22, "l'ai": 23} 23
 # addWord not in => self.word2index[word] = emporte 24 {'va': 2, '!': 3, 'cours!': 4, 'courez!': 5, 'ca': 6, 'alors!': 7, 'au': 8, 'feu': 9, 'a': 10, "l'aide!": 11, 'saute.': 12, 'suffit!': 13, 'stop!': 14, 'arrete-toi': 15, 'attends': 16, 'attendez': 17, 'je': 18, 'comprends.': 19, "j'essaye.": 20, "j'ai": 21, 'gagne': 22, "l'ai": 23, 'emporte': 24} 24
+
 
 ################################################################################
 # 데이터 정규화
@@ -234,7 +247,7 @@ def read_file(loc, lang1, lang2):
 
 def process_data(lang1,lang2):
 
-    df = read_file('../data/%s-%s.txt' % (lang1, lang2), lang1, lang2)
+    df = read_file('../data/%s-%s1.txt' % (lang1, lang2), lang1, lang2)
     sentence1, sentence2 = read_sentence(df, lang1, lang2)
 
     input_lang = Lang()
@@ -344,6 +357,7 @@ def tensorsFromPair(input_lang, output_lang, pair):
 
 ################################################################################
 # 인코더 네트워크
+################################################################################
 # 인코더는 입력 문장을 단어별로 순서대로 인코딩을 하게 되며,문장의 끝을 표시하는 토큰이 붙음
 # 또한 인코더는 임베딩 계층과 GRU 계층으로 구성됨.
 
@@ -354,8 +368,8 @@ def tensorsFromPair(input_lang, output_lang, pair):
 #             |   |
 #             V   V
 #              GRU
-#              |  |
-#              V  V
+#              | |
+#              V V
 #        outputs hidden
 
 # 임베딩 계층은 입력에 대한 임베딩 결과가 저장되어 있는 딕셔너리를 조회하는 테이블과 같음
@@ -363,25 +377,42 @@ def tensorsFromPair(input_lang, output_lang, pair):
 # 또한, 이전 계층의 은닉 상태를 계산한 후 망각 게이트와 업데이트 게이트를 갱신함
 ################################################################################
 
-class Encoder(nn.Module):
+class Encoder_Network(nn.Module):
     #                    23191       512           256          1
     def __init__(self, input_dim, hidden_dim, embbed_dim, num_layers):
-        super(Encoder, self).__init__()
-        self.input_dim = input_dim    # 인코더에서 사용할 입력 층 - 임베딩을 할 단어들의 개수. 다시 말해 단어 집합의 크기
-        self.embbed_dim = embbed_dim  # 인코더에서 사용할 임베딩 층 - 임베딩 할 벡터의 차원. 사용자가 정해주는 하이퍼파라미터
-        self.hidden_dim = hidden_dim  # 인코더에서 사용할 은닉 층(이전 은닉층)
-        self.num_layers = num_layers  # 인코더에서 사용할 GRU의 계층 갯수
+        super(Encoder_Network, self).__init__()
+        self.input_dim = input_dim    # 인코더에서 사용할 입력 층 - 임베딩을 할 단어들의 개수. 다시 말해 단어 집합의 크기(23,191)
+        self.embbed_dim = embbed_dim  # 인코더에서 사용할 임베딩 층 - 임베딩 할 벡터의 차원. 사용자가 정해주는 하이퍼파라미터(256)
+        self.hidden_dim = hidden_dim  # 인코더에서 사용할 은닉 층(이전 은닉층)(512)
+        self.num_layers = num_layers  # 인코더에서 사용할 GRU의 계층 갯수 (1)
 
+        # ****** 입력값을 임베딩 후 GRU 계층을 통과 시킴 ******
         # 임베딩 계층 초기화
         #                                23191            256
-        self.embedding = nn.Embedding(input_dim, self.embbed_dim)
+        self.embedding = nn.Embedding(input_dim, self.embbed_dim) # 임베딩을 할 단어들의 개수, 임베딩 할 벡터의 차원
+        # print('Encoder self.embedding.weight =', self.embedding.weight)
+
+        # Encoder self.embedding.weight = Parameter containing:
+        # tensor([[-0.1070, -0.1947, -0.0114,  ...,  1.5221, -2.1226, -1.4714],
+        #         [ 0.2172, -0.4880,  1.5195,  ...,  0.2550, -0.2288, -0.8428],
+        #         [-0.9794, -1.3526,  0.9334,  ...,  0.0383, -0.4121,  0.6605],
+        #         ...,
+        #         [ 1.3650, -0.8757, -0.7063,  ..., -0.2161,  1.2508, -1.8584],
+        #         [-0.4041,  1.4447, -1.2856,  ..., -0.4097, -0.4470, -1.0880],
+        #         [-0.3421,  0.2546, -1.7463,  ...,  0.2570, -0.9309,  0.1897]],
+        #        requires_grad=True)
+
         # 임베딩 차원, 은닉층 차원, GRU의 계층 갯수를 이용하여 GRU 계층을 초기화
         #                        256                512                       1
         self.gru = nn.GRU(self.embbed_dim, self.hidden_dim,num_layers=self.num_layers)
 
     def forward(self, src):
-        embedded = self.embedding(src).view(1, 1, -1) # 임베딩 처리
+        # print('Encoder forward src =', src)
+        # Encoder forward src = tensor([369])
 
+        embedded = self.embedding(src).view(1, 1, -1) # 임베딩 처리
+        # print('Encoder forward embedded.shape =', embedded.shape)
+        # Encoder forward embedded.shape = torch.Size([1, 1, 256])
         word_count1 = 0
 
         # word_count1 += 1
@@ -429,40 +460,71 @@ class Encoder(nn.Module):
         #            2.2817, -0.9432, -0.7737,  0.6714, -0.3643, -1.7460, -0.5409,
         #           -0.8999,  1.6545, -0.4321, -0.7969]]], grad_fn=<ViewBackward0>)
 
-        outputs, hidden = self.gru(embedded)          # 임베딩 결과를 GRU 모델에 적용
+        # 임베딩 결과를 GRU 모델에 적용  hidden이 512개이면 outputs도 512개 ???
+        outputs, hidden = self.gru(embedded)
+        # print('Encoder forward outputs.shape = ', outputs.shape)
+        # Encoder forward outputs.shape =  torch.Size([1, 1, 512])
+        # print('Encoder forward outputs = ', outputs)
+
+        # print('Encoder forward hidden.shape = ', hidden.shape)
+        # Encoder forward hidden.shape =  torch.Size([1, 1, 512])
+
         return outputs, hidden
 
 ################################################################################
 # 디코더 네트워크
 ################################################################################
+#  Input  previous_hidden
+#     |           |
+#     V           |
+#     embedding   |
+#             |   |
+#             V   |
+#            ReLU |
+#              |  |
+#              V  V
+#              GRU
+#              | |
+#              V  |
+#          linear  |
+#              |    |
+#              V     |
+#           Softmax   |
+#              |       |
+#              V       V
+#           outputs  hidden
 
-class Decoder(nn.Module):
+# 입베딩 계층에서는 출력을 위해 딕셔너리를 조회할 테이블 만들며, GRU계층에서는 다음 단어를 예측하기 위한
+# 확률을 계산. 그 후 선형 계층에서는 계산된 확률 값 중 최적의 값(최종 출력 단어)을 선택하기 위해
+# 소프트맥스 활성화 함수를 선정
+################################################################################
+
+class Decoder_Network(nn.Module):
+    #                     39387        512          256          1
     def __init__(self, output_dim, hidden_dim, embbed_dim, num_layers):
-        super(Decoder, self).__init__()
+        super(Decoder_Network, self).__init__()
 
         self.embbed_dim = embbed_dim
         self.hidden_dim = hidden_dim
         self.output_dim = output_dim
         self.num_layers = num_layers
-
-        self.embedding = nn.Embedding(output_dim, self.embbed_dim) # 임베딩 계층 초기화
-        self.gru = nn.GRU(self.embbed_dim, self.hidden_dim,  # GRU 계층 초기화
-                          num_layers=self.num_layers)
-        self.out = nn.Linear(self.hidden_dim, output_dim)  # 선형 계층 초기화
+        # 임베딩 계층 초기화                 39387           256
+        self.embedding = nn.Embedding(output_dim, self.embbed_dim)
+        # GRU 계층 초기화            256            512                      1
+        self.gru = nn.GRU(self.embbed_dim, self.hidden_dim,num_layers=self.num_layers)
+        # 선형 계층 초기화               512        39387
+        self.out = nn.Linear(self.hidden_dim, output_dim)
         self.softmax = nn.LogSoftmax(dim=1)
 
     def forward(self, input, hidden):
-        input = input.view(1, -1)  # 입력을 (1, 배치크기)로 변경
+        # 입력을 (1, 배치크기)로 변경
+        input = input.view(1, -1)
         embedded = F.relu(self.embedding(input))
         output, hidden = self.gru(embedded, hidden)
         prediction = self.softmax(self.out(output[0]))
 
-        # word_count2  = 0
-        # word_count2 += 1
-        # if word_count2 < 2:
-        #     print('Decoder forward input =', input)
-        #     print('Decoder forward hidden =', hidden)
-
+        # print('Decoder forward input =', input)
+        # print('Decoder forward hidden =', hidden)
 
         return prediction, hidden
 
@@ -494,7 +556,8 @@ class Seq2Seq(nn.Module):
         # 예측을 출력을 저장하기 위한 변수 초기화
         outputs = torch.zeros(target_length, batch_size, vocab_size).to(self.device)
 
-        for i in range(input_length): # 문장의 모든 단어를 인코딩
+        # 문장의 모든 단어를 인코딩
+        for i in range(input_length):
             encoder_output, encoder_hidden = self.encoder(input_lang[i])
 
         # 인코더의 은닉층을 디코더의 은닉층으로 사용
@@ -592,6 +655,7 @@ def evaluate(model, input_lang, output_lang, sentences, max_length=MAX_LENGTH):
                 break
             else: # 예측 결과를 출력 문자열에 추가
                 decoded_words.append(output_lang.index2word[topi[0].item()])
+
     return decoded_words
 
 # 훈련 데이터셋으로부터 임의의 문장을 가져와서 모델 평가
@@ -615,22 +679,25 @@ lang2 = 'fra'  # 출력으로 사용할 프랑스어
 # 데이터셋 불러오기
 input_lang, output_lang, pairs = process_data(lang1, lang2)
 
+print('input_lang =', input_lang)
+
 # print('input_lang {}' .format(input_lang))
 # print('output_lang {}' .format(output_lang))
 #
 # input_lang <__main__.Lang object at 0x00000283B8115220>
 # output_lang <__main__.Lang object at 0x00000283B81150D0>
 
-# print('random sentence {}'.format(randomize))
-# random sentence ['tom is married to mary.', 'tom est marie a mary.']
-
-# randomize = pairs
-# print('random sentence {}'.format(randomize))
+randomize = pairs
+print('random sentence {}'.format(randomize))
+# random sentence [['i made two.', "j'en ai confectionne deux."]]
 
 input_size = input_lang.n_words
 output_size = output_lang.n_words
-print('Input : {} Output : {}'.format(input_size, output_size)) # 입력과 출력에 대한 단어 수 출력
-# Input : 23191 Output : 39387
+print('Input : {} Output : {}'.format(input_size, output_size)) # 입력과 출력에 대한 단어 수 출력(공백은 계산에서 제외하고 SOS, EOS 2개 문자는 계산 포함)
+# input size는 1)sos 2)eos 3)i 4)made 5)two. 로 해서 5임
+# output size는 1)sos 2)eos 3)j'en 4)ai 5)confectionne 6)deux. 로 해서 6임
+
+# Input : 4 Output : 6
 
 embed_size = 256
 hidden_size = 512
@@ -640,11 +707,11 @@ num_iteration = 3000 # 30000 -> 3000
 
 # 인코더에 훈련 데이터셋을 입력과 모든 출력과 은닉 상태를 저장 (선언만 한 상태)
 #                    23191       512           256          1
-encoder = Encoder(input_size, hidden_size, embed_size, num_layers)
+encoder = Encoder_Network(input_size, hidden_size, embed_size, num_layers)
 
 # 디코더의 첫번째 입력으로 <SOS>토큰이 제공되고 인코더의 마지막 은닉 상태가 디코더의 첫번째 은닉상태로 제공 (선언만 한 상태)
 #                     39387        512          256          1
-decoder = Decoder(output_size, hidden_size, embed_size, num_layers)
+decoder = Decoder_Network(output_size, hidden_size, embed_size, num_layers)
 
 print(encoder)
 # Encoder(
@@ -658,6 +725,17 @@ print(decoder)
 #   (out): Linear(in_features=512, out_features=39387, bias=True)
 #   (softmax): LogSoftmax(dim=1)
 # )
+
+
+# Encoder_Network(
+#   (embedding): Embedding(5, 256)   5개 단어를 256 차원으로 임베딩
+#   (gru): GRU(256, 512)
+# )
+# Decoder_Network(
+#   (embedding): Embedding(6, 256)
+#   (gru): GRU(256, 512)
+#   (out): Linear(in_features=512, out_features=6, bias=True)
+#   (softmax): LogSoftmax(dim=1)
 
 # 인코드-디코더 모델(Seq2seq) 모델 생성
 Seq2Seq_model = Seq2Seq(encoder, decoder, device).to(device)
