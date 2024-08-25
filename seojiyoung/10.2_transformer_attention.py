@@ -712,6 +712,7 @@ encoder = Encoder_Network(input_size, hidden_size, embed_size, num_layers)
 
 # 디코더의 첫번째 입력으로 <SOS>토큰이 제공되고 인코더의 마지막 은닉 상태가 디코더의 첫번째 은닉상태로 제공 (선언만 한 상태)
 #                     39387        512          256          1
+
 decoder = Decoder_Network(output_size, hidden_size, embed_size, num_layers)
 
 print(encoder)
