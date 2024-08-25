@@ -693,11 +693,12 @@ print('random sentence {}'.format(randomize))
 
 input_size = input_lang.n_words
 output_size = output_lang.n_words
-print('Input : {} Output : {}'.format(input_size, output_size)) # 입력과 출력에 대한 단어 수 출력(공백은 계산에서 제외하고 SOS, EOS 2개 문자는 계산 포함)
+# 입력과 출력에 대한 단어 수 출력(공백은 계산에서 제외하고 SOS, EOS 2개 문자는 계산 포함)
+print('Input : {} Output : {}'.format(input_size, output_size))
 # input size는 1)sos 2)eos 3)i 4)made 5)two. 로 해서 5임
 # output size는 1)sos 2)eos 3)j'en 4)ai 5)confectionne 6)deux. 로 해서 6임
 
-# Input : 4 Output : 6
+# Input : 4 Output : 6gtt
 
 embed_size = 256
 hidden_size = 512
@@ -728,7 +729,7 @@ print(decoder)
 
 
 # Encoder_Network(
-#   (embedding): Embedding(5, 256)   5개 단어를 256 차원으로 임베딩
+#   (embedding): Embedding(5, 256) 5개 단어를 256 차원으로 임베딩
 #   (gru): GRU(256, 512)
 # )
 # Decoder_Network(
