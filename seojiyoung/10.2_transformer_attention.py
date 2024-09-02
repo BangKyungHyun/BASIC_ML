@@ -31,9 +31,6 @@ EOS_token = 1
 MAX_LENGTH = 20
 
 word_count = 0
-global word_count1
-global word_count2
-global word_count3
 
 ################################################################################
 # 딕셔너리를 위한 클래스
@@ -95,19 +92,19 @@ class Lang:
 
 def normalizeString(df, lang):
 
-    print('=====def normalizeString(df, lang): start =========')
+    # print('=====def normalizeString(df, lang): start =========')
 
     sentence = df[lang].str.lower()
     sentence = sentence.str.replace('[^A-Za-z\s]+', '') # [^A-Za-z\s]+ 등을 제외하고 모두 공백으로 바꿈
     sentence = sentence.str.normalize('NFD') # 유니코드 정규화 방식
     sentence = sentence.str.encode('ascii', errors='ignore').str.decode('utf-8') # unicode를 ascii로 치환
 
-    print('=====def normalizeString(df, lang): end =========')
+    # print('=====def normalizeString(df, lang): end =========')
 
     return sentence
 
 def read_sentence(df, lang1, lang2):
-    print('=====def read_sentence(df, lang1, lang2): start =========')
+    # print('=====def read_sentence(df, lang1, lang2): start =========')
 
     sentence1 = normalizeString(df, lang1) # 데이터셋의 첫번째 열 (영어)
     sentence2 = normalizeString(df, lang2) # 데이터셋의 두번째 열 (불어)
@@ -166,7 +163,7 @@ def read_sentence(df, lang1, lang2):
     # 135841    il est peut-etre impossible d'obtenir un corpu...
     # Name: fra, Length: 135842, dtype: object
 
-    print('=====def read_sentence(df, lang1, lang2): end =========')
+    # print('=====def read_sentence(df, lang1, lang2): end =========')
 
     return sentence1, sentence2
 
@@ -176,7 +173,7 @@ def read_sentence(df, lang1, lang2):
 
 def read_file(loc, lang1, lang2):
 
-    print('=====read_file(loc, lang1, lang2): start =========')
+    # print('=====read_file(loc, lang1, lang2): start =========')
 
     ###########################################################################
     # read_csv 사용법
@@ -187,7 +184,7 @@ def read_file(loc, lang1, lang2):
     #          불러올 데이터에 header가 없는 경우에는 header=None 옵션 사용
     # names : 열 이름을 리스트로 형태로 입력. 데이터셋은 총 두개의 열이 있기 때문에 lang1, lang2를 사용
     df = pd.read_csv(loc, delimiter='\t', header=None, names=[lang1, lang2])
-    print('=====read_file(loc, lang1, lang2): end =========')
+    # print('=====read_file(loc, lang1, lang2): end =========')
 
     return df
 
@@ -197,7 +194,7 @@ def read_file(loc, lang1, lang2):
 
 def process_data(lang1,lang2):
 
-    print('=====process_data(lang1,lang2): start =========')
+    # print('=====process_data(lang1,lang2): start =========')
 
     df = read_file('../data/%s-%s1.txt' % (lang1, lang2), lang1, lang2)
     sentence1, sentence2 = read_sentence(df, lang1, lang2)
@@ -224,10 +221,10 @@ def process_data(lang1,lang2):
         # split( )을 사용하면 길이에 상관없이 공백을 모두 제거 분리하고, split(' ')을 사용하면 공백 한 개마다 분리하는 것
         if len(sentence1[i].split(' ')) < MAX_LENGTH and len(sentence2[i].split(' ')) < MAX_LENGTH:
             #
-            print('process data sentence1[i] =', sentence1[i])
-            print('process data sentence2[i] =', sentence2[i])
-            print('process data len(sentence1[i].split(' ') =', len(sentence1[i].split(' ')))
-            print('process data len(sentence2[i].split(' ') =', len(sentence2[i].split(' ')))
+            # print('process data sentence1[i] =', sentence1[i])
+            # print('process data sentence2[i] =', sentence2[i])
+            # print('process data len(sentence1[i].split(' ') =', len(sentence1[i].split(' ')))
+            # print('process data len(sentence2[i].split(' ') =', len(sentence2[i].split(' ')))
 
             # process data sentence1[i] = i won!
             # process data sentence2[i] = je l'ai emporte !
@@ -239,9 +236,9 @@ def process_data(lang1,lang2):
             output_lang.addSentence(sentence2[i])    # 출력으로 프랑스어를 사용
             pairs.append(full)                       # pairs에는 입력과 출력이 합쳐진 것을 사용
 
-            print('input_lang 1 =', input_lang)
-            print('output_lang =', output_lang)
-    print('=====process_data(lang1,lang2): end =========')
+    #         print('input_lang 1 =', input_lang)
+    #         print('output_lang =', output_lang)
+    # print('=====process_data(lang1,lang2): end =========')
 
     return input_lang, output_lang, pairs
 ########################################################################################################################
@@ -254,30 +251,30 @@ def process_data(lang1,lang2):
 # 문장을 단어로 분리하고 인덱스를 반환
 def indexesFromSentence(lang, sentence):
 
-    print('=====indexesFromSentence(lang, sentence): start =========')
-
-    print('1. indexesFromSentence sentence =',sentence)
+    # print('=====indexesFromSentence(lang, sentence): start =========')
+    #
+    # print('1. indexesFromSentence sentence =',sentence)
 
     # 1. indexesFromSentence lang = <__main__.Lang object at 0x000002615E3D6850>
     # 2. indexesFromSentence sentence = let's leave the decision to our teacher.
 
-    print('=====indexesFromSentence(lang, sentence): end =========')
+    # print('=====indexesFromSentence(lang, sentence): end =========')
 
     return [lang.word2index[word] for word in sentence.split(' ')]
 
 # 딕셔너리에서 단어에 대한 인덱스를 가져오고 문장 끝에 토큰을 추가
 def tensorFromSentence(lang, sentence):
-    print('=====def tensorFromSentence(lang, sentence): start =========')
+    # print('=====def tensorFromSentence(lang, sentence): start =========')
 
     indexes = indexesFromSentence(lang, sentence)
     indexes.append(EOS_token)
-    print('1. tensorFromSentence indexes =',indexes)
-    print('2. tensorFromSentence sentence =',sentence)
+    # print('1. tensorFromSentence indexes =',indexes)
+    # print('2. tensorFromSentence sentence =',sentence)
 
     # 1. tensorFromSentence indexes = [178, 177, 693, 8339, 240, 1290, 1687, 1]
     # 2. tensorFromSentence sentence = let's leave the decision to our teacher.
 
-    print('=====def tensorFromSentence(lang, sentence): end =========')
+    # print('=====def tensorFromSentence(lang, sentence): end =========')
     return torch.tensor(indexes, dtype=torch.long, device=device).view(-1, 1)
 
 #############################################################################
@@ -286,14 +283,14 @@ def tensorFromSentence(lang, sentence):
 
 def tensorsFromPair(input_lang, output_lang, pair):
 
-    print('333333333333333333333333333333333333333333333333333333333333333333')
-    print('=====tensorsFromPair(input_lang, output_lang, pair): start =========')
-    print('333333333333333333333333333333333333333333333333333333333333333333')
+    # print('333333333333333333333333333333333333333333333333333333333333333333')
+    # print('=====tensorsFromPair(input_lang, output_lang, pair): start =========')
+    # print('333333333333333333333333333333333333333333333333333333333333333333')
 
     input_tensor = tensorFromSentence(input_lang, pair[0])
     # print('1. tensorsFromPair input_lang = ', input_lang)
-    print('1-1. input_lang tensorsFromPair pair[0] = ', pair[0])
-    print('1-2. input_lang tensorsFromPair input_tensor = ', input_tensor)
+    # print('1-1. input_lang tensorsFromPair pair[0] = ', pair[0])
+    # print('1-2. input_lang tensorsFromPair input_tensor = ', input_tensor)
 
     # 1. tensorsFromPair input_lang =  <__main__.Lang object at 0x000002615E3D6850>
     # 2. tensorsFromPair pair[0] =  let's leave the decision to our teacher.
@@ -308,8 +305,8 @@ def tensorsFromPair(input_lang, output_lang, pair):
 
     target_tensor = tensorFromSentence(output_lang, pair[1])
     # print('1. tensorsFromPair output_lang = ', output_lang)
-    print('2-1. input_lang  tensorsFromPair pair[1] = ', pair[1])
-    print('2-2. input_lang  tensorsFromPair target_tensor = ', target_tensor)
+    # print('2-1. input_lang  tensorsFromPair pair[1] = ', pair[1])
+    # print('2-2. input_lang  tensorsFromPair target_tensor = ', target_tensor)
 
     # 1. tensorsFromPair output_lang =  <__main__.Lang object at 0x000002615E3D60D0>
     # 2. tensorsFromPair pair[1] =  laissons la decision a notre professeur.
@@ -321,9 +318,9 @@ def tensorsFromPair(input_lang, output_lang, pair):
     #         [3278],
     #         [   1]])
 
-    print('333333333333333333333333333333333333333333333333333333333333333333')
-    print('=====tensorsFromPair(input_lang, output_lang, pair): end =========')
-    print('333333333333333333333333333333333333333333333333333333333333333333')
+    # print('333333333333333333333333333333333333333333333333333333333333333333')
+    # print('=====tensorsFromPair(input_lang, output_lang, pair): end =========')
+    # print('333333333333333333333333333333333333333333333333333333333333333333')
 
     return (input_tensor, target_tensor)
 
@@ -722,7 +719,7 @@ num_iteration = 1 # 30000 -> 3000
 
 # 인코더에 훈련 데이터셋을 입력과 모든 출력과 은닉 상태를 저장 (선언만 한 상태)
 #                    23191       512           256          1
-print('encoder = Encoder_Network(input_size, hidden_size, embed_size, num_layers) start')
+# print('encoder = Encoder_Network(input_size, hidden_size, embed_size, num_layers) start')
 
 encoder = Encoder_Network(input_size, hidden_size, embed_size, num_layers)
 
@@ -732,17 +729,17 @@ encoder = Encoder_Network(input_size, hidden_size, embed_size, num_layers)
 #   (gru): GRU(256, 512)
 # )
 
-print('encoder = Encoder_Network(input_size, hidden_size, embed_size, num_layers) end')
+# print('encoder = Encoder_Network(input_size, hidden_size, embed_size, num_layers) end')
 
 # 디코더의 첫번째 입력으로 <SOS>토큰이 제공되고 인코더의 마지막 은닉 상태가 디코더의 첫번째 은닉상태로 제공 (선언만 한 상태)
 #                     39387        512          256          1
-print('decoder = Decoder_Network(output_size, hidden_size, embed_size, num_layers) start')
+# print('decoder = Decoder_Network(output_size, hidden_size, embed_size, num_layers) start')
 
 decoder = Decoder_Network(output_size, hidden_size, embed_size, num_layers)
 
 # print(decoder)
 
-print('decoder = Decoder_Network(output_size, hidden_size, embed_size, num_layers) end')
+# print('decoder = Decoder_Network(output_size, hidden_size, embed_size, num_layers) end')
 
 # Decoder(
 #   (embedding): Embedding(39387, 256)
@@ -784,26 +781,24 @@ Seq2Seq_model = Seq2Seq(encoder, decoder, device).to(device)
 print('Seq2Seq_model = Seq2Seq(encoder, decoder, device).to(device) end')
 ######################################################################################################################
 ######################################################################################################################
-######################################################################################################################
-######################################################################################################################
 
 print('77777777777777777777777777777777777777777777777777777777777777777777777777777777777777')
+print('77777777777777777777777777777777777777777777777777777777777777777777777777777777777777\n')
+print('model = trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration) start\n')
 print('77777777777777777777777777777777777777777777777777777777777777777777777777777777777777')
-print('model = trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration) start')
-print('77777777777777777777777777777777777777777777777777777777777777777777777777777777777777')
-print('77777777777777777777777777777777777777777777777777777777777777777777777777777777777777')
+print('77777777777777777777777777777777777777777777777777777777777777777777777777777777777777\n')
 
 print('88888888888888888888888888888888888888888888888888888888888888888888888888888888888888')
-print('88888888888888888888888888888888888888888888888888888888888888888888888888888888888888')
+print('88888888888888888888888888888888888888888888888888888888888888888888888888888888888888\n')
 model = trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration)
 print('88888888888888888888888888888888888888888888888888888888888888888888888888888888888888')
-print('88888888888888888888888888888888888888888888888888888888888888888888888888888888888888')
+print('88888888888888888888888888888888888888888888888888888888888888888888888888888888888888\n')
 
 print('99999999999999999999999999999999999999999999999999999999999999999999999999999999999999')
+print('99999999999999999999999999999999999999999999999999999999999999999999999999999999999999\n')
+print('model = trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration) start\n')
 print('99999999999999999999999999999999999999999999999999999999999999999999999999999999999999')
-print('model = trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration) start')
-print('99999999999999999999999999999999999999999999999999999999999999999999999999999999999999')
-print('99999999999999999999999999999999999999999999999999999999999999999999999999999999999999')
+print('99999999999999999999999999999999999999999999999999999999999999999999999999999999999999\n')
 
 
 model = trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration)
@@ -837,7 +832,6 @@ print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 #     (softmax): LogSoftmax(dim=1)
 #   )
 # )
-
 
 print('11111111111111111111111111111111111111111111111111111111111111111111111111111111111111')
 print('model = trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration)  end')
