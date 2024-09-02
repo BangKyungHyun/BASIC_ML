@@ -24,7 +24,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 ################################################################################
 # 데이터 준비
-################################################################################
+#################################################################   ###############
 
 SOS_token = 0
 EOS_token = 1
@@ -54,106 +54,39 @@ class Lang:
         self.word2count = {}
         self.n_words = 2                       # SOS와 EOS에 대한 카운트
 
-    # 문장을 단어 단위로 분리한 후 컨테이너(word)에 추가
+    # 문장을 단어 단위(스페이스 기준)로 분리한 후 컨테이너(word)에 추가
     def addSentence(self, sentence):
 
         for word in sentence.split(' '):
-            # global word_count
-            # word_count += 1
-            # if word_count > 50:
-            #     sys.exit()
-            print('word =', word)
 
-            # word = go.
-            # word = va
-            # word = !
-            # word = run!
-            # word = cours!
-            # word = run!
-            # word = courez!
-            # word = wow!
-            # word = ca
-            # word = alors!
-            # word = fire!
-            # word = au
-            # word = feu
-            # word = !
-            # word = help!
-            # word = a
-            # word = l'aide!
-            # word = jump.
-            # word = saute.
-            # word = stop!
-            # word = ca
-            # word = suffit!
-            # word = stop!
-            # word = stop!
-            # word = stop!
-            # word = arrete - toi
-            # word = !
-            # word = wait!
-            # word = attends
-            # word = !
-            # word = wait!
-            # word = attendez
-            # word = !
-            # word = i
-            # word = see.
-            # word = je
-            # word = comprends.
-            # word = i
-            # word =
-            # try.
-            # word = j
-            # 'essaye.
-            # word = i
-            # word = won!
-            # word = j
-            # 'ai
-            # word = gagne
-            # word = !
-            # word = i
-            # word = won!
-            # word = je
-            # word = l
-            # 'ai
-            # word = emporte
+            print('word =', word)
 
             self.addWord(word)
 
     # 컨테이너에 단어가 없다면 추가되고 있다는 카운트를 업데이트
     def addWord(self, word):
-        #
-        # global word_count
-        # word_count += 1
-        # if word_count > 50:
-        #     sys.exit()
 
         if word not in self.word2index:
-
-            # print('def addWord self.n_words =', self.n_words)
 
             self.word2index[word] = self.n_words  # 초기값이 2부터 시작
             self.word2count[word] = 1
             self.index2word[self.n_words] = word
 
-            print('def addWord not in => word, self.n_words, self.word2index, self.word2index[word], self.index2word[self.n_words] ='
-                  ,word, self.n_words, self.word2index, self.word2index[word], self.index2word[self.n_words])
-            # def addWord not in => word, self.n_words, self.word2index, self.word2index[word], self.index2word[self.n_words] = i 2 {'i': 2} 2 i
-            # def addWord not in => word, self.n_words, self.word2index, self.word2index[word], self.index2word[self.n_words] = made 3 {'i': 2, 'made': 3} 3 made
-            # def addWord not in => word, self.n_words, self.word2index, self.word2index[word], self.index2word[self.n_words] = two. 4 {'i': 2, 'made': 3, 'two.': 4} 4 two.
+            # print('def addWord not in => word, self.n_words, self.word2index, self.index2word, self.word2index[word], self.index2word[self.n_words] ='
+            #                             ,word, self.n_words, self.word2index, self.index2word, self.word2index[word], self.index2word[self.n_words])
+            # def addWord not in => word, self.n_words, self.word2index, self.index2word, self.word2index[word], self.index2word[self.n_words] = i 2 {'i': 2} {0: 'SOS', 1: 'EOS', 2: 'i'} 2 i
+            # def addWord not in => word, self.n_words, self.word2index, self.index2word, self.word2index[word], self.index2word[self.n_words] = made 3 {'i': 2, 'made': 3} {0: 'SOS', 1: 'EOS', 2: 'i', 3: 'made'} 3 made
+            # def addWord not in => word, self.n_words, self.word2index, self.index2word, self.word2index[word], self.index2word[self.n_words] = two. 4 {'i': 2, 'made': 3, 'two.': 4} {0: 'SOS', 1: 'EOS', 2: 'i', 3: 'made', 4: 'two.'} 4 two.
+            # def addWord not in => word, self.n_words, self.word2index, self.index2word, self.word2index[word], self.index2word[self.n_words] = j'en 2 {"j'en": 2} {0: 'SOS', 1: 'EOS', 2: "j'en"} 2 j'en
+            # def addWord not in => word, self.n_words, self.word2index, self.index2word, self.word2index[word], self.index2word[self.n_words] = ai 3 {"j'en": 2, 'ai': 3} {0: 'SOS', 1: 'EOS', 2: "j'en", 3: 'ai'} 3 ai
+            # def addWord not in => word, self.n_words, self.word2index, self.index2word, self.word2index[word], self.index2word[self.n_words] = confectionne 4 {"j'en": 2, 'ai': 3, 'confectionne': 4} {0: 'SOS', 1: 'EOS', 2: "j'en", 3: 'ai', 4: 'confectionne'} 4 confectionne
+            # def addWord not in => word, self.n_words, self.word2index, self.index2word, self.word2index[word], self.index2word[self.n_words] = deux. 5 {"j'en": 2, 'ai': 3, 'confectionne': 4, 'deux.': 5} {0: 'SOS', 1: 'EOS', 2: "j'en", 3: 'ai', 4: 'confectionne', 5: 'deux.'} 5 deux.
             self.n_words += 1
 
         else:
             self.word2count[word] += 1  # 단어별 갯수를 계산
-            print('def addWord     in => word, self.n_words, self.word2index, self.word2index[word],self.index2word[self.n_words] ='
-                  ,word, self.n_words, self.word2index, self.word2index[word], self.index2word[self.n_words])
-
-# addWord     in => self.word2index[word] = i 14 {'go.': 2, 'run!': 3, 'wow!': 4, 'fire!': 5, 'help!': 6, 'jump.': 7, 'stop!': 8, 'wait!': 9, 'i': 10, 'see.': 11, 'try.': 12, 'won!': 13}
-# addWord     in => self.word2index[word] = won! 14 {'go.': 2, 'run!': 3, 'wow!': 4, 'fire!': 5, 'help!': 6, 'jump.': 7, 'stop!': 8, 'wait!': 9, 'i': 10, 'see.': 11, 'try.': 12, 'won!': 13}
-# addWord     in => self.word2index[word] = je 23 {'va': 2, '!': 3, 'cours!': 4, 'courez!': 5, 'ca': 6, 'alors!': 7, 'au': 8, 'feu': 9, 'a': 10, "l'aide!": 11, 'saute.': 12, 'suffit!': 13, 'stop!': 14, 'arrete-toi': 15, 'attends': 16, 'attendez': 17, 'je': 18, 'comprends.': 19, "j'essaye.": 20, "j'ai": 21, 'gagne': 22}
-# addWord not in => self.word2index[word] = l'ai 23 {'va': 2, '!': 3, 'cours!': 4, 'courez!': 5, 'ca': 6, 'alors!': 7, 'au': 8, 'feu': 9, 'a': 10, "l'aide!": 11, 'saute.': 12, 'suffit!': 13, 'stop!': 14, 'arrete-toi': 15, 'attends': 16, 'attendez': 17, 'je': 18, 'comprends.': 19, "j'essaye.": 20, "j'ai": 21, 'gagne': 22, "l'ai": 23} 23
-# addWord not in => self.word2index[word] = emporte 24 {'va': 2, '!': 3, 'cours!': 4, 'courez!': 5, 'ca': 6, 'alors!': 7, 'au': 8, 'feu': 9, 'a': 10, "l'aide!": 11, 'saute.': 12, 'suffit!': 13, 'stop!': 14, 'arrete-toi': 15, 'attends': 16, 'attendez': 17, 'je': 18, 'comprends.': 19, "j'essaye.": 20, "j'ai": 21, 'gagne': 22, "l'ai": 23, 'emporte': 24} 24
+            # print('def addWord     in => word, self.n_words, self.word2index, self.word2index[word],self.index2word[self.n_words] ='
+            #       ,word, self.n_words, self.word2index, self.word2index[word], self.index2word[self.n_words])
 
 
 ################################################################################
@@ -161,13 +94,21 @@ class Lang:
 ################################################################################
 
 def normalizeString(df, lang):
+
+    print('=====def normalizeString(df, lang): start =========')
+
     sentence = df[lang].str.lower()
     sentence = sentence.str.replace('[^A-Za-z\s]+', '') # [^A-Za-z\s]+ 등을 제외하고 모두 공백으로 바꿈
     sentence = sentence.str.normalize('NFD') # 유니코드 정규화 방식
     sentence = sentence.str.encode('ascii', errors='ignore').str.decode('utf-8') # unicode를 ascii로 치환
+
+    print('=====def normalizeString(df, lang): end =========')
+
     return sentence
 
 def read_sentence(df, lang1, lang2):
+    print('=====def read_sentence(df, lang1, lang2): start =========')
+
     sentence1 = normalizeString(df, lang1) # 데이터셋의 첫번째 열 (영어)
     sentence2 = normalizeString(df, lang2) # 데이터셋의 두번째 열 (불어)
 
@@ -225,6 +166,8 @@ def read_sentence(df, lang1, lang2):
     # 135841    il est peut-etre impossible d'obtenir un corpu...
     # Name: fra, Length: 135842, dtype: object
 
+    print('=====def read_sentence(df, lang1, lang2): end =========')
+
     return sentence1, sentence2
 
 ################################################################################
@@ -233,12 +176,19 @@ def read_sentence(df, lang1, lang2):
 
 def read_file(loc, lang1, lang2):
 
+    print('=====read_file(loc, lang1, lang2): start =========')
+
+    ###########################################################################
+    # read_csv 사용법
+    ###########################################################################
     # loc : 예제에서 사용할 데이터셋
     # delimeter : csv파일의 데이터가 어떤 형태(\t,' ','+')로 나뉘었는지 의미
     # header : 일반적으로 데이터셋의 첫 번째를 header(열 이름)로 지정해서 사용되게 되는데
     #          불러올 데이터에 header가 없는 경우에는 header=None 옵션 사용
     # names : 열 이름을 리스트로 형태로 입력. 데이터셋은 총 두개의 열이 있기 때문에 lang1, lang2를 사용
     df = pd.read_csv(loc, delimiter='\t', header=None, names=[lang1, lang2])
+    print('=====read_file(loc, lang1, lang2): end =========')
+
     return df
 
 ################################################################################
@@ -247,8 +197,13 @@ def read_file(loc, lang1, lang2):
 
 def process_data(lang1,lang2):
 
+    print('=====process_data(lang1,lang2): start =========')
+
     df = read_file('../data/%s-%s1.txt' % (lang1, lang2), lang1, lang2)
     sentence1, sentence2 = read_sentence(df, lang1, lang2)
+    # print('def process_data sentence1 =', sentence1)
+    # print('def process_data sentence2 =', sentence2)
+    # print('def process_data len(df) =', len(df))
 
     input_lang = Lang()
     # print('process_data input_lang =', input_lang)
@@ -269,10 +224,10 @@ def process_data(lang1,lang2):
         # split( )을 사용하면 길이에 상관없이 공백을 모두 제거 분리하고, split(' ')을 사용하면 공백 한 개마다 분리하는 것
         if len(sentence1[i].split(' ')) < MAX_LENGTH and len(sentence2[i].split(' ')) < MAX_LENGTH:
             #
-            # print('process data sentence1[i] =', sentence1[i])
-            # print('process data sentence2[i] =', sentence2[i])
-            # print('process data len(sentence1[i].split(' ') =', len(sentence1[i].split(' ')))
-            # print('process data len(sentence2[i].split(' ') =', len(sentence2[i].split(' ')))
+            print('process data sentence1[i] =', sentence1[i])
+            print('process data sentence2[i] =', sentence2[i])
+            print('process data len(sentence1[i].split(' ') =', len(sentence1[i].split(' ')))
+            print('process data len(sentence2[i].split(' ') =', len(sentence2[i].split(' ')))
 
             # process data sentence1[i] = i won!
             # process data sentence2[i] = je l'ai emporte !
@@ -284,7 +239,14 @@ def process_data(lang1,lang2):
             output_lang.addSentence(sentence2[i])    # 출력으로 프랑스어를 사용
             pairs.append(full)                       # pairs에는 입력과 출력이 합쳐진 것을 사용
 
+            print('input_lang 1 =', input_lang)
+            print('output_lang =', output_lang)
+    print('=====process_data(lang1,lang2): end =========')
+
     return input_lang, output_lang, pairs
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
 
 ################################################################################
 # 텐서로 변환
@@ -292,35 +254,46 @@ def process_data(lang1,lang2):
 # 문장을 단어로 분리하고 인덱스를 반환
 def indexesFromSentence(lang, sentence):
 
-    # print('1. indexesFromSentence lang =',lang)
-    # print('2. indexesFromSentence sentence =',sentence)
+    print('=====indexesFromSentence(lang, sentence): start =========')
+
+    print('1. indexesFromSentence sentence =',sentence)
 
     # 1. indexesFromSentence lang = <__main__.Lang object at 0x000002615E3D6850>
     # 2. indexesFromSentence sentence = let's leave the decision to our teacher.
+
+    print('=====indexesFromSentence(lang, sentence): end =========')
 
     return [lang.word2index[word] for word in sentence.split(' ')]
 
 # 딕셔너리에서 단어에 대한 인덱스를 가져오고 문장 끝에 토큰을 추가
 def tensorFromSentence(lang, sentence):
+    print('=====def tensorFromSentence(lang, sentence): start =========')
 
     indexes = indexesFromSentence(lang, sentence)
     indexes.append(EOS_token)
-    # print('1. tensorFromSentence indexes =',indexes)
-    # print('2. tensorFromSentence lang =',lang)
-    # print('3. tensorFromSentence sentence =',sentence)
+    print('1. tensorFromSentence indexes =',indexes)
+    print('2. tensorFromSentence sentence =',sentence)
 
     # 1. tensorFromSentence indexes = [178, 177, 693, 8339, 240, 1290, 1687, 1]
-    # 2. tensorFromSentence lang = <__main__.Lang object at 0x000002615E3D6850>
-    # 3. tensorFromSentence sentence = let's leave the decision to our teacher.
+    # 2. tensorFromSentence sentence = let's leave the decision to our teacher.
 
+    print('=====def tensorFromSentence(lang, sentence): end =========')
     return torch.tensor(indexes, dtype=torch.long, device=device).view(-1, 1)
 
+#############################################################################
 # 입력과 출력 문장을 텐서로 변환하여 반환
+#############################################################################
+
 def tensorsFromPair(input_lang, output_lang, pair):
+
+    print('333333333333333333333333333333333333333333333333333333333333333333')
+    print('=====tensorsFromPair(input_lang, output_lang, pair): start =========')
+    print('333333333333333333333333333333333333333333333333333333333333333333')
+
     input_tensor = tensorFromSentence(input_lang, pair[0])
     # print('1. tensorsFromPair input_lang = ', input_lang)
-    # print('2. tensorsFromPair pair[0] = ', pair[0])
-    # print('3. tensorsFromPair input_tensor = ', input_tensor)
+    print('1-1. input_lang tensorsFromPair pair[0] = ', pair[0])
+    print('1-2. input_lang tensorsFromPair input_tensor = ', input_tensor)
 
     # 1. tensorsFromPair input_lang =  <__main__.Lang object at 0x000002615E3D6850>
     # 2. tensorsFromPair pair[0] =  let's leave the decision to our teacher.
@@ -335,8 +308,8 @@ def tensorsFromPair(input_lang, output_lang, pair):
 
     target_tensor = tensorFromSentence(output_lang, pair[1])
     # print('1. tensorsFromPair output_lang = ', output_lang)
-    # print('2. tensorsFromPair pair[1] = ', pair[1])
-    # print('3. tensorsFromPair target_tensor = ', target_tensor)
+    print('2-1. input_lang  tensorsFromPair pair[1] = ', pair[1])
+    print('2-2. input_lang  tensorsFromPair target_tensor = ', target_tensor)
 
     # 1. tensorsFromPair output_lang =  <__main__.Lang object at 0x000002615E3D60D0>
     # 2. tensorsFromPair pair[1] =  laissons la decision a notre professeur.
@@ -348,10 +321,9 @@ def tensorsFromPair(input_lang, output_lang, pair):
     #         [3278],
     #         [   1]])
 
-    # global word_count
-    # word_count += 1
-    # if word_count > 50:
-    #     sys.exit()
+    print('333333333333333333333333333333333333333333333333333333333333333333')
+    print('=====tensorsFromPair(input_lang, output_lang, pair): end =========')
+    print('333333333333333333333333333333333333333333333333333333333333333333')
 
     return (input_tensor, target_tensor)
 
@@ -407,11 +379,13 @@ class Encoder_Network(nn.Module):
         self.gru = nn.GRU(self.embbed_dim, self.hidden_dim,num_layers=self.num_layers)
 
     def forward(self, src):
+        print('=====class Encoder_Network(nn.Module): start =========')
+
         # print('Encoder forward src =', src)
         # Encoder forward src = tensor([369])
 
         embedded = self.embedding(src).view(1, 1, -1) # 임베딩 처리
-        # print('Encoder forward embedded.shape =', embedded.shape)
+        print('=====class Encoder forward embedded.shape =', embedded.shape)
         # Encoder forward embedded.shape = torch.Size([1, 1, 256])
         word_count1 = 0
 
@@ -468,6 +442,7 @@ class Encoder_Network(nn.Module):
 
         # print('Encoder forward hidden.shape = ', hidden.shape)
         # Encoder forward hidden.shape =  torch.Size([1, 1, 512])
+        print('=====class Encoder_Network(nn.Module): end =========')
 
         return outputs, hidden
 
@@ -517,14 +492,17 @@ class Decoder_Network(nn.Module):
         self.softmax = nn.LogSoftmax(dim=1)
 
     def forward(self, input, hidden):
+        print('=====class Decoder_Network(nn.Module): start =========')
+
         # 입력을 (1, 배치크기)로 변경
         input = input.view(1, -1)
         embedded = F.relu(self.embedding(input))
         output, hidden = self.gru(embedded, hidden)
         prediction = self.softmax(self.out(output[0]))
 
-        # print('Decoder forward input =', input)
+        print('Decoder forward input =', input)
         # print('Decoder forward hidden =', hidden)
+        print('=====class Decoder_Network(nn.Module): end =========')
 
         return prediction, hidden
 
@@ -541,6 +519,7 @@ class Seq2Seq(nn.Module):
         self.device = device
 
     def forward(self, input_lang, output_lang, teacher_forcing_ratio=0.5):
+        print('=====class Seq2Seq(nn.Module): start =========')
 
         # word_count3 = 0
         #
@@ -558,6 +537,7 @@ class Seq2Seq(nn.Module):
 
         # 문장의 모든 단어를 인코딩
         for i in range(input_length):
+            print('=====class Seq2Seq(nn.Module): input_length = ',i, input_length)
             encoder_output, encoder_hidden = self.encoder(input_lang[i])
 
         # 인코더의 은닉층을 디코더의 은닉층으로 사용
@@ -567,6 +547,8 @@ class Seq2Seq(nn.Module):
         decoder_input = torch.tensor([SOS_token], device=device)
 
         for t in range(target_length): # 현재 단어에서 출력 단어를 예측
+            print('=====class Seq2Seq(nn.Module): target_length = ', t, target_length)
+
             decoder_output, decoder_hidden = self.decoder(decoder_input,decoder_hidden)
             outputs[t] = decoder_output
 
@@ -578,6 +560,7 @@ class Seq2Seq(nn.Module):
             # teacher force 활성화하지 않으면 자체 예측 값을 다음 입력으로 사용
             if (teacher_force == False and input.item() == EOS_token):
                 break
+        print('=====class Seq2Seq(nn.Module): end =========')
 
         return outputs
 
@@ -587,13 +570,18 @@ class Seq2Seq(nn.Module):
 
 teacher_forcing_ratio = 0.5
 
-def Model(model, input_tensor, target_tensor, model_optimizer, criterion):
+def Model(model_bkh21, input_tensor, target_tensor, model_optimizer, criterion):
+
+    print('=====Model(model, input_tensor, target_tensor, model_optimizer, criterion): start =========')
 
     model_optimizer.zero_grad()
     input_length = input_tensor.size(0)
     loss = 0
     epoch_loss = 0
-    output = model(input_tensor, target_tensor)
+    print('=====Model(model, input_tensor, target_tensor, model_optimizer, criterion): 22222 =========')
+    output = model_bkh21(input_tensor, target_tensor)
+    print('=====Model(model, input_tensor, target_tensor, model_optimizer, criterion): 33333 =========')
+
     num_iter = output.size(0)
 
     for ot in range(num_iter):
@@ -603,6 +591,9 @@ def Model(model, input_tensor, target_tensor, model_optimizer, criterion):
     loss.backward()
     model_optimizer.step()
     epoch_loss = loss.item() / num_iter
+
+    print('=====Model(model, input_tensor, target_tensor, model_optimizer, criterion): end =========')
+
     return epoch_loss
 
 ################################################################################
@@ -610,6 +601,10 @@ def Model(model, input_tensor, target_tensor, model_optimizer, criterion):
 ################################################################################
                                                      # 20000 -> 2000
 def trainModel(model, input_lang, output_lang, pairs, num_iteration=2000):
+
+    print('22222222222222222222222222222222222222222222222222222222222222222222222222222222222222222')
+    print('=====trainModel(model, input_lang, output_lang, pairs, num_iteration=2000): start =========')
+    print('22222222222222222222222222222222222222222222222222222222222222222222222222222222222222222')
 
     model.train()
     optimizer = optim.SGD(model.parameters(), lr=0.01) # 옵티마이져 SGD를 사용
@@ -623,7 +618,10 @@ def trainModel(model, input_lang, output_lang, pairs, num_iteration=2000):
         training_pair = training_pairs[iter - 1]
         input_tensor = training_pair[0]
         target_tensor = training_pair[1]
+        print('=====trainModel(model, input_lang, output_lang, pairs, num_iteration=2000): aaa =========')
         loss = Model(model, input_tensor, target_tensor, optimizer, criterion)
+        print('=====trainModel(model, input_lang, output_lang, pairs, num_iteration=2000): zzz =========')
+
         total_loss_iterations += loss
 
         if iter % 500 == 0:
@@ -633,6 +631,10 @@ def trainModel(model, input_lang, output_lang, pairs, num_iteration=2000):
 
     torch.save(model.state_dict(), '../data/mytraining.pt')
 
+    print('22222222222222222222222222222222222222222222222222222222222222222222222222222222222222222')
+    print('=====trainModel(model, input_lang, output_lang, pairs, num_iteration=2000): end =========')
+    print('22222222222222222222222222222222222222222222222222222222222222222222222222222222222222222')
+
     return model
 
 ################################################################################
@@ -640,6 +642,7 @@ def trainModel(model, input_lang, output_lang, pairs, num_iteration=2000):
 ################################################################################
 
 def evaluate(model, input_lang, output_lang, sentences, max_length=MAX_LENGTH):
+    print('=====evaluate(model, input_lang, output_lang, sentences, max_length=MAX_LENGTH): start =========')
 
     with torch.no_grad():
         input_tensor = tensorFromSentence(input_lang, sentences[0]) # 입력문자열를 텐서로 변환
@@ -655,23 +658,33 @@ def evaluate(model, input_lang, output_lang, sentences, max_length=MAX_LENGTH):
                 break
             else: # 예측 결과를 출력 문자열에 추가
                 decoded_words.append(output_lang.index2word[topi[0].item()])
+    print('=====evaluate(model, input_lang, output_lang, sentences, max_length=MAX_LENGTH): end =========')
 
     return decoded_words
 
-# 훈련 데이터셋으로부터 임의의 문장을 가져와서 모델 평가
-def evaluateRandomly(model, input_lang, output_lang, pairs, n=10):
+# 훈련 데이터셋으로부터 임의의 문장을 가져와서 모델 평가  (임의로 10개의 데이터를 가져옴)
+def evaluateRandomly(model, input_lang, output_lang, pairs, n=1):
+# def evaluateRandomly(model, input_lang, output_lang, pairs, n=10):
 
     for i in range(n):
+        print('=******************************************************************************=')
+        print('=====def evaluateRandomly(model, input_lang, output_lang, pairs) start =========')
+
         pair = random.choice(pairs)  # 임의의 문장을 가져온다.
-        print('input {}'.format(pair[0]))
-        print('output {}'.format(pair[1]))
+        print('=====def evaluateRandomly(model, input_lang, output_lang, pairs) === i  =', i,n)
+        print('=====def evaluateRandomly(model, input_lang, output_lang, pairs) === input {}'.format(pair[0]))
+        print('=====def evaluateRandomly(model, input_lang, output_lang, pairs) === output {}'.format(pair[1]))
         output_words = evaluate(model, input_lang, output_lang, pair) # 모델 평가 결과는 output_words에 저장
         output_sentence = ' '.join(output_words)
-        print('predicted {}'.format(output_sentence))
+        print('=====def evaluateRandomly(model, input_lang, output_lang, pairs) === predicted {}'.format(output_sentence))
+        print('=====def evaluateRandomly(model, input_lang, output_lang, pairs) end =========')
+        print('=******************************************************************************=')
 
 ################################################################################
 # 모델 훈련 (main module)
 ################################################################################
+
+print('============main module start ==========')
 
 lang1 = 'eng'  # 입력으로 사용할 영어
 lang2 = 'fra'  # 출력으로 사용할 프랑스어
@@ -695,32 +708,41 @@ input_size = input_lang.n_words
 output_size = output_lang.n_words
 # 입력과 출력에 대한 단어 수 출력(공백은 계산에서 제외하고 SOS, EOS 2개 문자는 계산 포함)
 print('Input : {} Output : {}'.format(input_size, output_size))
+
+# Input : 5 Output : 6
 # input size는 1)sos 2)eos 3)i 4)made 5)two. 로 해서 5임
 # output size는 1)sos 2)eos 3)j'en 4)ai 5)confectionne 6)deux. 로 해서 6임
-
-# Input : 4 Output : 6gtt
 
 embed_size = 256
 hidden_size = 512
 num_layers = 1
-num_iteration = 3000 # 30000 -> 3000
+num_iteration = 1 # 30000 -> 3000
 # num_iteration = 75000
 
 # 인코더에 훈련 데이터셋을 입력과 모든 출력과 은닉 상태를 저장 (선언만 한 상태)
 #                    23191       512           256          1
+print('encoder = Encoder_Network(input_size, hidden_size, embed_size, num_layers) start')
+
 encoder = Encoder_Network(input_size, hidden_size, embed_size, num_layers)
 
-# 디코더의 첫번째 입력으로 <SOS>토큰이 제공되고 인코더의 마지막 은닉 상태가 디코더의 첫번째 은닉상태로 제공 (선언만 한 상태)
-#                     39387        512          256          1
-
-decoder = Decoder_Network(output_size, hidden_size, embed_size, num_layers)
-
-print(encoder)
+# print(encoder)
 # Encoder(
 #   (embedding): Embedding(23191, 256)
 #   (gru): GRU(256, 512)
 # )
-print(decoder)
+
+print('encoder = Encoder_Network(input_size, hidden_size, embed_size, num_layers) end')
+
+# 디코더의 첫번째 입력으로 <SOS>토큰이 제공되고 인코더의 마지막 은닉 상태가 디코더의 첫번째 은닉상태로 제공 (선언만 한 상태)
+#                     39387        512          256          1
+print('decoder = Decoder_Network(output_size, hidden_size, embed_size, num_layers) start')
+
+decoder = Decoder_Network(output_size, hidden_size, embed_size, num_layers)
+
+# print(decoder)
+
+print('decoder = Decoder_Network(output_size, hidden_size, embed_size, num_layers) end')
+
 # Decoder(
 #   (embedding): Embedding(39387, 256)
 #   (gru): GRU(256, 512)
@@ -740,16 +762,95 @@ print(decoder)
 #   (softmax): LogSoftmax(dim=1)
 
 # 인코드-디코더 모델(Seq2seq) 모델 생성
+
+print('Seq2Seq_model = Seq2Seq(encoder, decoder, device).to(device) start')
 Seq2Seq_model = Seq2Seq(encoder, decoder, device).to(device)
+# print('Seq2Seq_model =', Seq2Seq_model)
+
+# Seq2Seq_model = Seq2Seq(
+#   (encoder): Encoder_Network(
+#     (embedding): Embedding(5, 256)
+#     (gru): GRU(256, 512)
+#   )
+#   (decoder): Decoder_Network(
+#     (embedding): Embedding(6, 256)
+#     (gru): GRU(256, 512)
+#     (out): Linear(in_features=512, out_features=6, bias=True)
+#     (softmax): LogSoftmax(dim=1)
+#   )
+# )
+
+print('Seq2Seq_model = Seq2Seq(encoder, decoder, device).to(device) end')
+######################################################################################################################
+######################################################################################################################
+######################################################################################################################
+######################################################################################################################
+
+print('77777777777777777777777777777777777777777777777777777777777777777777777777777777777777')
+print('77777777777777777777777777777777777777777777777777777777777777777777777777777777777777')
+print('model = trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration) start')
+print('77777777777777777777777777777777777777777777777777777777777777777777777777777777777777')
+print('77777777777777777777777777777777777777777777777777777777777777777777777777777777777777')
+
+print('88888888888888888888888888888888888888888888888888888888888888888888888888888888888888')
+print('88888888888888888888888888888888888888888888888888888888888888888888888888888888888888')
+model = trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration)
+print('88888888888888888888888888888888888888888888888888888888888888888888888888888888888888')
+print('88888888888888888888888888888888888888888888888888888888888888888888888888888888888888')
+
+print('99999999999999999999999999999999999999999999999999999999999999999999999999999999999999')
+print('99999999999999999999999999999999999999999999999999999999999999999999999999999999999999')
+print('model = trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration) start')
+print('99999999999999999999999999999999999999999999999999999999999999999999999999999999999999')
+print('99999999999999999999999999999999999999999999999999999999999999999999999999999999999999')
+
 
 model = trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration)
+print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+
+# print('model =', model)
+
+# model = Seq2Seq(
+#   (encoder): Encoder_Network(
+#     (embedding): Embedding(5, 256)
+#     (gru): GRU(256, 512)
+#   )
+#   (decoder): Decoder_Network(
+#     (embedding): Embedding(6, 256)
+#     (gru): GRU(256, 512)
+#     (out): Linear(in_features=512, out_features=6, bias=True)
+#     (softmax): LogSoftmax(dim=1)
+#   )
+# )
+
+# Seq2Seq_model = Seq2Seq(
+#   (encoder): Encoder_Network(
+#     (embedding): Embedding(5, 256)
+#     (gru): GRU(256, 512)
+#   )
+#   (decoder): Decoder_Network(
+#     (embedding): Embedding(6, 256)
+#     (gru): GRU(256, 512)
+#     (out): Linear(in_features=512, out_features=6, bias=True)
+#     (softmax): LogSoftmax(dim=1)
+#   )
+# )
+
+
+print('11111111111111111111111111111111111111111111111111111111111111111111111111111111111111')
+print('model = trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration)  end')
+print('11111111111111111111111111111111111111111111111111111111111111111111111111111111111111')
+
+print('============main module end ==========')
 
 ################################################################################
 # 임의의 문장에 대한 평가 결과
 ################################################################################
 #
-print('==================================================')
+print('evaluateRandomly(model, input_lang, output_lang, pairs) start=========')
 evaluateRandomly(model, input_lang, output_lang, pairs)
+print('evaluateRandomly(model, input_lang, output_lang, pairs) end=========')
 
 # ################################################################################
 # # 어텐션이 적용된 디코더
