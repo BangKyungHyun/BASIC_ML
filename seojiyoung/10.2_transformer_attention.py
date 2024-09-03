@@ -56,7 +56,7 @@ class Lang:
 
         for word in sentence.split(' '):
 
-            print('word =', word)
+            # print('word =', word)
 
             self.addWord(word)
 
@@ -79,12 +79,10 @@ class Lang:
             # def addWord not in => word, self.n_words, self.word2index, self.index2word, self.word2index[word], self.index2word[self.n_words] = confectionne 4 {"j'en": 2, 'ai': 3, 'confectionne': 4} {0: 'SOS', 1: 'EOS', 2: "j'en", 3: 'ai', 4: 'confectionne'} 4 confectionne
             # def addWord not in => word, self.n_words, self.word2index, self.index2word, self.word2index[word], self.index2word[self.n_words] = deux. 5 {"j'en": 2, 'ai': 3, 'confectionne': 4, 'deux.': 5} {0: 'SOS', 1: 'EOS', 2: "j'en", 3: 'ai', 4: 'confectionne', 5: 'deux.'} 5 deux.
             self.n_words += 1
-
         else:
             self.word2count[word] += 1  # 단어별 갯수를 계산
             # print('def addWord     in => word, self.n_words, self.word2index, self.word2index[word],self.index2word[self.n_words] ='
             #       ,word, self.n_words, self.word2index, self.word2index[word], self.index2word[self.n_words])
-
 
 ################################################################################
 # 데이터 정규화
@@ -102,6 +100,10 @@ def normalizeString(df, lang):
     # print('=====def normalizeString(df, lang): end =========')
 
     return sentence
+
+################################################################################
+# 문장 읽기
+################################################################################
 
 def read_sentence(df, lang1, lang2):
     # print('=====def read_sentence(df, lang1, lang2): start =========')
@@ -241,14 +243,11 @@ def process_data(lang1,lang2):
     # print('=====process_data(lang1,lang2): end =========')
 
     return input_lang, output_lang, pairs
-########################################################################################################################
-########################################################################################################################
-########################################################################################################################
 
 ################################################################################
-# 텐서로 변환
-################################################################################
 # 문장을 단어로 분리하고 인덱스를 반환
+################################################################################
+
 def indexesFromSentence(lang, sentence):
 
     # print('=====indexesFromSentence(lang, sentence): start =========')
@@ -262,21 +261,33 @@ def indexesFromSentence(lang, sentence):
 
     return [lang.word2index[word] for word in sentence.split(' ')]
 
-# 딕셔너리에서 단어에 대한 인덱스를 가져오고 문장 끝에 토큰을 추가
+########################################################################################################################
+# 1. 딕셔너리에서 단어에 대한 인덱스를 가져옴 : indexesFromSentence(lang, sentence)
+# 2. 문장 끝에 EOS 토큰을 추가 : indexes.append(EOS_token)
+# 3. 텐서로 변환 : torch.tensor(indexes, dtype=torch.long, device=device).view(-1, 1)
+########################################################################################################################
+
 def tensorFromSentence(lang, sentence):
-    # print('=====def tensorFromSentence(lang, sentence): start =========')
+    print('=====def tensorFromSentence(lang, sentence): start =========')
 
     indexes = indexesFromSentence(lang, sentence)
-    # indexes.append(EOS_token)
+    indexes.append(EOS_token)
     print('1. tensorFromSentence indexes =',indexes)
     print('2. tensorFromSentence sentence =',sentence)
 
-    # 1. tensorFromSentence indexes = [178, 177, 693, 8339, 240, 1290, 1687, 1]
-    # 2. tensorFromSentence sentence = let's leave the decision to our teacher.
+    # 1. tensorFromSentence indexes = [2, 3, 4, 1]
+    # 2. tensorFromSentence sentence = i made two.
+    #
+    # 1. tensorFromSentence indexes = [2, 3, 4, 5, 1]
+    # 2. tensorFromSentence sentence = j'en ai confectionne deux.
 
-    # print('=====def tensorFromSentence(lang, sentence): end =========')
+    print('=====def tensorFromSentence(lang, sentence): end =========')
     return torch.tensor(indexes, dtype=torch.long, device=device).view(-1, 1)
 
+# torch.tensor는 어떤 data를 tensor로 copy해주는 함수이다.
+# torch.tensor data를 넣었을 때,그 data가 tensor가 아니면 torch.Tensor클래스를 적용하여 복사한다.
+# 따라서 t=torch.tensor([1,2,3])처럼 data를 꼭 넣어주어야 한다. 그렇지 않으면 copy할 데이터가 없으니 에러가 난다
+# 출처: https://amber-chaeeunk.tistory.com/84 [채채씨의 학습 기록:티스토리]
 #############################################################################
 # 입력과 출력 문장을 텐서로 변환하여 반환
 #############################################################################
