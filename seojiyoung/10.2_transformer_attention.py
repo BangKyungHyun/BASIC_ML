@@ -238,9 +238,15 @@ def process_data(lang1,lang2):
             output_lang.addSentence(sentence2[i])    # 출력으로 프랑스어를 사용
             pairs.append(full)                       # pairs에는 입력과 출력이 합쳐진 것을 사용
 
-    #         print('input_lang 1 =', input_lang)
-    #         print('output_lang =', output_lang)
-    # print('=====process_data(lang1,lang2): end =========')
+            print('input_lang  =', input_lang)
+            print('output_lang =', output_lang)
+            print('pairs =', pairs)
+
+            # input_lang  = <__main__.Lang object at 0x000002699DEF1340>
+            # output_lang = <__main__.Lang object at 0x000002699DEF1370>
+            # pairs = [['i made two.', "j'en ai confectionne deux."]]
+
+    print('=====process_data(lang1,lang2): end =========')
 
     return input_lang, output_lang, pairs
 
@@ -267,6 +273,12 @@ def indexesFromSentence(lang, sentence):
 # 3. 텐서로 변환 : torch.tensor(indexes, dtype=torch.long, device=device).view(-1, 1)
 ########################################################################################################################
 
+# 1차는 input_lang과 'i made two.'를 사용
+# 2차는  output_lang과 "j'en ai confectionne deux."를 사용
+# input_lang  = <__main__.Lang object at 0x000002699DEF1340>
+# output_lang = <__main__.Lang object at 0x000002699DEF1370>
+# pairs = [['i made two.', "j'en ai confectionne deux."]]
+
 def tensorFromSentence(lang, sentence):
     print('=====def tensorFromSentence(lang, sentence): start =========')
 
@@ -292,6 +304,10 @@ def tensorFromSentence(lang, sentence):
 # 입력과 출력 문장을 텐서로 변환하여 반환
 #############################################################################
 
+# input_lang  = <__main__.Lang object at 0x000002699DEF1340>
+# output_lang = <__main__.Lang object at 0x000002699DEF1370>
+# pairs = [['i made two.', "j'en ai confectionne deux."]]
+
 def tensorsFromPair(input_lang, output_lang, pair):
 
     # print('333333333333333333333333333333333333333333333333333333333333333333')
@@ -299,41 +315,36 @@ def tensorsFromPair(input_lang, output_lang, pair):
     # print('333333333333333333333333333333333333333333333333333333333333333333')
 
     input_tensor = tensorFromSentence(input_lang, pair[0])
-    # print('1. tensorsFromPair input_lang = ', input_lang)
-    # print('1-1. input_lang tensorsFromPair pair[0] = ', pair[0])
-    # print('1-2. input_lang tensorsFromPair input_tensor = ', input_tensor)
+    print('1. tensorsFromPair input_lang = ', input_lang)
+    print('1-1. input_lang tensorsFromPair pair[0] = ', pair[0])
+    print('1-2. input_lang tensorsFromPair input_tensor = ', input_tensor)
 
-    # 1. tensorsFromPair input_lang =  <__main__.Lang object at 0x000002615E3D6850>
-    # 2. tensorsFromPair pair[0] =  let's leave the decision to our teacher.
-    # 3. tensorsFromPair input_tensor =  tensor([[ 178],
-    #         [ 177],
-    #         [ 693],
-    #         [8339],
-    #         [ 240],
-    #         [1290],
-    #         [1687],
-    #         [   1]])
+    # 1. tensorsFromPair input_lang =  <__main__.Lang object at 0x000001A75D890E30>
+    # 1-1. input_lang tensorsFromPair pair[0] =  i made two.
+    # 1-2. input_lang tensorsFromPair input_tensor =  tensor([[2],
+    #         [3],
+    #         [4],
+    #         [1]])
 
     target_tensor = tensorFromSentence(output_lang, pair[1])
-    # print('1. tensorsFromPair output_lang = ', output_lang)
-    # print('2-1. input_lang  tensorsFromPair pair[1] = ', pair[1])
-    # print('2-2. input_lang  tensorsFromPair target_tensor = ', target_tensor)
+    print('2. tensorsFromPair output_lang = ', output_lang)
+    print('2-1. input_lang  tensorsFromPair pair[1] = ', pair[1])
+    print('2-2. input_lang  tensorsFromPair target_tensor = ', target_tensor)
 
-    # 1. tensorsFromPair output_lang =  <__main__.Lang object at 0x000002615E3D60D0>
-    # 2. tensorsFromPair pair[1] =  laissons la decision a notre professeur.
-    # 3. tensorsFromPair target_tensor =  tensor([[3432],
-    #         [ 142],
-    #         [5673],
-    #         [  10],
-    #         [2472],
-    #         [3278],
-    #         [   1]])
+    # 2. tensorsFromPair output_lang =  <__main__.Lang object at 0x000001A75D890E60>
+    # 2-1. input_lang  tensorsFromPair pair[1] =  j'en ai confectionne deux.
+    # 2-2. input_lang  tensorsFromPair target_tensor =  tensor([[2],
+    #         [3],
+    #         [4],
+    #         [5],
+    #         [1]])
 
     # print('333333333333333333333333333333333333333333333333333333333333333333')
     # print('=====tensorsFromPair(input_lang, output_lang, pair): end =========')
     # print('333333333333333333333333333333333333333333333333333333333333333333')
 
     return (input_tensor, target_tensor)
+
 
 ################################################################################
 # 인코더 네트워크
@@ -616,7 +627,8 @@ def Model(model_bkh21, input_tensor, target_tensor, model_optimizer, criterion):
 ################################################################################
 # 모델 훈련 함수 정의
 ################################################################################
-                                                     # 20000 -> 2000
+
+                     # 20000 -> 2000
 def trainModel(model, input_lang, output_lang, pairs, num_iteration=2000):
 
     print('22222222222222222222222222222222222222222222222222222222222222222222222222222222222222222')
@@ -628,6 +640,8 @@ def trainModel(model, input_lang, output_lang, pairs, num_iteration=2000):
     # criterion : 판단이나 결정을 위한 기준
     criterion = nn.NLLLoss() # NLLLoss 역시 크로스엔트로피 손실함수와 마찬가지로 분류문제에 사용함
     total_loss_iterations = 0
+
+    # random.choice : 지정된 sequence(리스트 등)에서 무작위로 추출하는 함수
 
     training_pairs = [tensorsFromPair(input_lang, output_lang, random.choice(pairs))
         for i in range(num_iteration)]
