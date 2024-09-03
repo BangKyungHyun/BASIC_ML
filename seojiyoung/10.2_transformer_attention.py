@@ -510,16 +510,20 @@ class Decoder_Network(nn.Module):
 
 class Seq2Seq(nn.Module):
     def __init__(self, encoder, decoder, device, MAX_LENGTH=MAX_LENGTH):
+
+        print('=====class Seq2Seq(nn.Module): def __init__ start =========')
+
         super().__init__()
 
         self.encoder = encoder  # 인코더 초기화
         self.decoder = decoder  # 디코더 초기화
         self.device = device
 
+    print('=====class Seq2Seq(nn.Module): def __init__ end =========')
+
     def forward(self, input_lang, output_lang, teacher_forcing_ratio=0.5):
 
         print('=====class Seq2Seq(nn.Module): start =========')
-
         input_length = input_lang.size(0)  # 입력 문자 길이(문장의 단어 수)
         batch_size = output_lang.shape[1]
         target_length = output_lang.shape[0]
