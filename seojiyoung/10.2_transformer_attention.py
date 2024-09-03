@@ -517,13 +517,8 @@ class Seq2Seq(nn.Module):
         self.device = device
 
     def forward(self, input_lang, output_lang, teacher_forcing_ratio=0.5):
-        print('=====class Seq2Seq(nn.Module): start =========')
 
-        # word_count3 = 0
-        #
-        # word_count3 += 1
-        # if word_count3 < 2:
-        #     print('Seq2Seq  =')
+        print('=====class Seq2Seq(nn.Module): start =========')
 
         input_length = input_lang.size(0)  # 입력 문자 길이(문장의 단어 수)
         batch_size = output_lang.shape[1]
@@ -574,6 +569,9 @@ def Model(model_bkh21, input_tensor, target_tensor, model_optimizer, criterion):
 
     model_optimizer.zero_grad()
     input_length = input_tensor.size(0)
+    print('input length = ',input_length)
+    # input length = 4
+
     loss = 0
     epoch_loss = 0
     print('=====Model(model, input_tensor, target_tensor, model_optimizer, criterion): 22222 =========')
@@ -606,6 +604,7 @@ def trainModel(model, input_lang, output_lang, pairs, num_iteration=2000):
 
     model.train()
     optimizer = optim.SGD(model.parameters(), lr=0.01) # 옵티마이져 SGD를 사용
+    # criterion : 판단이나 결정을 위한 기준
     criterion = nn.NLLLoss() # NLLLoss 역시 크로스엔트로피 손실함수와 마찬가지로 분류문제에 사용함
     total_loss_iterations = 0
 
@@ -763,6 +762,7 @@ decoder = Decoder_Network(output_size, hidden_size, embed_size, num_layers)
 
 print('Seq2Seq_model = Seq2Seq(encoder, decoder, device).to(device) start')
 Seq2Seq_model = Seq2Seq(encoder, decoder, device).to(device)
+
 # print('Seq2Seq_model =', Seq2Seq_model)
 
 # Seq2Seq_model = Seq2Seq(
@@ -777,8 +777,8 @@ Seq2Seq_model = Seq2Seq(encoder, decoder, device).to(device)
 #     (softmax): LogSoftmax(dim=1)
 #   )
 # )
-
 print('Seq2Seq_model = Seq2Seq(encoder, decoder, device).to(device) end')
+
 ######################################################################################################################
 ######################################################################################################################
 
@@ -791,19 +791,10 @@ print('7777777777777777777777777777777777777777777777777777777777777777777777777
 print('88888888888888888888888888888888888888888888888888888888888888888888888888888888888888')
 print('88888888888888888888888888888888888888888888888888888888888888888888888888888888888888\n')
 model = trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration)
-print('88888888888888888888888888888888888888888888888888888888888888888888888888888888888888')
-print('88888888888888888888888888888888888888888888888888888888888888888888888888888888888888\n')
+print('\n9999999999999999999999999999999999999999999999999999999999999999999999999999999999999')
+print('9999999999999999999999999999999999999999999999999999999999999999999999999999999999999')
 
-print('99999999999999999999999999999999999999999999999999999999999999999999999999999999999999')
-print('99999999999999999999999999999999999999999999999999999999999999999999999999999999999999\n')
-print('model = trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration) start\n')
-print('99999999999999999999999999999999999999999999999999999999999999999999999999999999999999')
-print('99999999999999999999999999999999999999999999999999999999999999999999999999999999999999\n')
-
-
-model = trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration)
-print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
-print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+print('model = trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration)  end')
 
 # print('model =', model)
 
@@ -833,19 +824,15 @@ print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 #   )
 # )
 
-print('11111111111111111111111111111111111111111111111111111111111111111111111111111111111111')
-print('model = trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration)  end')
-print('11111111111111111111111111111111111111111111111111111111111111111111111111111111111111')
-
 print('============main module end ==========')
 
 ################################################################################
 # 임의의 문장에 대한 평가 결과
 ################################################################################
 #
-print('evaluateRandomly(model, input_lang, output_lang, pairs) start=========')
-evaluateRandomly(model, input_lang, output_lang, pairs)
-print('evaluateRandomly(model, input_lang, output_lang, pairs) end=========')
+# print('evaluateRandomly(model, input_lang, output_lang, pairs) start=========')
+# evaluateRandomly(model, input_lang, output_lang, pairs)
+# print('evaluateRandomly(model, input_lang, output_lang, pairs) end=========')
 
 # ################################################################################
 # # 어텐션이 적용된 디코더
