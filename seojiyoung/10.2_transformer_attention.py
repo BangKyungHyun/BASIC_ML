@@ -267,9 +267,9 @@ def tensorFromSentence(lang, sentence):
     # print('=====def tensorFromSentence(lang, sentence): start =========')
 
     indexes = indexesFromSentence(lang, sentence)
-    indexes.append(EOS_token)
-    # print('1. tensorFromSentence indexes =',indexes)
-    # print('2. tensorFromSentence sentence =',sentence)
+    # indexes.append(EOS_token)
+    print('1. tensorFromSentence indexes =',indexes)
+    print('2. tensorFromSentence sentence =',sentence)
 
     # 1. tensorFromSentence indexes = [178, 177, 693, 8339, 240, 1290, 1687, 1]
     # 2. tensorFromSentence sentence = let's leave the decision to our teacher.
@@ -519,7 +519,7 @@ class Seq2Seq(nn.Module):
         self.decoder = decoder  # 디코더 초기화
         self.device = device
 
-    print('=====class Seq2Seq(nn.Module): def __init__ end =========')
+        print('=====class Seq2Seq(nn.Module): def __init__ end =========')
 
     def forward(self, input_lang, output_lang, teacher_forcing_ratio=0.5):
 
@@ -574,7 +574,13 @@ def Model(model_bkh21, input_tensor, target_tensor, model_optimizer, criterion):
     model_optimizer.zero_grad()
     input_length = input_tensor.size(0)
     print('input length = ',input_length)
+    print('input tensor = ',input_tensor)
+
     # input length = 4
+    # input  tensor = tensor([[2],
+    #                  [3],
+    #                  [4],
+    #                  [1]])
 
     loss = 0
     epoch_loss = 0
