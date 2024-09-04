@@ -578,13 +578,37 @@ class Seq2Seq(nn.Module):
         target_length = output_lang.shape[0]
         vocab_size = self.decoder.output_dim
 
+        print('input_length = ', input_length)
+        print('batch_size = ', batch_size)
+        print('target_length = ', target_length)
+        print('vocab_size = ', vocab_size)
+
+        # input_length =  4
+        # batch_size =  1
+        # target_length =  5
+        # vocab_size =  6
+
         # 예측을 출력을 저장하기 위한 변수 초기화
+        #                        5                 1        6
         outputs = torch.zeros(target_length, batch_size, vocab_size).to(self.device)
+        print('outputs = ', outputs)
+
+        # outputs =  \
+        #  tensor([[[0., 0., 0., 0., 0., 0.]],
+        #          [[0., 0., 0., 0., 0., 0.]],
+        #          [[0., 0., 0., 0., 0., 0.]],
+        #          [[0., 0., 0., 0., 0., 0.]],
+        #          [[0., 0., 0., 0., 0., 0.]]])
 
         # 문장의 모든 단어를 인코딩
         for i in range(input_length):
+
             print('=====class Seq2Seq(nn.Module): input_length = ',i, input_length)
+
+            print('input_lang[i] =', input_lang[i])
             encoder_output, encoder_hidden = self.encoder(input_lang[i])
+            print('encoder_output = ', encoder_output)
+            print('encoder_hidden = ', encoder_hidden)
 
         # 인코더의 은닉층을 디코더의 은닉층으로 사용
         decoder_hidden = encoder_hidden.to(device)
@@ -593,6 +617,7 @@ class Seq2Seq(nn.Module):
         decoder_input = torch.tensor([SOS_token], device=device)
 
         for t in range(target_length): # 현재 단어에서 출력 단어를 예측
+
             print('=====class Seq2Seq(nn.Module): target_length = ', t, target_length)
 
             decoder_output, decoder_hidden = self.decoder(decoder_input,decoder_hidden)
@@ -606,6 +631,7 @@ class Seq2Seq(nn.Module):
             # teacher force 활성화하지 않으면 자체 예측 값을 다음 입력으로 사용
             if (teacher_force == False and input.item() == EOS_token):
                 break
+
         print('=====class Seq2Seq(nn.Module): end =========')
 
         return outputs
@@ -638,15 +664,11 @@ def Model(model_bkh21, input_tensor, target_tensor, model_optimizer, criterion):
     print('output = \n', output)
     # output =
     #  tensor([[[-1.7506, -1.8085, -1.7836, -1.8240, -1.7847, -1.8008]],
-    #
-    #         [[-1.7385, -1.8067, -1.7858, -1.7889, -1.8095, -1.8234]],
-    #
-    #         [[-1.7328, -1.8109, -1.7883, -1.7667, -1.8121, -1.8436]],
-    #
-    #         [[-1.7300, -1.8153, -1.7910, -1.7542, -1.8090, -1.8560]],
-    #
-    #         [[-1.7289, -1.8183, -1.7935, -1.7480, -1.8054, -1.8623]]],
-    #        grad_fn=<CopySlices>)
+    #          [[-1.7385, -1.8067, -1.7858, -1.7889, -1.8095, -1.8234]],
+    #          [[-1.7328, -1.8109, -1.7883, -1.7667, -1.8121, -1.8436]],
+    #          [[-1.7300, -1.8153, -1.7910, -1.7542, -1.8090, -1.8560]],
+    #          [[-1.7289, -1.8183, -1.7935, -1.7480, -1.8054, -1.8623]]],
+    #         grad_fn=<CopySlices>)
 
     print('=====Model(model, input_tensor, target_tensor, model_optimizer, criterion): 33333 =========')
 
@@ -703,11 +725,18 @@ def trainModel(model, input_lang, output_lang, pairs, num_iteration=2000):
     #         [1]]))]
 
     for iter in range(1, num_iteration + 1):
+
         training_pair = training_pairs[iter - 1]
         input_tensor = training_pair[0]
         target_tensor = training_pair[1]
         print('=====trainModel(model, input_lang, output_lang, pairs, num_iteration=2000): aaa =========')
+
+        # Model 객체를 이용하여 오차 계산
         loss = Model(model, input_tensor, target_tensor, optimizer, criterion)
+
+        print('loss = ', loss)
+        # loss = 1.7806238174438476
+
         print('=====trainModel(model, input_lang, output_lang, pairs, num_iteration=2000): zzz =========')
 
         total_loss_iterations += loss
@@ -730,6 +759,7 @@ def trainModel(model, input_lang, output_lang, pairs, num_iteration=2000):
 ################################################################################
 
 def evaluate(model, input_lang, output_lang, sentences, max_length=MAX_LENGTH):
+
     print('=====evaluate(model, input_lang, output_lang, sentences, max_length=MAX_LENGTH): start =========')
 
     with torch.no_grad():
@@ -746,6 +776,7 @@ def evaluate(model, input_lang, output_lang, sentences, max_length=MAX_LENGTH):
                 break
             else: # 예측 결과를 출력 문자열에 추가
                 decoded_words.append(output_lang.index2word[topi[0].item()])
+
     print('=====evaluate(model, input_lang, output_lang, sentences, max_length=MAX_LENGTH): end =========')
 
     return decoded_words
@@ -755,6 +786,7 @@ def evaluateRandomly(model, input_lang, output_lang, pairs, n=1):
 # def evaluateRandomly(model, input_lang, output_lang, pairs, n=10):
 
     for i in range(n):
+
         print('=******************************************************************************=')
         print('=====def evaluateRandomly(model, input_lang, output_lang, pairs) start =========')
 
@@ -762,8 +794,10 @@ def evaluateRandomly(model, input_lang, output_lang, pairs, n=1):
         print('=====def evaluateRandomly(model, input_lang, output_lang, pairs) === i  =', i,n)
         print('=====def evaluateRandomly(model, input_lang, output_lang, pairs) === input {}'.format(pair[0]))
         print('=====def evaluateRandomly(model, input_lang, output_lang, pairs) === output {}'.format(pair[1]))
+
         output_words = evaluate(model, input_lang, output_lang, pair) # 모델 평가 결과는 output_words에 저장
         output_sentence = ' '.join(output_words)
+
         print('=====def evaluateRandomly(model, input_lang, output_lang, pairs) === predicted {}'.format(output_sentence))
         print('=====def evaluateRandomly(model, input_lang, output_lang, pairs) end =========')
         print('=******************************************************************************=')
