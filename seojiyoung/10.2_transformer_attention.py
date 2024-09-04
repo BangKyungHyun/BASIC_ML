@@ -90,14 +90,40 @@ class Lang:
 
 def normalizeString(df, lang):
 
-    # print('=====def normalizeString(df, lang): start =========')
-
+    print('=====def normalizeString(df, lang): start =========')
+    print('df[lang] 11111 =', df[lang])
     sentence = df[lang].str.lower()
+    print('sentence 111 =', sentence)
     sentence = sentence.str.replace('[^A-Za-z\s]+', '') # [^A-Za-z\s]+ 등을 제외하고 모두 공백으로 바꿈
+    print('sentence 222 =', sentence)
     sentence = sentence.str.normalize('NFD') # 유니코드 정규화 방식
+    print('sentence 333 =', sentence)
     sentence = sentence.str.encode('ascii', errors='ignore').str.decode('utf-8') # unicode를 ascii로 치환
+    print('sentence 444 =', sentence)
 
-    # print('=====def normalizeString(df, lang): end =========')
+    # df[lang] 11111 = 0    I made two.
+    # Name: eng, dtype: object
+    # sentence 111 = 0    i made two.
+    # Name: eng, dtype: object
+    # sentence 222 = 0    i made two.
+    # Name: eng, dtype: object
+    # sentence 333 = 0    i made two.
+    # Name: eng, dtype: object
+    # sentence 444 = 0    i made two.
+    # Name: eng, dtype: object
+
+    # df[lang] 11111 = 0    J'en ai confectionné deux.
+    # Name: fra, dtype: object
+    # sentence 111 = 0    j'en ai confectionné deux.
+    # Name: fra, dtype: object
+    # sentence 222 = 0    j'en ai confectionné deux.
+    # Name: fra, dtype: object
+    # sentence 333 = 0    j'en ai confectionné deux.
+    # Name: fra, dtype: object
+    # sentence 444 = 0    j'en ai confectionne deux.
+    # Name: fra, dtype: object
+
+    print('=====def normalizeString(df, lang): end =========')
 
     return sentence
 
@@ -106,66 +132,34 @@ def normalizeString(df, lang):
 ################################################################################
 
 def read_sentence(df, lang1, lang2):
-    # print('=====def read_sentence(df, lang1, lang2): start =========')
+    print('=====def read_sentence(df, lang1, lang2): start =========')
 
     sentence1 = normalizeString(df, lang1) # 데이터셋의 첫번째 열 (영어)
     sentence2 = normalizeString(df, lang2) # 데이터셋의 두번째 열 (불어)
 
-    # print('def read_sentence df =\n', df)
+    print('def read_sentence df =\n', df)
     # def read_sentence df =
-    #                                                        eng                                                fra
-    # 0                                                     Go.                                               Va !
-    # 1                                                    Run!                                            Cours !
-    # 2                                                    Run!                                           Courez !
-    # 3                                                    Wow!                                         Ça alors !
-    # 4                                                   Fire!                                           Au feu !
-    # ...                                                   ...                                                ...
-    # 135837  A carbon footprint is the amount of carbon dio...  Une empreinte carbone est la somme de pollutio...
-    # 135838  Death is something that we're often discourage...  La mort est une chose qu'on nous décourage sou...
-    # 135839  Since there are usually multiple websites on a...  Puisqu'il y a de multiples sites web sur chaqu...
-    # 135840  If someone who doesn't know your background sa...  Si quelqu'un qui ne connaît pas vos antécédent...
-    # 135841  It may be impossible to get a completely error...  Il est peut-être impossible d'obtenir un Corpu...
-    # [135842 rows x 2 columns]
+    #             eng                         fra
+    # 0  I made two.  J'en ai confectionné deux.
 
-    # print('def read_sentence lang1 =\n', lang1)
-
+    print('def read_sentence lang1 = ', lang1)
     # def read_sentence lang1 =  eng
 
-    # print('def read_sentence lang2 =\n', lang2)
-
+    print('def read_sentence lang2 = ', lang2)
     # def read_sentence lang2 = fra
 
-    # print('def read_sentence sentence1 =\n', sentence1)
+    print('def read_sentence sentence1 =\n', sentence1)
+
     # def read_sentence sentence1 =
-    #  0                                                       go.
-    # 1                                                      run!
-    # 2                                                      run!
-    # 3                                                      wow!
-    # 4                                                     fire!
-    #                                 ...
-    # 135837    a carbon footprint is the amount of carbon dio...
-    # 135838    death is something that we're often discourage...
-    # 135839    since there are usually multiple websites on a...
-    # 135840    if someone who doesn't know your background sa...
-    # 135841    it may be impossible to get a completely error...
-    # Name: eng, Length: 135842, dtype: object
+    #  0    i made two.
+    # Name: eng, dtype: object
 
-    # print('def read_sentence sentence2 =\n', sentence2)
+    print('def read_sentence sentence2 =\n', sentence2)
     # def read_sentence sentence2 =
-    #  0                                                      va !
-    # 1                                                    cours!
-    # 2                                                   courez!
-    # 3                                                 ca alors!
-    # 4                                                  au feu !
-    #                                 ...
-    # 135837    une empreinte carbone est la somme de pollutio...
-    # 135838    la mort est une chose qu'on nous decourage sou...
-    # 135839    puisqu'il y a de multiples sites web sur chaqu...
-    # 135840    si quelqu'un qui ne connait pas vos antecedent...
-    # 135841    il est peut-etre impossible d'obtenir un corpu...
-    # Name: fra, Length: 135842, dtype: object
+    #  0    j'en ai confectionne deux.
+    # Name: fra, dtype: object
 
-    # print('=====def read_sentence(df, lang1, lang2): end =========')
+    print('=====def read_sentence(df, lang1, lang2): end =========')
 
     return sentence1, sentence2
 
@@ -177,9 +171,9 @@ def read_file(loc, lang1, lang2):
 
     # print('=====read_file(loc, lang1, lang2): start =========')
 
-    ###########################################################################
+    #-------------------------------------------------------------------------
     # read_csv 사용법
-    ###########################################################################
+    #-------------------------------------------------------------------------
     # loc : 예제에서 사용할 데이터셋
     # delimeter : csv파일의 데이터가 어떤 형태(\t,' ','+')로 나뉘었는지 의미
     # header : 일반적으로 데이터셋의 첫 번째를 header(열 이름)로 지정해서 사용되게 되는데
@@ -196,7 +190,7 @@ def read_file(loc, lang1, lang2):
 
 def process_data(lang1,lang2):
 
-    # print('=====process_data(lang1,lang2): start =========')
+    print('=====process_data(lang1,lang2): start =========')
 
     df = read_file('../data/%s-%s1.txt' % (lang1, lang2), lang1, lang2)
     sentence1, sentence2 = read_sentence(df, lang1, lang2)
@@ -205,16 +199,16 @@ def process_data(lang1,lang2):
     # print('def process_data len(df) =', len(df))
 
     input_lang = Lang()
-    # print('process_data input_lang =', input_lang)
+    print('process_data input_lang =', input_lang)
     # process_data input_lang = <__main__.Lang object at 0x000001DEF86B5310>
 
     output_lang = Lang()
-    # print('process_data output_lang =', output_lang)
+    print('process_data output_lang =', output_lang)
     # process_data output_lang = <__main__.Lang object at 0x000001DEF995FE50>
 
     pairs = []
 
-    # print('process_data len(df) =', len(df))
+    print('process_data len(df) =', len(df))
     # process_data len(df) = 135842
 
     for i in range(len(df)):
@@ -222,11 +216,11 @@ def process_data(lang1,lang2):
         # MAX_LENGTH = 20
         # split( )을 사용하면 길이에 상관없이 공백을 모두 제거 분리하고, split(' ')을 사용하면 공백 한 개마다 분리하는 것
         if len(sentence1[i].split(' ')) < MAX_LENGTH and len(sentence2[i].split(' ')) < MAX_LENGTH:
-            #
-            # print('process data sentence1[i] =', sentence1[i])
-            # print('process data sentence2[i] =', sentence2[i])
-            # print('process data len(sentence1[i].split(' ') =', len(sentence1[i].split(' ')))
-            # print('process data len(sentence2[i].split(' ') =', len(sentence2[i].split(' ')))
+
+            print('process data sentence1[i] =', sentence1[i])
+            print('process data sentence2[i] =', sentence2[i])
+            print('process data len(sentence1[i].split(' ') =', len(sentence1[i].split(' ')))
+            print('process data len(sentence2[i].split(' ') =', len(sentence2[i].split(' ')))
 
             # process data sentence1[i] = i won!
             # process data sentence2[i] = je l'ai emporte !
@@ -256,14 +250,13 @@ def process_data(lang1,lang2):
 
 def indexesFromSentence(lang, sentence):
 
-    # print('=====indexesFromSentence(lang, sentence): start =========')
+    print('=====indexesFromSentence(lang, sentence): start =========')
     #
-    # print('1. indexesFromSentence sentence =',sentence)
+    print('1. indexesFromSentence sentence =',sentence)
 
-    # 1. indexesFromSentence lang = <__main__.Lang object at 0x000002615E3D6850>
     # 2. indexesFromSentence sentence = let's leave the decision to our teacher.
 
-    # print('=====indexesFromSentence(lang, sentence): end =========')
+    print('=====indexesFromSentence(lang, sentence): end =========')
 
     return [lang.word2index[word] for word in sentence.split(' ')]
 
@@ -304,10 +297,6 @@ def tensorFromSentence(lang, sentence):
 # 입력과 출력 문장을 텐서로 변환하여 반환
 #############################################################################
 
-# input_lang  = <__main__.Lang object at 0x000002699DEF1340>
-# output_lang = <__main__.Lang object at 0x000002699DEF1370>
-# pairs = [['i made two.', "j'en ai confectionne deux."]]
-
 def tensorsFromPair(input_lang, output_lang, pair):
 
     # print('333333333333333333333333333333333333333333333333333333333333333333')
@@ -344,7 +333,6 @@ def tensorsFromPair(input_lang, output_lang, pair):
     # print('333333333333333333333333333333333333333333333333333333333333333333')
 
     return (input_tensor, target_tensor)
-
 
 ################################################################################
 # 인코더 네트워크
