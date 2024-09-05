@@ -45,11 +45,19 @@ class Lang:
     # alors !
 
     # 단어의 인덱스를 저장하기 위한 컨테이너를 초기화
+
+    print('=====class Lang def __init__ start =========')
+
     def __init__(self):
+        print('=====class Lang def __init__ body start =========')
+
         self.word2index = {}
         self.index2word = {0: "SOS", 1: "EOS"} # 문장의 시작, 문자의 끝
         self.word2count = {}
         self.n_words = 2                       # SOS와 EOS에 대한 카운트
+        print('=====class Lang def __init__ body end =========')
+
+    print('=====class Lang def __init__ end =========')
 
     # 문장을 단어 단위(스페이스 기준)로 분리한 후 컨테이너(word)에 추가
     def addSentence(self, sentence):
@@ -319,7 +327,6 @@ def tensorFromSentence(lang, sentence):
     print('3. tensorFromSentence indexes =',indexes)
     # 3. tensorFromSentence indexes = [2, 3, 4, 1]
 
-
     print('=====def tensorFromSentence(lang, sentence): end =========')
     return torch.tensor(indexes, dtype=torch.long, device=device).view(-1, 1)
 
@@ -396,8 +403,12 @@ def tensorsFromPair(input_lang, output_lang, pair):
 ################################################################################
 
 class Encoder_Network(nn.Module):
+    print('=====class Encoder_Network(nn.Module): def __init__ start =========')
+
     #                    23191       512           256          1
     def __init__(self, input_dim, hidden_dim, embbed_dim, num_layers):
+        print('=====class Encoder_Network(nn.Module): def __init__body start  =========')
+
         super(Encoder_Network, self).__init__()
         self.input_dim = input_dim    # 인코더에서 사용할 입력 층 - 임베딩을 할 단어들의 개수. 다시 말해 단어 집합의 크기(23,191)
         self.embbed_dim = embbed_dim  # 인코더에서 사용할 임베딩 층 - 임베딩 할 벡터의 차원. 사용자가 정해주는 하이퍼파라미터(256)
@@ -423,9 +434,12 @@ class Encoder_Network(nn.Module):
         # 임베딩 차원, 은닉층 차원, GRU의 계층 갯수를 이용하여 GRU 계층을 초기화
         #                        256                512                       1
         self.gru = nn.GRU(self.embbed_dim, self.hidden_dim,num_layers=self.num_layers)
+        print('=====class Encoder_Network(nn.Module): def __init__body end =========')
+
+    print('=====class Encoder_Network(nn.Module): def __init__ end =========')
 
     def forward(self, src):
-        print('=====class Encoder_Network(nn.Module): start =========')
+        print('=====class Encoder_Network(nn.Module): def forward start =========')
 
         # print('Encoder forward src =', src)
         # Encoder forward src = tensor([369])
@@ -488,7 +502,11 @@ class Encoder_Network(nn.Module):
 
         # print('Encoder forward hidden.shape = ', hidden.shape)
         # Encoder forward hidden.shape =  torch.Size([1, 1, 512])
-        print('=====class Encoder_Network(nn.Module): end =========')
+
+        # print('=====class Encoder_Network(nn.Module): encoder_outputs = ', outputs)
+        # print('=====class Encoder_Network(nn.Module): encoder_hidden = ', hidden)
+
+        print('=====class Encoder_Network(nn.Module): def forward end =========')
 
         return outputs, hidden
 
@@ -522,8 +540,13 @@ class Encoder_Network(nn.Module):
 ################################################################################
 
 class Decoder_Network(nn.Module):
+    print('=====class Decoder_Network(nn.Module): def __init__ start =========')
+
     #                     39387        512          256          1
     def __init__(self, output_dim, hidden_dim, embbed_dim, num_layers):
+
+        print('=====class Decoder_Network(nn.Module): def __init__ body start =========')
+
         super(Decoder_Network, self).__init__()
 
         self.embbed_dim = embbed_dim
@@ -537,9 +560,13 @@ class Decoder_Network(nn.Module):
         # 선형 계층 초기화               512        39387
         self.out = nn.Linear(self.hidden_dim, output_dim)
         self.softmax = nn.LogSoftmax(dim=1)
+        print('=====class Decoder_Network(nn.Module): def __init__ body end =========')
+
+    print('=====class Decoder_Network(nn.Module): def __init__ end =========')
 
     def forward(self, input, hidden):
-        print('=====class Decoder_Network(nn.Module): start =========')
+
+        print('=====class Decoder_Network(nn.Module): def forward start =========')
 
         # 입력을 (1, 배치크기)로 변경
         input = input.view(1, -1)
@@ -547,9 +574,12 @@ class Decoder_Network(nn.Module):
         output, hidden = self.gru(embedded, hidden)
         prediction = self.softmax(self.out(output[0]))
 
-        print('Decoder forward input =', input)
-        # print('Decoder forward hidden =', hidden)
-        print('=====class Decoder_Network(nn.Module): end =========')
+        # print('=====class Decoder_Network(nn.Module): Decoder forward input =', input)
+        # print('=====class Decoder_Network(nn.Module): Decoder forward output =', output)
+        # print('=====class Decoder_Network(nn.Module): Decoder forward hidden =', hidden)
+        # print('=====class Decoder_Network(nn.Module): Decoder forward prediction =', prediction)
+
+        print('=====class Decoder_Network(nn.Module): def forward end =========')
 
         return prediction, hidden
 
@@ -558,30 +588,33 @@ class Decoder_Network(nn.Module):
 ################################################################################
 
 class Seq2Seq(nn.Module):
+    print('=====class Seq2Seq(nn.Module): def __init__ start =========')
+
     def __init__(self, encoder, decoder, device, MAX_LENGTH=MAX_LENGTH):
 
-        print('=====class Seq2Seq(nn.Module): def __init__ start =========')
+        print('=====class Seq2Seq(nn.Module): def __init__body start =========')
 
         super().__init__()
 
         self.encoder = encoder  # 인코더 초기화
         self.decoder = decoder  # 디코더 초기화
         self.device = device
+        print('=====class Seq2Seq(nn.Module): def __init__body start =========')
 
-        print('=====class Seq2Seq(nn.Module): def __init__ end =========')
+    print('=====class Seq2Seq(nn.Module): def __init__ end =========')
 
     def forward(self, input_lang, output_lang, teacher_forcing_ratio=0.5):
 
-        print('=====class Seq2Seq(nn.Module): start =========')
+        print('=====class Seq2Seq(nn.Module): def forward start =========')
         input_length = input_lang.size(0)  # 입력 문자 길이(문장의 단어 수)
         batch_size = output_lang.shape[1]
         target_length = output_lang.shape[0]
         vocab_size = self.decoder.output_dim
 
-        print('input_length = ', input_length)
-        print('batch_size = ', batch_size)
-        print('target_length = ', target_length)
-        print('vocab_size = ', vocab_size)
+        print('=====class Seq2Seq(nn.Module): def forward input_length = ', input_length)
+        print('=====class Seq2Seq(nn.Module): def forward batch_size = ', batch_size)
+        print('=====class Seq2Seq(nn.Module): def forward target_length = ', target_length)
+        print('=====class Seq2Seq(nn.Module): def forward vocab_size = ', vocab_size)
 
         # input_length =  4
         # batch_size =  1
@@ -591,7 +624,7 @@ class Seq2Seq(nn.Module):
         # 예측을 출력을 저장하기 위한 변수 초기화
         #                        5                 1        6
         outputs = torch.zeros(target_length, batch_size, vocab_size).to(self.device)
-        print('outputs = ', outputs)
+        print('=====class Seq2Seq(nn.Module): def forward outputs = ', outputs)
 
         # outputs =  \
         #  tensor([[[0., 0., 0., 0., 0., 0.]],
@@ -603,12 +636,10 @@ class Seq2Seq(nn.Module):
         # 문장의 모든 단어를 인코딩
         for i in range(input_length):
 
-            print('=====class Seq2Seq(nn.Module): input_length = ',i, input_length)
+            print('=====class Seq2Seq(nn.Module): def forward input_length = ',i, input_length)
+            print('=====class Seq2Seq(nn.Module): def forward input_lang[i] =', input_lang[i])
 
-            print('input_lang[i] =', input_lang[i])
             encoder_output, encoder_hidden = self.encoder(input_lang[i])
-            print('encoder_output = ', encoder_output)
-            print('encoder_hidden = ', encoder_hidden)
 
         # 인코더의 은닉층을 디코더의 은닉층으로 사용
         decoder_hidden = encoder_hidden.to(device)
@@ -618,7 +649,7 @@ class Seq2Seq(nn.Module):
 
         for t in range(target_length): # 현재 단어에서 출력 단어를 예측
 
-            print('=====class Seq2Seq(nn.Module): target_length = ', t, target_length)
+            print('=====class Seq2Seq(nn.Module): def forward target_length = ', t, target_length)
 
             decoder_output, decoder_hidden = self.decoder(decoder_input,decoder_hidden)
             outputs[t] = decoder_output
@@ -632,7 +663,7 @@ class Seq2Seq(nn.Module):
             if (teacher_force == False and input.item() == EOS_token):
                 break
 
-        print('=====class Seq2Seq(nn.Module): end =========')
+        print('=====class Seq2Seq(nn.Module): def forward end =========')
 
         return outputs
 
@@ -642,14 +673,14 @@ class Seq2Seq(nn.Module):
 
 teacher_forcing_ratio = 0.5
 
-def Model(model_bkh21, input_tensor, target_tensor, model_optimizer, criterion):
+def Model(model, input_tensor, target_tensor, model_optimizer, criterion):
 
-    print('=====Model(model, input_tensor, target_tensor, model_optimizer, criterion): start =========')
+    print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): start =========')
 
     model_optimizer.zero_grad()
     input_length = input_tensor.size(0)
-    print('input length = ',input_length)
-    print('input tensor = ',input_tensor)
+    print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): input length = ',input_length)
+    print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): input tensor = ',input_tensor)
 
     # input length = 4
     # input  tensor = tensor([[2],
@@ -659,9 +690,25 @@ def Model(model_bkh21, input_tensor, target_tensor, model_optimizer, criterion):
 
     loss = 0
     epoch_loss = 0
-    print('=====Model(model, input_tensor, target_tensor, model_optimizer, criterion): 22222 =========')
-    output = model_bkh21(input_tensor, target_tensor)
-    print('output = \n', output)
+    print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): output = model(input_tensor, target_tensor ) start =========')
+    output = model(input_tensor, target_tensor )
+    print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): model =========\n', model)
+    # Seq2Seq(
+    #     (encoder): Encoder_Network(
+    #     (embedding): Embedding(5, 256)
+    # (gru): GRU(256, 512)
+    # )
+    # (decoder): Decoder_Network(
+    #     (embedding): Embedding(6, 256)
+    # (gru): GRU(256, 512)
+    # (out): Linear(in_features=512, out_features=6, bias=True)
+    # (softmax): LogSoftmax(dim=1)
+    # )
+    # )
+
+    print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): output = model(input_tensor, target_tensor ) end =========')
+
+    print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): output = \n', output)
     # output =
     #  tensor([[[-1.7506, -1.8085, -1.7836, -1.8240, -1.7847, -1.8008]],
     #          [[-1.7385, -1.8067, -1.7858, -1.7889, -1.8095, -1.8234]],
@@ -670,10 +717,8 @@ def Model(model_bkh21, input_tensor, target_tensor, model_optimizer, criterion):
     #          [[-1.7289, -1.8183, -1.7935, -1.7480, -1.8054, -1.8623]]],
     #         grad_fn=<CopySlices>)
 
-    print('=====Model(model, input_tensor, target_tensor, model_optimizer, criterion): 33333 =========')
-
     num_iter = output.size(0)
-    print('num_iter = ', num_iter)
+    print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): num_iter = ', num_iter)
     # num_iter =  5
 
     for ot in range(num_iter):
@@ -684,11 +729,11 @@ def Model(model_bkh21, input_tensor, target_tensor, model_optimizer, criterion):
     model_optimizer.step()
     epoch_loss = loss.item() / num_iter
 
-    print('epoch_loss = ', epoch_loss)
+    print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion):epoch_loss = ', epoch_loss)
 
     # epoch_loss = 0.736637020111084
 
-    print('=====Model(model, input_tensor, target_tensor, model_optimizer, criterion): end =========')
+    print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): end =========')
 
     return epoch_loss
 ################################################################################
@@ -713,7 +758,7 @@ def trainModel(model, input_lang, output_lang, pairs, num_iteration=2000):
     training_pairs = [tensorsFromPair(input_lang, output_lang, random.choice(pairs))
         for i in range(num_iteration)]
 
-    print('training paris = \n', training_pairs )
+    print('=====trainModel(model, input_lang, output_lang, pairs, num_iteration=2000): training paris = \n', training_pairs )
     # training paris =
     #  [(tensor([[2],
     #         [3],
@@ -732,11 +777,12 @@ def trainModel(model, input_lang, output_lang, pairs, num_iteration=2000):
         target_tensor = training_pair[1]
 
         # Model 객체를 이용하여 오차 계산
+        print('=====trainModel loss = Model(model, input_tensor, target_tensor, optimizer, criterion) start ')
         loss = Model(model, input_tensor, target_tensor, optimizer, criterion)
+        print('=====trainModel loss = Model(model, input_tensor, target_tensor, optimizer, criterion) end ')
 
-        print('loss = ', loss)
+        print('=====trainModel(model, input_lang, output_lang, pairs, num_iteration=2000): for 문 loss = ', loss)
         # loss = 1.7806238174438476
-
 
         total_loss_iterations += loss
 
