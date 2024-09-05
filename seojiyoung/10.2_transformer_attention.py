@@ -447,12 +447,6 @@ class Encoder_Network(nn.Module):
         embedded = self.embedding(src).view(1, 1, -1) # 임베딩 처리
         print('=====class Encoder forward embedded.shape =', embedded.shape)
         # Encoder forward embedded.shape = torch.Size([1, 1, 256])
-        word_count1 = 0
-
-        # word_count1 += 1
-        # if word_count1 < 2:
-        #     print('Encoder forward src =', src)
-        #     print('Encoder forward embedded =', embedded)
 
         # Encoder forward src = tensor([10])
         # Encoder forward embedded =  36*7 +4 = 256
@@ -690,9 +684,12 @@ def Model(model, input_tensor, target_tensor, model_optimizer, criterion):
 
     loss = 0
     epoch_loss = 0
-    print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): output = model(input_tensor, target_tensor ) start =========')
-    output = model(input_tensor, target_tensor )
     print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): model =========\n', model)
+    print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): output = model(input_tensor, target_tensor ) start =========')
+
+    # print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): model(input_tensor, target_tensor ) =========\n', model(input_tensor, target_tensor ))
+
+    output = model(input_tensor, target_tensor )
     # Seq2Seq(
     #     (encoder): Encoder_Network(
     #     (embedding): Embedding(5, 256)
