@@ -725,11 +725,11 @@ def trainModel(model, input_lang, output_lang, pairs, num_iteration=2000):
     #         [1]]))]
 
     for iter in range(1, num_iteration + 1):
+        print('=====trainModel(model, input_lang, output_lang, pairs, num_iteration=2000): for 문 시작 =========')
 
         training_pair = training_pairs[iter - 1]
         input_tensor = training_pair[0]
         target_tensor = training_pair[1]
-        print('=====trainModel(model, input_lang, output_lang, pairs, num_iteration=2000): aaa =========')
 
         # Model 객체를 이용하여 오차 계산
         loss = Model(model, input_tensor, target_tensor, optimizer, criterion)
@@ -737,7 +737,6 @@ def trainModel(model, input_lang, output_lang, pairs, num_iteration=2000):
         print('loss = ', loss)
         # loss = 1.7806238174438476
 
-        print('=====trainModel(model, input_lang, output_lang, pairs, num_iteration=2000): zzz =========')
 
         total_loss_iterations += loss
 
@@ -745,6 +744,7 @@ def trainModel(model, input_lang, output_lang, pairs, num_iteration=2000):
             average_loss = total_loss_iterations / 500
             total_loss_iterations = 0
             print('%d %.4f' % (iter, average_loss))
+        print('=====trainModel(model, input_lang, output_lang, pairs, num_iteration=2000): for 종료 =========')
 
     torch.save(model.state_dict(), '../data/mytraining.pt')
 
@@ -910,13 +910,11 @@ print('Seq2Seq_model = Seq2Seq(encoder, decoder, device).to(device) end')
 print('77777777777777777777777777777777777777777777777777777777777777777777777777777777777777')
 print('77777777777777777777777777777777777777777777777777777777777777777777777777777777777777\n')
 print('model = trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration) start\n')
-print('77777777777777777777777777777777777777777777777777777777777777777777777777777777777777')
-print('77777777777777777777777777777777777777777777777777777777777777777777777777777777777777\n')
 
 model = trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration)
+
 print('88888888888888888888888888888888888888888888888888888888888888888888888888888888888888')
 print('88888888888888888888888888888888888888888888888888888888888888888888888888888888888888\n')
-
 print('model = trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration)  end')
 
 # print('model =', model)
