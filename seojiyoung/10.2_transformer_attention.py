@@ -441,10 +441,8 @@ class Encoder_Network(nn.Module):
     def forward(self, src):
         print('=====class Encoder_Network(nn.Module): def forward start =========')
 
-        # print('Encoder forward src =', src)
-        # Encoder forward src = tensor([369])
-
         embedded = self.embedding(src).view(1, 1, -1) # 임베딩 처리
+
         print('=====class Encoder forward embedded.shape =', embedded.shape)
         # Encoder forward embedded.shape = torch.Size([1, 1, 256])
 
@@ -490,15 +488,14 @@ class Encoder_Network(nn.Module):
 
         # 임베딩 결과를 GRU 모델에 적용  hidden이 512개이면 outputs도 512개 ???
         outputs, hidden = self.gru(embedded)
-        # print('Encoder forward outputs.shape = ', outputs.shape)
+        print('Encoder forward outputs.shape = ', outputs.shape)
         # Encoder forward outputs.shape =  torch.Size([1, 1, 512])
-        # print('Encoder forward outputs = ', outputs)
 
-        # print('Encoder forward hidden.shape = ', hidden.shape)
+        print('Encoder forward hidden.shape = ', hidden.shape)
         # Encoder forward hidden.shape =  torch.Size([1, 1, 512])
 
-        # print('=====class Encoder_Network(nn.Module): encoder_outputs = ', outputs)
-        # print('=====class Encoder_Network(nn.Module): encoder_hidden = ', hidden)
+        print('=====class Encoder_Network(nn.Module): encoder_outputs = ', outputs)
+        print('=====class Encoder_Network(nn.Module): encoder_hidden = ', hidden)
 
         print('=====class Encoder_Network(nn.Module): def forward end =========')
 
