@@ -323,9 +323,14 @@ def tensorFromSentence(lang, sentence):
     print('2. tensorFromSentence indexes =',indexes)
     # 2. tensorFromSentence indexes = [2, 3, 4]
 
+    ###################################################
+    # input index [2,3,4]에 EOS index [1]를 추가하여 크기가 4가 됨
+    ###################################################
+
     indexes.append(EOS_token)
     print('3. tensorFromSentence indexes =',indexes)
     # 3. tensorFromSentence indexes = [2, 3, 4, 1]
+
 
     print('=====def tensorFromSentence(lang, sentence): end =========')
     return torch.tensor(indexes, dtype=torch.long, device=device).view(-1, 1)
@@ -334,6 +339,7 @@ def tensorFromSentence(lang, sentence):
 # torch.tensor data를 넣었을 때,그 data가 tensor가 아니면 torch.Tensor클래스를 적용하여 복사한다.
 # 따라서 t=torch.tensor([1,2,3])처럼 data를 꼭 넣어주어야 한다. 그렇지 않으면 copy할 데이터가 없으니 에러가 난다
 # 출처: https://amber-chaeeunk.tistory.com/84 [채채씨의 학습 기록:티스토리]
+
 #############################################################################
 # 입력과 출력 문장을 텐서로 변환하여 반환
 #############################################################################
@@ -402,21 +408,24 @@ def tensorsFromPair(input_lang, output_lang, pair):
 # 또한, 이전 계층의 은닉 상태를 계산한 후 망각 게이트와 업데이트 게이트를 갱신함
 ################################################################################
 
+
 class Encoder_Network(nn.Module):
     print('=====class Encoder_Network(nn.Module): def __init__ start =========')
 
+    #                    4           512           256          1
     #                    23191       512           256          1
     def __init__(self, input_dim, hidden_dim, embbed_dim, num_layers):
         print('=====class Encoder_Network(nn.Module): def __init__body start  =========')
 
         super(Encoder_Network, self).__init__()
-        self.input_dim = input_dim    # 인코더에서 사용할 입력 층 - 임베딩을 할 단어들의 개수. 다시 말해 단어 집합의 크기(23,191)
+        self.input_dim = input_dim    # 인코더에서 사용할 입력 층 - 임베딩을 할 단어들의 개수. 다시 말해 단어 집합의 크기(23,191) -> 4
         self.embbed_dim = embbed_dim  # 인코더에서 사용할 임베딩 층 - 임베딩 할 벡터의 차원. 사용자가 정해주는 하이퍼파라미터(256)
         self.hidden_dim = hidden_dim  # 인코더에서 사용할 은닉 층(이전 은닉층)(512)
         self.num_layers = num_layers  # 인코더에서 사용할 GRU의 계층 갯수 (1)
 
         # ****** 입력값을 임베딩 후 GRU 계층을 통과 시킴 ******
         # 임베딩 계층 초기화
+        #                                4                256
         #                                23191            256
         self.embedding = nn.Embedding(input_dim, self.embbed_dim) # 임베딩을 할 단어들의 개수, 임베딩 할 벡터의 차원
         # print('Encoder self.embedding.weight =', self.embedding.weight)
@@ -434,19 +443,26 @@ class Encoder_Network(nn.Module):
         # 임베딩 차원, 은닉층 차원, GRU의 계층 갯수를 이용하여 GRU 계층을 초기화
         #                        256                512                       1
         self.gru = nn.GRU(self.embbed_dim, self.hidden_dim,num_layers=self.num_layers)
+
         print('=====class Encoder_Network(nn.Module): def __init__body end =========')
 
     print('=====class Encoder_Network(nn.Module): def __init__ end =========')
 
     def forward(self, src):
+
         print('=====class Encoder_Network(nn.Module): def forward start =========')
+
+        # - reshape(): reshape은 가능하면 input의 view를 반환하고, 안되면 contiguous(인접한)한 tensor로 copy하고 view를 반환한다.
+        # - view(): view는 기존의 데이터와 같은 메모리 공간을 공유하며 stride 크기만 변경하여 보여주기만 다르게 한다. 그래서 contigious해야만 동작하며, 아닌 경우 에러가 발생함.
 
         embedded = self.embedding(src).view(1, 1, -1) # 임베딩 처리
 
+        print('=====class Encoder forward src =', src)
         print('=====class Encoder forward embedded.shape =', embedded.shape)
         # Encoder forward embedded.shape = torch.Size([1, 1, 256])
 
-        # Encoder forward src = tensor([10])
+        #tensor([2]), tensor([3]), tensor([4]), tensor([1])에 대해서 각각 [1,1,256] 크기의 임베딩 벡터를 생성함
+        # Encoder forward src = tensor([1])
         # Encoder forward embedded =  36*7 +4 = 256
         # tensor([[[ 0.2215,  0.8102, -1.2375, -1.3954, -0.1623, -1.9292,  1.3573,
         #           -1.0219,  0.8392, -0.3229, -0.2732,  0.4185, -0.4613,  0.9092,
@@ -456,46 +472,19 @@ class Encoder_Network(nn.Module):
         #            1.7901, -0.7208,  1.5146,  0.0939,  0.4331,  0.4723,  0.8610,
         #           -1.2301,  0.8869, -0.0169, -0.2197,  0.0658, -1.9672,  0.0917,
         #           -0.6169, -0.0764, -1.2058,  1.2717, -0.0666, -0.7653,  0.9771,
-        #            0.6673,  0.0446, -0.7167, -2.0586,  0.8522,  0.5982,  0.4620,
-        #            1.9661,  0.3834,  1.6873, -0.6224, -1.7762, -1.9262, -0.2312,
-        #            0.4898, -2.5955,  0.7723, -1.2442,  1.2768, -1.1019, -1.5610,
-        #            0.1194,  1.3721, -1.5488,  1.8853,  1.4130,  0.5337, -0.0993,
-        #           -1.6803, -0.2402, -1.3779, -0.6867, -1.7560, -0.3093,  0.3853,
-        #           -1.0606, -1.3019,  0.1817,  1.1574,  0.9445,  0.5632, -0.2178,
-        #           -2.0942, -1.6376, -0.2915, -0.0052,  0.0441,  0.7073,  1.9574,
-        #            1.1097, -0.1203, -0.9073,  1.0708,  0.2502, -0.7879, -1.6044,
-        #            1.9468,  0.5393,  0.1580,  0.3825, -0.5834, -1.0625, -2.4772,
-        #            1.2314, -1.2677,  0.5129, -0.0402,  0.0085,  0.1768, -0.5596,
-        #           -0.1755, -1.2816, -2.3034,  0.5600, -0.2414, -0.7948,  0.9095,
-        #           -0.6750, -0.1480,  0.8471, -0.2082, -1.0599, -0.1175,  0.0997,
-        #           -0.9972,  0.3830, -1.0479, -2.5655, -0.2249,  0.2717,  1.1209,
-        #            1.3518, -0.3287, -0.5851,  1.2655, -1.6686, -0.5664,  0.1931,
-        #           -0.8782, -0.7385,  0.1457, -1.0454,  0.4788,  0.1807,  0.1939,
-        #           -0.1025, -0.2175, -0.1676,  0.9348,  0.2036,  0.3091, -0.0112,
-        #            0.1692,  0.1049, -1.1047, -0.9794, -0.2680,  0.4062,  0.9460,
-        #            0.2318, -0.5433, -1.4904, -1.0969, -0.8909,  0.1870, -0.5887,
-        #            0.5263,  1.4904, -0.2998,  0.2489,  0.6626, -0.7645,  0.5196,
-        #            0.3576,  0.3508,  0.6918,  1.7858, -1.2526, -1.5197, -0.0696,
-        #           -0.0043,  0.0420,  0.2179, -0.3461, -1.0943,  0.4596, -0.9311,
-        #            0.6362,  0.7047, -0.8704, -0.3572, -0.9505,  1.1413,  1.6477,
-        #            0.1786, -0.8749,  0.1661, -0.6268, -0.3012, -1.7983, -0.0523,
-        #           -1.9643, -0.5399,  0.0889,  2.2691, -1.3379,  1.1193,  0.4021,
-        #            0.2998,  2.2152,  1.0406,  0.6693,  0.8560,  0.0860, -0.3354,
-        #            0.7567,  0.9014, -0.6964,  0.4915,  0.7528,  0.5360, -0.1124,
-        #            0.7534, -1.0246, -1.3543,  1.3342,  1.0165, -0.4316, -0.6143,
         #            2.2817, -0.9432, -0.7737,  0.6714, -0.3643, -1.7460, -0.5409,
         #           -0.8999,  1.6545, -0.4321, -0.7969]]], grad_fn=<ViewBackward0>)
 
         # 임베딩 결과를 GRU 모델에 적용  hidden이 512개이면 outputs도 512개 ???
         outputs, hidden = self.gru(embedded)
-        print('Encoder forward outputs.shape = ', outputs.shape)
+        print('=====class Encoder forward outputs.shape = ', outputs.shape)
         # Encoder forward outputs.shape =  torch.Size([1, 1, 512])
 
-        print('Encoder forward hidden.shape = ', hidden.shape)
+        print('=====class Encoder forward hidden.shape = ', hidden.shape)
         # Encoder forward hidden.shape =  torch.Size([1, 1, 512])
 
-        print('=====class Encoder_Network(nn.Module): encoder_outputs = ', outputs)
-        print('=====class Encoder_Network(nn.Module): encoder_hidden = ', hidden)
+        # print('=====class Encoder_Network(nn.Module): encoder_outputs = ', outputs)
+        # print('=====class Encoder_Network(nn.Module): encoder_hidden = ', hidden)
 
         print('=====class Encoder_Network(nn.Module): def forward end =========')
 
@@ -579,6 +568,7 @@ class Decoder_Network(nn.Module):
 ################################################################################
 
 class Seq2Seq(nn.Module):
+
     print('=====class Seq2Seq(nn.Module): def __init__ start =========')
 
     def __init__(self, encoder, decoder, device, MAX_LENGTH=MAX_LENGTH):
@@ -627,10 +617,19 @@ class Seq2Seq(nn.Module):
         # 문장의 모든 단어를 인코딩
         for i in range(input_length):
 
-            print('=====class Seq2Seq(nn.Module): def forward input_length = ',i, input_length)
+            print('=====class Seq2Seq(nn.Module): def forward input_length = ',i+1, input_length)
             print('=====class Seq2Seq(nn.Module): def forward input_lang[i] =', input_lang[i])
+            # =====class Seq2Seq(nn.Module): def forward input_length =  0 4
+            # =====class Seq2Seq(nn.Module): def forward input_lang[i] = tensor([2])
 
+
+            #############################################################
+            #############################################################
+            #############################################################
             encoder_output, encoder_hidden = self.encoder(input_lang[i])
+            #############################################################
+            #############################################################
+            #############################################################
 
         # 인코더의 은닉층을 디코더의 은닉층으로 사용
         decoder_hidden = encoder_hidden.to(device)
@@ -772,7 +771,9 @@ def trainModel(model, input_lang, output_lang, pairs, num_iteration=2000):
 
         # Model 객체를 이용하여 오차 계산
         print('=====trainModel loss = Model(model, input_tensor, target_tensor, optimizer, criterion) start ')
+
         loss = Model(model, input_tensor, target_tensor, optimizer, criterion)
+
         print('=====trainModel loss = Model(model, input_tensor, target_tensor, optimizer, criterion) end ')
 
         print('=====trainModel(model, input_lang, output_lang, pairs, num_iteration=2000): for 문 loss = ', loss)
