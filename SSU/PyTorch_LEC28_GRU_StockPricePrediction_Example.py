@@ -11,7 +11,7 @@ DEVICE = torch.device("cuda") if torch.cuda.is_available() else torch.device("cp
 print(f"using PyTorch version: {torch.__version__}, Device: {DEVICE}")
 
 FEATURE_NUMS = 4        # 입력층으로 들어가는 데이터 개수 feature
-SEQ_LENGTH = 5          # 정답을 만들기 위해 필요한 시점 개수 time step
+SEQ_LENGTH = 5          # 정답을 만들기 위해 필요한 시점 개수 time step  (5일간의 데이터를 기반으로 6일째 주가를 예측)
 HIDDEN_SIZE = 4         # RNN 계열 계층을 구성하는 hidden state 개수
 NUM_LAYERS = 1          # RNN 계열 계층이 몇겹으로 쌓였는지 나타냄
 LEARNING_RATE = 1e-3    # 학습율
@@ -37,11 +37,15 @@ SPLIT = int(0.7*len(df))  # train : test = 7 : 3
 train_df = df[ :SPLIT ]
 test_df = df[ SPLIT: ]
 
+# MinMaxScaler() 이용해서 0~1 값을 가지도록 feature scaling과 label scaling 각각 수행함
 scaler_x = MinMaxScaler()  # feature scaling
 
 train_df.iloc[ : , :-1 ] = scaler_x.fit_transform(train_df.iloc[ : , :-1 ])
 test_df.iloc[ : , :-1 ] = scaler_x.fit_transform(test_df.iloc[ : , :-1 ])
 
+# 여기서 lalel saling을 별도로 하는 이유는 우리가 test data로 예측을 수행하면 0~1 범위를
+# 가지는 예측값이 나오기 때문에 scaling 되기 전의 이러한 0~1에 대응되는 원래의 값(label)으로
+# 바뀌기 위해서 scaler의 inverse_transform 함수를 사용하기 위한 목적임
 scaler_y = MinMaxScaler()  # label scaling
 
 train_df.iloc[ : , -1 ] = scaler_y.fit_transform(train_df.iloc[ : , [-1] ])
