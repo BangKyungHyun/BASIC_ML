@@ -359,9 +359,7 @@ test_loader = DataLoader(dataset=test_dataset, batch_size=BATCH_SIZE, shuffle=Fa
 # input_size: input x에 대한 features의 수
 # hidden_size: hidden state의 features의 수
 # num_layers: LSTM을 스택킹(stacking)하는 수
-# batch_first: 입출력 텐서의 형태가 다음과 같음. 기본값은 False
-# True로 설정시 (batch, seq, feature)
-# False로 설정시 (seq, batch, feature)
+# batch_first: 입출력 텐서의 형태가 다음과 같음. 기본값은 False ==> True로 설정시 (batch, seq, feature) False로 설정시 (seq, batch, feature)
 # (주의사항) hidden_state, cell_state에는 영향을 미치지 않습니다.
 # bidirectional: 양방향 LSTM 구현 여부. 기본값은 False
 
@@ -409,7 +407,8 @@ class MyLSTMModel(nn.Module):
         #
         # data.shape = torch.Size([20, 5, 4]) => batch_size(20) sequence_length(5)  input_size(4)
 
-        # data = tensor([[[0.4853, 0.5571, 0.5435, 0.1544],
+        # data =
+        # tensor([[[0.4853, 0.5571, 0.5435, 0.1544],
         #          [0.5074, 0.4857, 0.4565, 0.2505],
         #          [0.3309, 0.3786, 0.3913, 0.1165],
         #          [0.3750, 0.3643, 0.4130, 0.0326],

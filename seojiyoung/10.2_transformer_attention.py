@@ -46,7 +46,7 @@ class Lang:
 
     # 단어의 인덱스를 저장하기 위한 컨테이너를 초기화
 
-    print('=====class Lang def __init__ start =========')
+    # print('=====class Lang def __init__ start =========')
 
     def __init__(self):
         print('=====class Lang def __init__ body start =========')
@@ -57,14 +57,14 @@ class Lang:
         self.n_words = 2                       # SOS와 EOS에 대한 카운트
         print('=====class Lang def __init__ body end =========')
 
-    print('=====class Lang def __init__ end =========')
+    # print('=====class Lang def __init__ end =========')
 
     # 문장을 단어 단위(스페이스 기준)로 분리한 후 컨테이너(word)에 추가
     def addSentence(self, sentence):
 
         for word in sentence.split(' '):
 
-            # print('word =', word)
+            print('word =', word)
 
             self.addWord(word)
 
@@ -99,6 +99,7 @@ class Lang:
 def normalizeString(df, lang):
 
     print('=====def normalizeString(df, lang): start =========')
+
     print('df[lang] 000 =', df[lang])
     sentence = df[lang].str.lower()
     print('sentence 111 =', sentence)
@@ -140,6 +141,7 @@ def normalizeString(df, lang):
 ################################################################################
 
 def read_sentence(df, lang_kind_1, lang_kind_2):
+
     print('=====def read_sentence(df, lang_kind_1, lang_kind_2): start =========')
 
     print('def read_sentence df =\n', df)
@@ -156,13 +158,13 @@ def read_sentence(df, lang_kind_1, lang_kind_2):
     sentence1 = normalizeString(df, lang_kind_1) # 데이터셋의 첫번째 열 (영어)
     sentence2 = normalizeString(df, lang_kind_2) # 데이터셋의 두번째 열 (불어)
 
-    print('def read_sentence sentence1 =\n', sentence1)
+    # print('def read_sentence sentence1 =\n', sentence1)
 
     # def read_sentence sentence1 =
     #  0    i made two.
     # Name: eng, dtype: object
 
-    print('def read_sentence sentence2 =\n', sentence2)
+    # print('def read_sentence sentence2 =\n', sentence2)
     # def read_sentence sentence2 =
     #  0    j'en ai confectionne deux.
     # Name: fra, dtype: object
@@ -314,6 +316,7 @@ def indexesFromSentence(lang, sentence):
 # pairs = [['i made two.', "j'en ai confectionne deux."]]
 
 def tensorFromSentence(lang, sentence):
+
     print('=====def tensorFromSentence(lang, sentence): start =========')
 
     print('1. tensorFromSentence sentence =',sentence)
@@ -331,8 +334,8 @@ def tensorFromSentence(lang, sentence):
     print('3. tensorFromSentence indexes =',indexes)
     # 3. tensorFromSentence indexes = [2, 3, 4, 1]
 
-
     print('=====def tensorFromSentence(lang, sentence): end =========')
+
     return torch.tensor(indexes, dtype=torch.long, device=device).view(-1, 1)
 
 # torch.tensor는 어떤 data를 tensor로 copy해주는 함수이다.
@@ -345,10 +348,11 @@ def tensorFromSentence(lang, sentence):
 #############################################################################
 
 def tensorsFromPair(input_lang, output_lang, pair):
+    print('###################################################################')
+    print('########def tensorsFromPair(input_lang, output_lang, pair):########')
+    print('###################################################################')
 
-    # print('333333333333333333333333333333333333333333333333333333333333333333')
-    # print('=====tensorsFromPair(input_lang, output_lang, pair): start =========')
-    # print('333333333333333333333333333333333333333333333333333333333333333333')
+    print('=====tensorsFromPair(input_lang, output_lang, pair): start =========')
 
     print('1. tensorsFromPair input_lang = ', input_lang)
     print('1-1. input_lang tensorsFromPair pair[0] = ', pair[0])
@@ -379,11 +383,14 @@ def tensorsFromPair(input_lang, output_lang, pair):
     #         [5],
     #         [1]])
 
-    # print('333333333333333333333333333333333333333333333333333333333333333333')
-    # print('=====tensorsFromPair(input_lang, output_lang, pair): end =========')
-    # print('333333333333333333333333333333333333333333333333333333333333333333')
+    print('=====tensorsFromPair(input_lang, output_lang, pair): end =========')
+
+    print('###################################################################')
+    print('########def tensorsFromPair(input_lang, output_lang, pair):########')
+    print('###################################################################\n')
 
     return (input_tensor, target_tensor)
+
 ################################################################################
 #  step 2 end
 ################################################################################
@@ -408,13 +415,12 @@ def tensorsFromPair(input_lang, output_lang, pair):
 # 또한, 이전 계층의 은닉 상태를 계산한 후 망각 게이트와 업데이트 게이트를 갱신함
 ################################################################################
 
-
 class Encoder_Network(nn.Module):
-    print('=====class Encoder_Network(nn.Module): def __init__ start =========')
 
     #                    4           512           256          1
     #                    23191       512           256          1
     def __init__(self, input_dim, hidden_dim, embbed_dim, num_layers):
+
         print('=====class Encoder_Network(nn.Module): def __init__body start  =========')
 
         super(Encoder_Network, self).__init__()
@@ -445,8 +451,6 @@ class Encoder_Network(nn.Module):
         self.gru = nn.GRU(self.embbed_dim, self.hidden_dim,num_layers=self.num_layers)
 
         print('=====class Encoder_Network(nn.Module): def __init__body end =========')
-
-    print('=====class Encoder_Network(nn.Module): def __init__ end =========')
 
     def forward(self, src):
 
@@ -520,7 +524,6 @@ class Encoder_Network(nn.Module):
 ################################################################################
 
 class Decoder_Network(nn.Module):
-    print('=====class Decoder_Network(nn.Module): def __init__ start =========')
 
     #                     39387        512          256          1
     def __init__(self, output_dim, hidden_dim, embbed_dim, num_layers):
@@ -540,9 +543,10 @@ class Decoder_Network(nn.Module):
         # 선형 계층 초기화               512        39387
         self.out = nn.Linear(self.hidden_dim, output_dim)
         self.softmax = nn.LogSoftmax(dim=1)
-        print('=====class Decoder_Network(nn.Module): def __init__ body end =========')
 
-    print('=====class Decoder_Network(nn.Module): def __init__ end =========')
+        print('=====class Decoder_Network(nn.Module): def __init__ body end =========')
+    #
+    # print('=====class Decoder_Network(nn.Module): def __init__ end =========')
 
     def forward(self, input, hidden):
 
@@ -569,8 +573,6 @@ class Decoder_Network(nn.Module):
 
 class Seq2Seq(nn.Module):
 
-    print('=====class Seq2Seq(nn.Module): def __init__ start =========')
-
     def __init__(self, encoder, decoder, device, MAX_LENGTH=MAX_LENGTH):
 
         print('=====class Seq2Seq(nn.Module): def __init__body start =========')
@@ -580,13 +582,13 @@ class Seq2Seq(nn.Module):
         self.encoder = encoder  # 인코더 초기화
         self.decoder = decoder  # 디코더 초기화
         self.device = device
-        print('=====class Seq2Seq(nn.Module): def __init__body start =========')
 
-    print('=====class Seq2Seq(nn.Module): def __init__ end =========')
+        print('=====class Seq2Seq(nn.Module): def __init__body end =========')
 
     def forward(self, input_lang, output_lang, teacher_forcing_ratio=0.5):
 
         print('=====class Seq2Seq(nn.Module): def forward start =========')
+
         input_length = input_lang.size(0)  # 입력 문자 길이(문장의 단어 수)
         batch_size = output_lang.shape[1]
         target_length = output_lang.shape[0]
@@ -622,13 +624,8 @@ class Seq2Seq(nn.Module):
             # =====class Seq2Seq(nn.Module): def forward input_length =  0 4
             # =====class Seq2Seq(nn.Module): def forward input_lang[i] = tensor([2])
 
-
-            #############################################################
-            #############################################################
             #############################################################
             encoder_output, encoder_hidden = self.encoder(input_lang[i])
-            #############################################################
-            #############################################################
             #############################################################
 
         # 인코더의 은닉층을 디코더의 은닉층으로 사용
@@ -681,7 +678,7 @@ def Model(model, input_tensor, target_tensor, model_optimizer, criterion):
     loss = 0
     epoch_loss = 0
     print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): model =========\n', model)
-    print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): output = model(input_tensor, target_tensor ) start =========')
+    # print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): output = model(input_tensor, target_tensor ) start =========')
 
     # print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): model(input_tensor, target_tensor ) =========\n', model(input_tensor, target_tensor ))
 
@@ -699,7 +696,7 @@ def Model(model, input_tensor, target_tensor, model_optimizer, criterion):
     # )
     # )
 
-    print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): output = model(input_tensor, target_tensor ) end =========')
+    # print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): output = model(input_tensor, target_tensor ) end =========')
 
     print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): output = \n', output)
     # output =
@@ -736,9 +733,7 @@ def Model(model, input_tensor, target_tensor, model_optimizer, criterion):
                      # 20000 -> 2000
 def trainModel(model, input_lang, output_lang, pairs, num_iteration=2000):
 
-    print('22222222222222222222222222222222222222222222222222222222222222222222222222222222222222222')
     print('=====trainModel(model, input_lang, output_lang, pairs, num_iteration=2000): start =========')
-    print('22222222222222222222222222222222222222222222222222222222222222222222222222222222222222222')
 
     model.train()
     optimizer = optim.SGD(model.parameters(), lr=0.01) # 옵티마이져 SGD를 사용
@@ -763,6 +758,7 @@ def trainModel(model, input_lang, output_lang, pairs, num_iteration=2000):
     #         [1]]))]
 
     for iter in range(1, num_iteration + 1):
+
         print('=====trainModel(model, input_lang, output_lang, pairs, num_iteration=2000): for 문 시작 =========')
 
         training_pair = training_pairs[iter - 1]
@@ -770,11 +766,16 @@ def trainModel(model, input_lang, output_lang, pairs, num_iteration=2000):
         target_tensor = training_pair[1]
 
         # Model 객체를 이용하여 오차 계산
+
+        print('###################################################################')
         print('=====trainModel loss = Model(model, input_tensor, target_tensor, optimizer, criterion) start ')
+        print('###################################################################\n')
 
         loss = Model(model, input_tensor, target_tensor, optimizer, criterion)
 
+        print('###################################################################')
         print('=====trainModel loss = Model(model, input_tensor, target_tensor, optimizer, criterion) end ')
+        print('###################################################################\n')
 
         print('=====trainModel(model, input_lang, output_lang, pairs, num_iteration=2000): for 문 loss = ', loss)
         # loss = 1.7806238174438476
@@ -785,63 +786,13 @@ def trainModel(model, input_lang, output_lang, pairs, num_iteration=2000):
             average_loss = total_loss_iterations / 500
             total_loss_iterations = 0
             print('%d %.4f' % (iter, average_loss))
-        print('=====trainModel(model, input_lang, output_lang, pairs, num_iteration=2000): for 종료 =========')
+        # print('=====trainModel(model, input_lang, output_lang, pairs, num_iteration=2000): for 종료 =========')
 
     torch.save(model.state_dict(), '../data/mytraining.pt')
 
-    print('22222222222222222222222222222222222222222222222222222222222222222222222222222222222222222')
     print('=====trainModel(model, input_lang, output_lang, pairs, num_iteration=2000): end =========')
-    print('22222222222222222222222222222222222222222222222222222222222222222222222222222222222222222')
 
     return model
-
-################################################################################
-# 모델 평가
-################################################################################
-
-def evaluate(model, input_lang, output_lang, sentences, max_length=MAX_LENGTH):
-
-    print('=====evaluate(model, input_lang, output_lang, sentences, max_length=MAX_LENGTH): start =========')
-
-    with torch.no_grad():
-        input_tensor = tensorFromSentence(input_lang, sentences[0]) # 입력문자열를 텐서로 변환
-        output_tensor = tensorFromSentence(output_lang, sentences[1]) # 출력 문자열을 텐서로 변환
-        decoded_words = []
-        output = model(input_tensor, output_tensor)
-
-        for ot in range(output.size(0)):
-            topv, topi = output[ot].topk(1)  # 각 출력에서 가장 높은 값을 찾아 인덱스로 변환
-
-            if topi[0].item() == EOS_token:
-                decoded_words.append('<EOS>') # EOS 토큰를 만나면 평가를 멈춤
-                break
-            else: # 예측 결과를 출력 문자열에 추가
-                decoded_words.append(output_lang.index2word[topi[0].item()])
-
-    print('=====evaluate(model, input_lang, output_lang, sentences, max_length=MAX_LENGTH): end =========')
-
-    return decoded_words
-
-# 훈련 데이터셋으로부터 임의의 문장을 가져와서 모델 평가  (임의로 10개의 데이터를 가져옴)
-def evaluateRandomly(model, input_lang, output_lang, pairs, n=1):
-# def evaluateRandomly(model, input_lang, output_lang, pairs, n=10):
-
-    for i in range(n):
-
-        print('=******************************************************************************=')
-        print('=====def evaluateRandomly(model, input_lang, output_lang, pairs) start =========')
-
-        pair = random.choice(pairs)  # 임의의 문장을 가져온다.
-        print('=====def evaluateRandomly(model, input_lang, output_lang, pairs) === i  =', i,n)
-        print('=====def evaluateRandomly(model, input_lang, output_lang, pairs) === input {}'.format(pair[0]))
-        print('=====def evaluateRandomly(model, input_lang, output_lang, pairs) === output {}'.format(pair[1]))
-
-        output_words = evaluate(model, input_lang, output_lang, pair) # 모델 평가 결과는 output_words에 저장
-        output_sentence = ' '.join(output_words)
-
-        print('=====def evaluateRandomly(model, input_lang, output_lang, pairs) === predicted {}'.format(output_sentence))
-        print('=====def evaluateRandomly(model, input_lang, output_lang, pairs) end =========')
-        print('=******************************************************************************=')
 
 ################################################################################
 # 모델 훈련 (main module)
@@ -876,6 +827,11 @@ print('Input : {} Output : {}'.format(input_size, output_size))
 # input size는 1)sos 2)eos 3)i 4)made 5)two. 로 해서 5임
 # output size는 1)sos 2)eos 3)j'en 4)ai 5)confectionne 6)deux. 로 해서 6임
 
+print('###################################################################')
+print('###################################################################')
+print('###################################################################')
+print('###################################################################')
+
 embed_size = 256
 hidden_size = 512
 num_layers = 1
@@ -884,7 +840,7 @@ num_iteration = 1 # 30000 -> 3000
 
 # 인코더에 훈련 데이터셋을 입력과 모든 출력과 은닉 상태를 저장 (선언만 한 상태)
 #                    23191       512           256          1
-# print('encoder = Encoder_Network(input_size, hidden_size, embed_size, num_layers) start')
+print('encoder = Encoder_Network(input_size, hidden_size, embed_size, num_layers) start')
 
 encoder = Encoder_Network(input_size, hidden_size, embed_size, num_layers)
 
@@ -894,17 +850,17 @@ encoder = Encoder_Network(input_size, hidden_size, embed_size, num_layers)
 #   (gru): GRU(256, 512)
 # )
 
-# print('encoder = Encoder_Network(input_size, hidden_size, embed_size, num_layers) end')
+print('encoder = Encoder_Network(input_size, hidden_size, embed_size, num_layers) end\n')
 
 # 디코더의 첫번째 입력으로 <SOS>토큰이 제공되고 인코더의 마지막 은닉 상태가 디코더의 첫번째 은닉상태로 제공 (선언만 한 상태)
 #                     39387        512          256          1
-# print('decoder = Decoder_Network(output_size, hidden_size, embed_size, num_layers) start')
+print('decoder = Decoder_Network(output_size, hidden_size, embed_size, num_layers) start')
 
 decoder = Decoder_Network(output_size, hidden_size, embed_size, num_layers)
 
 # print(decoder)
 
-# print('decoder = Decoder_Network(output_size, hidden_size, embed_size, num_layers) end')
+print('decoder = Decoder_Network(output_size, hidden_size, embed_size, num_layers) end\n')
 
 # Decoder(
 #   (embedding): Embedding(39387, 256)
@@ -927,8 +883,10 @@ decoder = Decoder_Network(output_size, hidden_size, embed_size, num_layers)
 # 인코드-디코더 모델(Seq2seq) 모델 생성
 
 print('Seq2Seq_model = Seq2Seq(encoder, decoder, device).to(device) start')
+
 Seq2Seq_model = Seq2Seq(encoder, decoder, device).to(device)
 
+print('Seq2Seq_model = Seq2Seq(encoder, decoder, device).to(device) end\n')
 # print('Seq2Seq_model =', Seq2Seq_model)
 
 # Seq2Seq_model = Seq2Seq(
@@ -943,20 +901,26 @@ Seq2Seq_model = Seq2Seq(encoder, decoder, device).to(device)
 #     (softmax): LogSoftmax(dim=1)
 #   )
 # )
-print('Seq2Seq_model = Seq2Seq(encoder, decoder, device).to(device) end')
 
-######################################################################################################################
-######################################################################################################################
+print('trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration) start\n')
 
-print('77777777777777777777777777777777777777777777777777777777777777777777777777777777777777')
-print('77777777777777777777777777777777777777777777777777777777777777777777777777777777777777\n')
-print('model = trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration) start\n')
+print('000000000000000000000000000000000000000rt\n')
+print('000000000000000000000000000000000000000rt\n')
+print('000000000000000000000000000000000000000rt\n')
 
-model = trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration)
+# trainModel은 class가 아닌 일반 함수로서 바로 실행됨
+# model = trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration) 형태가 아닌
+# trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration) 형태로 호출해도 됨
 
-print('88888888888888888888888888888888888888888888888888888888888888888888888888888888888888')
-print('88888888888888888888888888888888888888888888888888888888888888888888888888888888888888\n')
-print('model = trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration)  end')
+# model = trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration)
+
+trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration)
+
+print('111111111111111111111111111111111111111rt\n')
+print('111111111111111111111111111111111111111rt\n')
+print('111111111111111111111111111111111111111rt\n')
+
+print('trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration)  end')
 
 # print('model =', model)
 
@@ -987,6 +951,57 @@ print('model = trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_ite
 # )
 
 print('============main module end ==========')
+
+################################################################################
+# 모델 평가
+################################################################################
+
+def evaluate(model, input_lang, output_lang, sentences, max_length=MAX_LENGTH):
+
+    print('=====evaluate(model, input_lang, output_lang, sentences, max_length=MAX_LENGTH): start =========')
+
+    with torch.no_grad():
+        input_tensor = tensorFromSentence(input_lang, sentences[0])   # 입력 문자열를 텐서로 변환
+        output_tensor = tensorFromSentence(output_lang, sentences[1]) # 출력 문자열을 텐서로 변환
+        decoded_words = []
+        output = model(input_tensor, output_tensor)
+
+        for ot in range(output.size(0)):
+            topv, topi = output[ot].topk(1)  # 각 출력에서 가장 높은 값을 찾아 인덱스로 변환
+
+            if topi[0].item() == EOS_token:
+                decoded_words.append('<EOS>') # EOS 토큰를 만나면 평가를 멈춤
+                break
+            else: # 예측 결과를 출력 문자열에 추가
+                decoded_words.append(output_lang.index2word[topi[0].item()])
+
+    print('=====evaluate(model, input_lang, output_lang, sentences, max_length=MAX_LENGTH): end =========')
+
+    return decoded_words
+
+################################################################################
+# 훈련 데이터셋으로부터 임의의 문장을 가져와서 모델 평가  (임의로 10개의 데이터를 가져옴)
+################################################################################
+
+def evaluateRandomly(model, input_lang, output_lang, pairs, n=1):
+# def evaluateRandomly(model, input_lang, output_lang, pairs, n=10):
+
+    for i in range(n):
+
+        # print('=******************************************************************************=')
+        # print('=====def evaluateRandomly(model, input_lang, output_lang, pairs) start =========')
+        #
+        pair = random.choice(pairs)  # 임의의 문장을 가져온다.
+        print('=====def evaluateRandomly(model, input_lang, output_lang, pairs) === i  =', i,n)
+        print('=====def evaluateRandomly(model, input_lang, output_lang, pairs) === input {}'.format(pair[0]))
+        print('=====def evaluateRandomly(model, input_lang, output_lang, pairs) === output {}'.format(pair[1]))
+
+        output_words = evaluate(model, input_lang, output_lang, pair) # 모델 평가 결과는 output_words에 저장
+        output_sentence = ' '.join(output_words)
+
+        print('=====def evaluateRandomly(model, input_lang, output_lang, pairs) === predicted {}'.format(output_sentence))
+        # print('=====def evaluateRandomly(model, input_lang, output_lang, pairs) end =========')
+        # print('=******************************************************************************=')
 
 ################################################################################
 # 임의의 문장에 대한 평가 결과
