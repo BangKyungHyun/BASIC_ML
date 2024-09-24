@@ -615,19 +615,19 @@ class Seq2Seq(nn.Module):
 
     def forward(self, input_lang, output_lang, teacher_forcing_ratio=0.5):
 
-        print('=====class Seq2Seq(nn.Module): def forward start =========')
+        # print('=====class Seq2Seq(nn.Module): def forward start =========')
 
         input_length = input_lang.size(0)  # 입력 문자 길이(문장의 단어 수)
         batch_size = output_lang.shape[1]
         target_length = output_lang.shape[0]
         vocab_size = self.decoder.output_dim
 
-        print('=====class Seq2Seq(nn.Module): def forward input_lang = ', input_lang)
-        print('=====class Seq2Seq(nn.Module): def forward input_lang.shape[0] = ', input_lang.shape[0])
-        print('=====class Seq2Seq(nn.Module): def forward input_lang.shape[1] = ', input_lang.shape[1])
-        print('=====class Seq2Seq(nn.Module): def forward output_lang = ', output_lang)
-        print('=====class Seq2Seq(nn.Module): def forward output_lang.shape[0] = ', output_lang.shape[0])
-        print('=====class Seq2Seq(nn.Module): def forward output_lang.shape[1] = ', output_lang.shape[1])
+        # print('=====class Seq2Seq(nn.Module): def forward input_lang = ', input_lang)
+        # print('=====class Seq2Seq(nn.Module): def forward input_lang.shape[0] = ', input_lang.shape[0])
+        # print('=====class Seq2Seq(nn.Module): def forward input_lang.shape[1] = ', input_lang.shape[1])
+        # print('=====class Seq2Seq(nn.Module): def forward output_lang = ', output_lang)
+        # print('=====class Seq2Seq(nn.Module): def forward output_lang.shape[0] = ', output_lang.shape[0])
+        # print('=====class Seq2Seq(nn.Module): def forward output_lang.shape[1] = ', output_lang.shape[1])
 
         # =====class Seq2Seq(nn.Module): def forward input_lang =  tensor([[2],
         #         [3],
@@ -643,10 +643,10 @@ class Seq2Seq(nn.Module):
         # =====class Seq2Seq(nn.Module): def forward output_lang.shape[0] =  5
         # =====class Seq2Seq(nn.Module): def forward output_lang.shape[1] =  1
 
-        print('=====class Seq2Seq(nn.Module): def forward input_length = ', input_length)
-        print('=====class Seq2Seq(nn.Module): def forward batch_size = ', batch_size)
-        print('=====class Seq2Seq(nn.Module): def forward target_length = ', target_length)
-        print('=====class Seq2Seq(nn.Module): def forward vocab_size = ', vocab_size)
+        # print('=====class Seq2Seq(nn.Module): def forward input_length = ', input_length)
+        # print('=====class Seq2Seq(nn.Module): def forward batch_size = ', batch_size)
+        # print('=====class Seq2Seq(nn.Module): def forward target_length = ', target_length)
+        # print('=====class Seq2Seq(nn.Module): def forward vocab_size = ', vocab_size)
 
         # input_length =  4
         # batch_size =  1
@@ -656,7 +656,7 @@ class Seq2Seq(nn.Module):
         # 예측된 출력을 저장하기 위한 변수 초기화
         #                        5                 1        6
         outputs = torch.zeros(target_length, batch_size, vocab_size).to(self.device)
-        print('=====class Seq2Seq(nn.Module): def forward outputs = ', outputs)
+        # print('=====class Seq2Seq(nn.Module): def forward outputs = ', outputs)
 
         # outputs =  \
         #  tensor([[[0., 0., 0., 0., 0., 0.]],
@@ -665,14 +665,14 @@ class Seq2Seq(nn.Module):
         #          [[0., 0., 0., 0., 0., 0.]],
         #          [[0., 0., 0., 0., 0., 0.]]])
 
-        print('encoder encoder encoder encoder encoder encoder encoder encoder encoder ')
-        print('encoder encoder encoder encoder encoder encoder encoder encoder encoder ')
-        print('encoder encoder encoder encoder encoder encoder encoder encoder encoder ')
+        # print('encoder encoder encoder encoder encoder encoder encoder encoder encoder ')
+        # print('encoder encoder encoder encoder encoder encoder encoder encoder encoder ')
+        # print('encoder encoder encoder encoder encoder encoder encoder encoder encoder ')
 
         for i in range(input_length):
 
-            print('=====class Seq2Seq(nn.Module): def forward input_length = ',i+1, input_length)
-            print('=====class Seq2Seq(nn.Module): def forward input_lang[i] =', input_lang[i])
+            # print('=====class Seq2Seq(nn.Module): def forward input_length = ',i+1, input_length)
+            # print('=====class Seq2Seq(nn.Module): def forward input_lang[i] =', input_lang[i])
             # =====class Seq2Seq(nn.Module): def forward input_length =  0 4
             # =====class Seq2Seq(nn.Module): def forward input_lang[i] = tensor([2])
 
@@ -684,24 +684,24 @@ class Seq2Seq(nn.Module):
         # 인코더의 은닉층을 디코더의 은닉층으로 사용
         decoder_hidden = encoder_hidden.to(device)
 
-        print('=====class Seq2Seq(nn.Module): def forward decoder_hidden = ', decoder_hidden)
+        # print('=====class Seq2Seq(nn.Module): def forward decoder_hidden = ', decoder_hidden)
 
         # 첫 번째 예측 단어 앞에 토큰(SOS) 추가
         decoder_input = torch.tensor([SOS_token], device=device)
 
-        print('decoder decoder decoder decoder decoder decoder decoder decoder decoder ')
-        print('decoder decoder decoder decoder decoder decoder decoder decoder decoder ')
-        print('decoder decoder decoder decoder decoder decoder decoder decoder decoder ')
+        # print('decoder decoder decoder decoder decoder decoder decoder decoder decoder ')
+        # print('decoder decoder decoder decoder decoder decoder decoder decoder decoder ')
+        # print('decoder decoder decoder decoder decoder decoder decoder decoder decoder ')
 
         # 타켓 단어의 갯수만큼 반복하여 디코더에 forwarding
         # 현재 단어에서 출력 단어를 예측
         for t in range(target_length):
 
-            print('=====class Seq2Seq(nn.Module): def forward target_length = ', t, target_length)
-            print('=====class Seq2Seq(nn.Module): def forward decoder_hidden.shape = ', decoder_hidden.shape)
-            print('=====class Seq2Seq(nn.Module): def forward decoder_input.shape = ', decoder_input.shape)
-
-            # =====class Seq2Seq(nn.Module): def forward target_length =  0 5
+            # print('=====class Seq2Seq(nn.Module): def forward target_length = ', t, target_length)
+            # print('=====class Seq2Seq(nn.Module): def forward decoder_hidden.shape = ', decoder_hidden.shape)
+            # print('=====class Seq2Seq(nn.Module): def forward decoder_input.shape = ', decoder_input.shape)
+            #
+            # # =====class Seq2Seq(nn.Module): def forward target_length =  0 5
             # =====class Seq2Seq(nn.Module): def forward decoder_hidden.shape =  torch.Size([1, 1, 512])
             # =====class Seq2Seq(nn.Module): def forward decoder_input.shape =  tensor([0])
 
@@ -742,9 +742,9 @@ class Seq2Seq(nn.Module):
             # torch.return_types.topk(values=tensor([5., 4., 3.]), indices=tensor([4, 3, 2]))
 
             topv, topi = decoder_output.topk(1)
-            print('decoder_output.topk(1) =', decoder_output.topk(1))
-            print('topv =', topv)
-            print('topi =', topi)
+            # print('decoder_output.topk(1) =', decoder_output.topk(1))
+            # print('topv =', topv)
+            # print('topi =', topi)
             # -1.6180 이 가장 큼(모두 마이너스이여서 숫자가 가장 작은 것이 큼)
             # prediction = tensor([[-1.8532, -1.7986, -1.6180, -1.9043, -1.9382, -1.6791]]
             # decoder_output.topk(1) = torch.return_types.topk(1) values=tensor([[-1.6180]], grad_fn=<TopkBackward0>), indices=tensor([[2]]))
@@ -755,10 +755,10 @@ class Seq2Seq(nn.Module):
             #                 false이면 자체 예측 단어를 다음 입력으로 사용
 
             input = (output_lang[t] if teacher_force else topi)
-            print('input = ', input)
-            print('output_lang[t] = ', output_lang[t])
-            print('teacher_force = ', teacher_force)
-            print('topi = ', topi)
+            # print('input = ', input)
+            # print('output_lang[t] = ', output_lang[t])
+            # print('teacher_force = ', teacher_force)
+            # print('topi = ', topi)
 
             # teacher_force = True 이여서 input은 목표 단어(output_lang[t] )를 사용
             # input = tensor([3])
@@ -772,19 +772,19 @@ class Seq2Seq(nn.Module):
             # teacher_force = False
             # topi = tensor([[5]])
 
-            print('teacher_force = ', teacher_force)
-            print('input.item() = ', input.item())
-            print('EOS_token = ', EOS_token)
+            # print('teacher_force = ', teacher_force)
+            # print('input.item() = ', input.item())
+            # print('EOS_token = ', EOS_token)
 
             # teacher force 활성화하지 않으면 자체 예측 값을 다음 입력으로 사용
             if (teacher_force == False and input.item() == EOS_token):
-                print('break break break break break break break break ')
-                print('break break break break break break break break ')
-                print('break break break break break break break break ')
+                # print('break break break break break break break break ')
+                # print('break break break break break break break break ')
+                # print('break break break break break break break break ')
 
                 break
 
-        print('=====class Seq2Seq(nn.Module): def forward end =========')
+        # print('=====class Seq2Seq(nn.Module): def forward end =========')
 
         return outputs
 
@@ -796,13 +796,13 @@ teacher_forcing_ratio = 0.5
 
 def Model(Seq2Seq_model, input_tensor, target_tensor, model_optimizer, criterion):
 
-    print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): start =========')
-
-    print('=====def Model Seq2Seq_model = ', Seq2Seq_model)
-    print('=====def Model input_tensor = ', input_tensor)
-    print('=====def Model target_tensor = ', target_tensor)
-    print('=====def Model model_optimizer = ', model_optimizer)
-    print('=====def Model criterion = ', criterion)
+    # print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): start =========')
+    #
+    # print('=====def Model Seq2Seq_model = ', Seq2Seq_model)
+    # print('=====def Model input_tensor = ', input_tensor)
+    # print('=====def Model target_tensor = ', target_tensor)
+    # print('=====def Model model_optimizer = ', model_optimizer)
+    # print('=====def Model criterion = ', criterion)
 
     # =====def Model Seq2Seq_model =
     # Seq2Seq(
@@ -842,8 +842,8 @@ def Model(Seq2Seq_model, input_tensor, target_tensor, model_optimizer, criterion
 
     model_optimizer.zero_grad()
     input_length = input_tensor.size(0)
-    print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): input length = ',input_length)
-    print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): input tensor = ',input_tensor)
+    # print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): input length = ',input_length)
+    # print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): input tensor = ',input_tensor)
 
     # input length = 4
     # input  tensor = tensor([[2],
@@ -853,12 +853,12 @@ def Model(Seq2Seq_model, input_tensor, target_tensor, model_optimizer, criterion
 
     loss = 0
     epoch_loss = 0
-    print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): model =========\n', Seq2Seq_model)
+    # print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): model =========\n', Seq2Seq_model)
     # print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): output = model(input_tensor, target_tensor ) start =========')
 
-    # print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): model(input_tensor, target_tensor ) =========\n', model(input_tensor, target_tensor ))
+    # print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): model(input_tensor, target_tensor ) =========\n', Seq2Seq_model(input_tensor, target_tensor ))
 
-    output = Seq2Seq_model(input_tensor, target_tensor )
+    output = Seq2Seq_model(input_tensor, target_tensor)
     # Seq2Seq(
     #     (encoder): Encoder_Network(
     #     (embedding): Embedding(5, 256)
@@ -874,7 +874,7 @@ def Model(Seq2Seq_model, input_tensor, target_tensor, model_optimizer, criterion
 
     # print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): output = model(input_tensor, target_tensor ) end =========')
 
-    print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): output = \n', output)
+    # print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): output = \n', output)
     # output =
     #  tensor([[[-1.7506, -1.8085, -1.7836, -1.8240, -1.7847, -1.8008]],
     #          [[-1.7385, -1.8067, -1.7858, -1.7889, -1.8095, -1.8234]],
@@ -884,27 +884,28 @@ def Model(Seq2Seq_model, input_tensor, target_tensor, model_optimizer, criterion
     #         grad_fn=<CopySlices>)
 
     num_iter = output.size(0)
-    print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): num_iter = ', num_iter)
+    # print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): num_iter = ', num_iter)
     # num_iter =  5
 
     for ot in range(num_iter):
         # 모델의 예측 결과와 정답(예상 결과)를 이용하여 오차를 계산
         loss += criterion(output[ot], target_tensor[ot])
-        print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): output[ot] = \n', output[ot])
-        print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): target_tensor[ot] = \n', target_tensor[ot])
-        print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): loss = \n', loss)
+        # print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): output[ot] = \n', output[ot])
+        # print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): target_tensor[ot] = \n', target_tensor[ot])
+        # print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): loss = \n', loss)
 
     loss.backward()
     model_optimizer.step()
     epoch_loss = loss.item() / num_iter
 
-    print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion):epoch_loss = ', epoch_loss)
+    # print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion):epoch_loss = ', epoch_loss)
 
     # epoch_loss = 0.736637020111084
 
-    print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): end =========')
+    # print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): end =========')
 
     return epoch_loss
+
 ################################################################################
 # 모델 훈련 함수 정의
 ################################################################################
@@ -912,12 +913,12 @@ def Model(Seq2Seq_model, input_tensor, target_tensor, model_optimizer, criterion
                      # 20000 -> 2000
 def trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration=2000):
 
-    print('=====trainModel(model, input_lang, output_lang, pairs, num_iteration=2000): start =========\n')
-
-    print('def trainModel -> Seq2Seq_model =', Seq2Seq_model)
-    print('def trainModel -> input_lang =', input_lang)
-    print('def trainModel -> output_lang =', output_lang)
-    print('def trainModel -> pairs =', pairs)
+    # print('=====trainModel(model, input_lang, output_lang, pairs, num_iteration=2000): start =========\n')
+    #
+    # print('def trainModel -> Seq2Seq_model =', Seq2Seq_model)
+    # print('def trainModel -> input_lang =', input_lang)
+    # print('def trainModel -> output_lang =', output_lang)
+    # print('def trainModel -> pairs =', pairs)
 
     # def trainModel ->
     # Seq2Seq_model =
@@ -949,7 +950,7 @@ def trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration=2000
     training_pairs = [tensorsFromPair(input_lang, output_lang, random.choice(pairs))
         for i in range(num_iteration)]
 
-    print('=====trainModel(model, input_lang, output_lang, pairs, num_iteration=2000): training paris = \n', training_pairs )
+    # print('=====trainModel(model, input_lang, output_lang, pairs, num_iteration=2000): training paris = \n', training_pairs )
     # training paris =
     #  [(tensor([[2],
     #         [3],
@@ -1011,7 +1012,7 @@ def trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration=2000
 
     torch.save(Seq2Seq_model.state_dict(), '../data/mytraining.pt')
 
-    print('=====trainModel(model, input_lang, output_lang, pairs, num_iteration=2000): end =========')
+    # print('=====trainModel(model, input_lang, output_lang, pairs, num_iteration=2000): end =========')
 
     return Seq2Seq_model
 
@@ -1119,14 +1120,11 @@ Seq2Seq_model = Seq2Seq(encoder, decoder, device).to(device)
 
 print('###################################################################')
 print('######## MAIN START ###############################################')
-print('######## MAIN START ###############################################')
 print('###################################################################')
 
 # trainModel은 class가 아닌 일반 함수로서 바로 실행됨
 # model = trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration) 형태가 아닌
 # trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration) 형태로 호출해도 됨
-
-print('trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration) start\n')
 
 # model = trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration)
 XXX = trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration)
@@ -1134,10 +1132,7 @@ XXX = trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration)
 # 객체의 이름은 임의로 지정해도 됨
 # print('XXX =', XXX)
 
-print('trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration)  end')
-
 print('###################################################################')
-print('######## MAIN END ###############################################')
 print('######## MAIN END ###############################################')
 print('###################################################################')
 
