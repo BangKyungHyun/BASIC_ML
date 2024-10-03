@@ -19,6 +19,7 @@ from torch import nn
 x_train = torch.Tensor(x_train_np)
 y_train = torch.Tensor(y_train_np)
 
+########################################################
 class MyLogisticRegressionModel(nn.Module):
 
     def __init__(self):
@@ -33,6 +34,9 @@ class MyLogisticRegressionModel(nn.Module):
 
         return prediction
 
+########################################################
+
+# 객체 생성
 model = MyLogisticRegressionModel()
 
 for param in model.parameters():
@@ -44,12 +48,13 @@ optimizer = torch.optim.SGD(model.parameters(), lr=1e-1)
 train_loss_list = []
 train_accuracy_list = []
 
-nums_epoch = 3
+nums_epoch = 1
 
 for epoch in range(nums_epoch+1):
 
-    outputs = model(x_train)
-    # print('outputs.shape =', outputs.shape)
+      outputs = model(x_train)
+
+#   print('outputs.shape =', outputs.shape)
     # outputs.shape = torch.Size([759, 1])
     #
     # print('outputs =', outputs)
@@ -65,8 +70,7 @@ for epoch in range(nums_epoch+1):
     #                   [0.4530],
     #                   [0.4855],
 
-
-    loss = loss_function(outputs, y_train)
+      loss = loss_function(outputs, y_train)
     # print('loss.shape =', loss.shape)
     # loss.shape = torch.Size([])
 
@@ -79,15 +83,14 @@ for epoch in range(nums_epoch+1):
     # loss.item() = 0.6710168123245239
     # loss.item() = 0.6674610376358032
 
-    #
-    train_loss_list.append(loss.item())
+      train_loss_list.append(loss.item())
     # print('train_loss_list =', train_loss_list)
     # train_loss_list = [0.6791601181030273]
     # train_loss_list = [0.6791601181030273, 0.6749033331871033]
     # train_loss_list = [0.6791601181030273, 0.6749033331871033,0.6710168123245239]
     # train_loss_list = [0.6791601181030273, 0.6749033331871033,0.6710168123245239, 0.6674610376358032]
 
-    prediction = outputs > 0.5
+      prediction = outputs > 0.5
     # print('prediction.shape =', prediction.shape)
     # prediction.shape = torch.Size([759, 1])
 
@@ -108,7 +111,7 @@ for epoch in range(nums_epoch+1):
     #                              [1.],
     #                              [1.],
 
-    correct = (prediction.float() == y_train)
+      correct = (prediction.float() == y_train)
     # print('correct.shape =', correct.shape)
     # correct.shape = torch.Size([759, 1])
 
@@ -119,9 +122,8 @@ for epoch in range(nums_epoch+1):
     #                   [False],
     # print('correct =', correct.item())
     # RuntimeError: a Tensor with 759 elements cannot be converted to Scalar
-    #
 
-    accuracy = correct.sum().item() / len(correct)
+      accuracy = correct.sum().item() / len(correct)
     # print('accuracy.shape =', accuracy.shape)
     # AttributeError: 'float' object has no attribute 'shape'
 
@@ -150,22 +152,21 @@ for epoch in range(nums_epoch+1):
     # accuracy = 0.6007905138339921
     # accuracy = 0.6060606060606061
 
-    train_accuracy_list.append(accuracy)
+      train_accuracy_list.append(accuracy)
     # print('train_accuracy_list=', train_accuracy_list)
     # train_accuracy_list = [0.5862977602108037]
     # train_accuracy_list = [0.5862977602108037, 0.5968379446640316]
     # train_accuracy_list = [0.5862977602108037, 0.5968379446640316, 0.6007905138339921]
     # train_accuracy_list = [0.5862977602108037, 0.5968379446640316, 0.6007905138339921, 0.6060606060606061]
 
-    optimizer.zero_grad()
-    loss.backward()
-    optimizer.step()
+      optimizer.zero_grad()
+      loss.backward()
+      optimizer.step()
 
-    if epoch % 1000 == 0:
-        print('epoch = ', epoch, ' current loss = ', loss.item(), ' accuracy = ', accuracy)
+      if epoch % 1000 == 0:
+          print('epoch = ', epoch, ' current loss = ', loss.item(), ' accuracy = ', accuracy)
 
     # epoch =  0  current loss =  0.6791601181030273  accuracy =  0.5862977602108037
-
 
 # for name, child in model.named_children():
 #     for param in child.parameters():
@@ -173,7 +174,6 @@ for epoch in range(nums_epoch+1):
 #
 # for param in model.parameters():
 #     print(param)
-
 
 import matplotlib.pyplot as plt
 

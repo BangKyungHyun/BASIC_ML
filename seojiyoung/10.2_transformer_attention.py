@@ -77,8 +77,8 @@ class Lang:
             self.word2count[word] = 1
             self.index2word[self.n_words] = word
 
-            # print('def addWord not in => word, self.n_words, self.word2index, self.index2word, self.word2index[word], self.index2word[self.n_words] ='
-            #                             ,word, self.n_words, self.word2index, self.index2word, self.word2index[word], self.index2word[self.n_words])
+            print('def addWord not in => self.index2word, self.word2index[word], self.index2word[self.n_words] =',
+                                         self.index2word, self.word2index[word], self.index2word[self.n_words])
             # def addWord not in => word, self.n_words, self.word2index, self.index2word, self.word2index[word], self.index2word[self.n_words] = i 2 {'i': 2} {0: 'SOS', 1: 'EOS', 2: 'i'} 2 i
             # def addWord not in => word, self.n_words, self.word2index, self.index2word, self.word2index[word], self.index2word[self.n_words] = made 3 {'i': 2, 'made': 3} {0: 'SOS', 1: 'EOS', 2: 'i', 3: 'made'} 3 made
             # def addWord not in => word, self.n_words, self.word2index, self.index2word, self.word2index[word], self.index2word[self.n_words] = two. 4 {'i': 2, 'made': 3, 'two.': 4} {0: 'SOS', 1: 'EOS', 2: 'i', 3: 'made', 4: 'two.'} 4 two.
@@ -216,23 +216,23 @@ def process_data(lang_kind_1,lang_kind_2):
     # def process_data lang_kind_2 = fra
 
     # lang_kind_1, lang_kind_2 문자를 받아 들여서 [../data/%s-%s1.txt] 문장을 완성시킴
-    df = read_file('../data/%s-%s1.txt' % (lang_kind_1, lang_kind_2), lang_kind_1, lang_kind_2)
+    df = read_file('../data/%s-%s22.txt' % (lang_kind_1, lang_kind_2), lang_kind_1, lang_kind_2)
 
-    # print('def process_data df =\n', df)
+    print('def process_data df =\n', df)
     # def process_data df =            '
     #          eng                         fra
     # 0  I made two.  J'en ai confectionné deux.
 
-    # print('def process_data len(df) =', len(df))
+    print('def process_data len(df) =', len(df))
     # def process_data len(df) = 1
 
     sentence1, sentence2 = read_sentence(df, lang_kind_1, lang_kind_2)
 
-    # print('def process_data sentence1 =', sentence1)
+    print('def process_data sentence1 =', sentence1)
     # def process_data sentence1 = 0    i made two.
     # Name: eng, dtype: object
 
-    # print('def process_data sentence2 =', sentence2)
+    print('def process_data sentence2 =', sentence2)
     # def process_data sentence2 = 0    j'en ai confectionne deux.
     # Name: fra, dtype: object
 
@@ -246,19 +246,21 @@ def process_data(lang_kind_1,lang_kind_2):
 
     pairs = []
 
-    # print('process_data len(df) =', len(df))
+    print('process_data len(df) =', len(df))
     # process_data len(df) = 1
 
     for i in range(len(df)):
 
         # MAX_LENGTH = 20
         # split( )을 사용하면 길이에 상관없이 공백을 모두 제거 분리하고, split(' ')을 사용하면 공백 한 개마다 분리하는 것
+
+        #  len(sentence1[i].split(' ')) 길이와 len(sentence2[i].split(' ')) 길이가 20보다 적으면 실행
         if len(sentence1[i].split(' ')) < MAX_LENGTH and len(sentence2[i].split(' ')) < MAX_LENGTH:
 
-            # print('process data sentence1[i] =', sentence1[i])
-            # print('process data sentence2[i] =', sentence2[i])
-            # print('process data len(sentence1[i].split(' ') =', len(sentence1[i].split(' ')))
-            # print('process data len(sentence2[i].split(' ') =', len(sentence2[i].split(' ')))
+            print('process data sentence1[i] =', sentence1[i])
+            print('process data sentence2[i] =', sentence2[i])
+            print('process data len(sentence1[i].split(' ') =', len(sentence1[i].split(' ')))
+            print('process data len(sentence2[i].split(' ') =', len(sentence2[i].split(' ')))
 
             # process data sentence1[i] = i made two.
             # process data sentence2[i] = j'en ai confectionne deux.
@@ -266,21 +268,26 @@ def process_data(lang_kind_1,lang_kind_2):
             # process data len(sentence2[i].split() = 4   공백으로 분리하면 4개 단어가 됨
 
             full = [sentence1[i], sentence2[i]]      # 첫번째와 두번째 열을 합쳐서 저장
-            input_lang.addSentence(sentence1[i])     # 입력으로 영어를 사용
-            output_lang.addSentence(sentence2[i])    # 출력으로 프랑스어를 사용
+
+            print('input_lang.addSentence(sentence1[i]) ')
+            input_lang.addSentence(sentence1[i])     # 입력으로 중복 제거된 영어 단어를 사용
+
+            print('output_lang.addSentence(sentence2[i]) ')
+            output_lang.addSentence(sentence2[i])    # 출력으로 중복 제거된 프랑스어 단어를 사용
             pairs.append(full)                       # pairs에는 입력과 출력이 합쳐진 것을 사용
 
             # print('input_lang  =', input_lang)
             # print('output_lang =', output_lang)
-            # print('pairs =', pairs)
+            print('pairs =', pairs)
 
             # input_lang  = <__main__.Lang object at 0x000002699DEF1340>
             # output_lang = <__main__.Lang object at 0x000002699DEF1370>
-            # pairs = [['i made two.', "j'en ai confectionne deux."]]
+            # pairs = [['i made two.', "j'en ai confectionne deux."], ['oh no!', 'oh non !'], ['attack!', 'attaque !'], ['attack!', 'attaquez !'], ['cheers!', 'sante !']]
 
     # print('=====process_data(lang_kind_1,lang_kind_2): end =========')
 
     return input_lang, output_lang, pairs
+
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #  step1) process_data end
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -308,7 +315,6 @@ def indexesFromSentence(lang, sentence):
 # 3. 텐서로 변환 : torch.tensor(indexes, dtype=torch.long, device=device).view(-1, 1)
 ########################################################################################################################
 
-
 # 1차는 input_lang과 'i made two.'를 사용
 # 2차는  output_lang과 "j'en ai confectionne deux."를 사용
 # input_lang  = <__main__.Lang object at 0x000002699DEF1340>
@@ -319,20 +325,23 @@ def tensorFromSentence(lang, sentence):
 
     # print('=====def tensorFromSentence(lang, sentence): start =========')
 
-    # print('1. tensorFromSentence sentence =',sentence)
-    # 1. indexesFromSentence sentence = i made two.
+    print('1. tensorFromSentence sentence =',sentence)
+    # 1. tensorFromSentence sentence = i made two.
+    # 1. tensorFromSentence sentence = j'en ai confectionne deux.
 
     indexes = indexesFromSentence(lang, sentence)
-    # print('2. tensorFromSentence indexes =',indexes)
+    print('2. tensorFromSentence indexes =',indexes)
     # 2. tensorFromSentence indexes = [2, 3, 4]
+    # 2. tensorFromSentence indexes = [2, 3, 4, 5]
 
     ###################################################
     # input index [2,3,4]에 EOS index [1]를 추가하여 크기가 4가 됨
     ###################################################
 
     indexes.append(EOS_token)
-    # print('3. tensorFromSentence indexes =',indexes)
+    print('3. tensorFromSentence indexes =',indexes)
     # 3. tensorFromSentence indexes = [2, 3, 4, 1]
+    # 3. tensorFromSentence indexes = [2, 3, 4, 5, 1]
 
     # print('=====def tensorFromSentence(lang, sentence): end =========')
 
@@ -356,13 +365,13 @@ def tensorsFromPair(input_lang, output_lang, pair):
     # print('=====tensorsFromPair(input_lang, output_lang, pair): start =========')
     #
     # print('1. tensorsFromPair input_lang = ', input_lang)
-    # print('1-1. input_lang tensorsFromPair pair[0] = ', pair[0])
+    print('1-1. input_lang tensorsFromPair pair[0] = ', pair[0])
 
     # 1. tensorsFromPair input_lang =  <__main__.Lang object at 0x000001A75D890E30>
     # 1-1. input_lang tensorsFromPair pair[0] =  i made two.
 
     input_tensor = tensorFromSentence(input_lang, pair[0])
-    # print('1-2. input_lang tensorsFromPair input_tensor = ', input_tensor)
+    print('1-2. input_lang tensorsFromPair input_tensor = ', input_tensor)
 
     # 1-2. input_lang tensorsFromPair input_tensor =
     # tensor([[2],
@@ -375,7 +384,7 @@ def tensorsFromPair(input_lang, output_lang, pair):
     # 2-1. input_lang  tensorsFromPair pair[1] =  j'en ai confectionne deux.
 
     target_tensor = tensorFromSentence(output_lang, pair[1])
-    # print('2-2. input_lang  tensorsFromPair target_tensor = ', target_tensor)
+    print('2-2. input_lang  tensorsFromPair target_tensor = ', target_tensor)
 
     # 2-2. input_lang  tensorsFromPair target_tensor =
     # tensor([[2],
@@ -858,6 +867,7 @@ def Model(Seq2Seq_model, input_tensor, target_tensor, model_optimizer, criterion
 
     # print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): model(input_tensor, target_tensor ) =========\n', Seq2Seq_model(input_tensor, target_tensor ))
 
+    # Seq2Seq_model 객체를 호출
     output = Seq2Seq_model(input_tensor, target_tensor)
     # Seq2Seq(
     #     (encoder): Encoder_Network(
@@ -875,7 +885,7 @@ def Model(Seq2Seq_model, input_tensor, target_tensor, model_optimizer, criterion
     # print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): output = model(input_tensor, target_tensor ) end =========')
 
     # print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): output = \n', output)
-    # output =
+    # output =  j'en ai confectionné deux.
     #  tensor([[[-1.7506, -1.8085, -1.7836, -1.8240, -1.7847, -1.8008]],
     #          [[-1.7385, -1.8067, -1.7858, -1.7889, -1.8095, -1.8234]],
     #          [[-1.7328, -1.8109, -1.7883, -1.7667, -1.8121, -1.8436]],
@@ -888,11 +898,11 @@ def Model(Seq2Seq_model, input_tensor, target_tensor, model_optimizer, criterion
     # num_iter =  5
 
     for ot in range(num_iter):
-        # 모델의 예측 결과와 정답(예상 결과)를 이용하여 오차를 계산
+        # 모델의 예측 결과와 정답을 이용하여 오차를 계산
         loss += criterion(output[ot], target_tensor[ot])
         # print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): output[ot] = \n', output[ot])
         # print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): target_tensor[ot] = \n', target_tensor[ot])
-        # print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): loss = \n', loss)
+        print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): loss = \n', loss)
 
     loss.backward()
     model_optimizer.step()
@@ -900,7 +910,7 @@ def Model(Seq2Seq_model, input_tensor, target_tensor, model_optimizer, criterion
 
     # print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion):epoch_loss = ', epoch_loss)
 
-    # epoch_loss = 0.736637020111084
+    # epoch_loss = 1.7271339416503906
 
     # print('=====def Model(model, input_tensor, target_tensor, model_optimizer, criterion): end =========')
 
@@ -946,7 +956,13 @@ def trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration=2000
 
     # random.choice : 지정된 sequence(리스트 등)에서 무작위로 추출하는 함수
 
+    #---------------------------------------------------------------------------
     # 입력과 출력 문장을 텐서로 변환하여 반환
+    #---------------------------------------------------------------------------
+    # 1. 딕셔너리에서 단어에 대한 인덱스를 가져옴 : indexesFromSentence(lang, sentence)
+    # 2. 문장 끝에 EOS 토큰을 추가 : indexes.append(EOS_token)   (input length 3 -> 4, output length 4 -> 5 로 변경)
+    # 3. 텐서로 변환 : torch.tensor(indexes, dtype=torch.long, device=device).view(-1, 1)
+
     training_pairs = [tensorsFromPair(input_lang, output_lang, random.choice(pairs))
         for i in range(num_iteration)]
 
@@ -963,14 +979,14 @@ def trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration=2000
 
     for iter in range(1, num_iteration + 1): # range의 결과는 시작숫자부터 종료숫자 바로 앞 숫자까지 컬렉션을 만듭니다.
 
-        print('=====trainModel(model, input_lang, output_lang, pairs, num_iteration=2000): for 문 시작 =========')
+        # print('=====trainModel(model, input_lang, output_lang, pairs, num_iteration=2000): for 문 시작 =========')
 
-        print('iter = ', iter)
+        # print('iter = ', iter)
 
         training_pair = training_pairs[iter - 1]
-        print('training_pairs = ', training_pairs)
-        print('training_pair = ', training_pair)
-        #
+        # print('training_pairs = ', training_pairs)
+        # print('training_pair = ', training_pair)
+        # #
         # training_pairs = [(tensor([[2],
         #                            [3],
         #                            [4],
@@ -990,17 +1006,21 @@ def trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration=2000
 
         input_tensor = training_pair[0]
         target_tensor = training_pair[1]
+        print('=====trainModel loss input_tensor = ',input_tensor)
+        print('=====trainModel loss target_tensor = ',target_tensor)
 
+        # ---------------------------------------------------------------------------
         # Model 객체를 이용하여 오차 계산
+        # ---------------------------------------------------------------------------
 
-        print('=====trainModel loss = Model(model, input_tensor, target_tensor, optimizer, criterion) start ')
+        # print('=====trainModel loss = Model(model, input_tensor, target_tensor, optimizer, criterion) start ')
 
         loss = Model(Seq2Seq_model, input_tensor, target_tensor, optimizer, criterion)
 
-        print('=====trainModel loss = Model(model, input_tensor, target_tensor, optimizer, criterion) end ')
+        # print('=====trainModel loss = Model(model, input_tensor, target_tensor, optimizer, criterion) end ')
 
-        print('=====trainModel(model, input_lang, output_lang, pairs, num_iteration=2000): for 문 loss = ', loss)
-        # loss = 1.7806238174438476
+        # print('=====trainModel(model, input_lang, output_lang, pairs, num_iteration=2000): for 문 loss = ', loss)
+        # loss = 1.7271339416503906
 
         total_loss_iterations += loss
 
@@ -1026,33 +1046,40 @@ lang_kind_1 = 'eng'  # 입력으로 사용할 영어
 lang_kind_2 = 'fra'  # 출력으로 사용할 프랑스어
 
 # 데이터셋 불러오기
+# 입력, 출력 단어를
 input_lang, output_lang, pairs = process_data(lang_kind_1, lang_kind_2)
 
 # print('input_lang {}' .format(input_lang))
 # print('output_lang {}' .format(output_lang))
-# print('pairs {}' .format(pairs))
+print('pairs {}' .format(pairs))
 
 # input_lang  = <__main__.Lang object at 0x00000234132C8EF0>
 # output_lang = <__main__.Lang object at 0x000002341359DE50>
 # pairs = [['i made two.', "j'en ai confectionne deux."]]
 
 randomize = pairs
-# print('random sentence {}'.format(randomize))
+print('random sentence {}'.format(randomize))
 # random sentence [['i made two.', "j'en ai confectionne deux."]]
 
 input_size = input_lang.n_words
 output_size = output_lang.n_words
 # 입력과 출력에 대한 단어 수 출력(공백은 계산에서 제외하고 SOS, EOS 2개 문자는 계산 포함)
-# print('Input : {} Output : {}'.format(input_size, output_size))
+print('# 입력과 출력에 대한 단어 수 출력(공백은 계산에서 제외하고 SOS, EOS 2개 문자는 계산 포함) ')
+
+print('Input : {} Output : {}'.format(input_size, output_size))
 
 # Input : 5 Output : 6
 # input size는 1)sos 2)eos 3)i 4)made 5)two. 로 해서 5임
 # output size는 1)sos 2)eos 3)j'en 4)ai 5)confectionne 6)deux. 로 해서 6임
 
+# random sentence [['i made two.', "j'en ai confectionne deux."], ['oh no!', 'oh non !'], ['attack!', 'attaque !'], ['attack!', 'attaquez !'], ['cheers!', 'sante !']]
+# 입력과 출력에 대한 단어 수 출력(공백은 계산에서 제외하고 SOS, EOS 2개 문자는 계산 포함)
+# Input : 9 Output : 12
+
 embed_size = 256
 hidden_size = 512
 num_layers = 1
-num_iteration = 1 # 30000 -> 3000
+num_iteration = 6 # 30000 -> 3000
 # num_iteration = 75000
 
 # 인코더에 훈련 데이터셋을 입력과 모든 출력과 은닉 상태를 저장 (선언만 한 상태)
@@ -1096,7 +1123,7 @@ decoder = Decoder_Network(output_size, hidden_size, embed_size, num_layers)
 #   (out): Linear(in_features=512, out_features=6, bias=True)
 #   (softmax): LogSoftmax(dim=1)
 
-# 인코드-디코더 모델(Seq2seq) 모델 생성
+# 인코드-디코더 모델(Seq2seq) 객체 생성
 
 # print('Seq2Seq_model = Seq2Seq(encoder, decoder, device).to(device) start')
 
@@ -1127,9 +1154,11 @@ print('###################################################################')
 # trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration) 형태로 호출해도 됨
 
 # model = trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration)
-XXX = trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration)
+trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration)
 
-# 객체의 이름은 임의로 지정해도 됨
+# XXX = trainModel(Seq2Seq_model, input_lang, output_lang, pairs, num_iteration)
+
+# 객체의 이름은 임의로 지정하거나 미지정해도 됨 (1동 101호, 2동 203호)
 # print('XXX =', XXX)
 
 print('###################################################################')
