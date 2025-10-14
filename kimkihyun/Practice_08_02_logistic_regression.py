@@ -50,6 +50,7 @@ print('list(df.columns) = ', list(df.columns))
 print('list(df.columns[:10]) =',list(df.columns[:10]))
 # list(df.columns[:10]) =
 # ['mean radius', 'mean texture', 'mean perimeter', 'mean area', 'mean smoothness',
+
 # 'mean compactness', 'mean concavity', 'mean concave points', 'mean symmetry',
 # 'mean fractal dimension']
 
@@ -105,7 +106,7 @@ print('x.shape, y.shape =',x.shape, y.shape)
 # 2. 학습 수행
 ################################################################################
 
-n_epochs = 10000000
+n_epochs = 100000000
 learning_rate = 1e-2
 print_interval = 100000
 
@@ -240,14 +241,17 @@ for i in range(n_epochs):
     if (i + 1) % print_interval == 0:
         now = datetime.datetime.now()
         nowDatetime = now.strftime('%Y-%m-%d %H:%M:%S')
-        print(nowDatetime,'Epoch %d: loss=%.4e' % (i + 1, loss))
+        formatted_value = format(i + 1, ",")
+        print(nowDatetime,'Epoch', formatted_value,'loss=%.6e',loss)
+        # print(nowDatetime,'Epoch %d: loss=%.6e' % (i + 1, loss))
+        # print(nowDatetime, 'Epoch', formatted_value, % (loss))
+
 # 2023-09-13 06:44:22 Epoch 27600000: loss=7.4783e-02
 # 2023-09-13 06:45:12 Epoch 27800000: loss=7.4780e-02
 # 2023-09-13 06:46:01 Epoch 28000000: loss=7.4777e-02
 # 2023-09-13 06:46:50 Epoch 28200000: loss=7.4774e-02
 # 2023-09-13 06:47:39 Epoch 28400000: loss=7.4774e-02
 # 2023-09-13 06:48:28 Epoch 28600000: loss=7.4774e-02
-
 
 # Let's see the result!
 # y와 y_hat을 비교하여 정확도 계산
